@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "io.github.mzdluo123.mirai.android"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 2
         versionName "1.1"
@@ -70,13 +70,15 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
+    implementation 'net.lingala.zip4j:zip4j:2.5.2'
+
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
 //    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 //
-//// https://mvnrepository.com/artifact/org.yaml/snakeyaml
-//    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
-//// https://mvnrepository.com/artifact/com.moandjiezana.toml/toml4j
-//    compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
+// https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+// https://mvnrepository.com/artifact/com.moandjiezana.toml/toml4j
+    compile group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
