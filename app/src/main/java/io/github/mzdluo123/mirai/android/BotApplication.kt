@@ -3,6 +3,7 @@ package io.github.mzdluo123.mirai.android
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
 import android.util.Log
 
@@ -10,9 +11,12 @@ class BotApplication : Application() {
     companion object{
         const val SERVICE_NOTIFICATION = "service"
         const val CAPTCHA_NOTIFICATION = "captcha"
+        lateinit var context:Context
+        private set
     }
     override fun onCreate() {
         super.onCreate()
+        context = this
         // 设置工作目录为内部存储
         Log.d("app", getExternalFilesDirs("external")[0].absolutePath)
 
