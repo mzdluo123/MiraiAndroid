@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_add_plugin"
-        android:icon="@drawable/ic_add_black_24dp"
+        android:icon="@drawable/ic_add_white_24dp"
         android:iconTint="#FFFFFF"
         android:title="添加插件"
         app:showAsAction="always" />

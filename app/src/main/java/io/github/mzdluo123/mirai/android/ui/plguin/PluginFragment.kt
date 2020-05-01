@@ -1,6 +1,7 @@
 package io.github.mzdluo123.mirai.android.ui.plguin
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -112,9 +113,16 @@ class PluginFragment : Fragment() {
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
+            val dialog = AlertDialog.Builder(activity)
+                .setTitle("正在编译")
+                .setMessage("这可能需要一些时间，请不要最小化")
+                .setCancelable(false)
+                .create()
+
             resultData?.data?.also { uri ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val name = uri.lastPathSegment?.split(":")?.get(1) ?: return@launch
+                    dialog.show()
+                    val name = uri.lastPathSegment?: return@launch
                     withContext(Dispatchers.IO) {
                         copyToFileDir(uri, name)
                     }
@@ -122,6 +130,9 @@ class PluginFragment : Fragment() {
                     withContext(Dispatchers.IO) {
                         File(activity!!.getExternalFilesDir(null), name).delete()
                     }
+                    dialog.dismiss()
+                    Toast.makeText(activity,"安装成功,重启后即可加载",Toast.LENGTH_SHORT).show()
+                    pluginViewModel.refreshPluginList()
                 }
 
             }

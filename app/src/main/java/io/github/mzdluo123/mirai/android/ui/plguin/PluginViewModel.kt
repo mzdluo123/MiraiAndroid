@@ -14,9 +14,7 @@ class PluginViewModel : ViewModel() {
     val pluginList = MutableLiveData<List<File>>()
 
     init {
-        viewModelScope.launch {
-            pluginList.postValue(loadPluginList())
-        }
+        refreshPluginList()
     }
 
     private fun loadPluginList(): List<File> {
@@ -32,6 +30,10 @@ class PluginViewModel : ViewModel() {
     fun deletePlugin(pos: Int) {
         val file = pluginList.value?.get(pos) ?: return
         file.delete()
+        refreshPluginList()
+    }
+
+    fun refreshPluginList() {
         viewModelScope.launch {
             pluginList.postValue(loadPluginList())
         }
