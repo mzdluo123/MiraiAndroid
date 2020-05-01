@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.*
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -61,12 +62,22 @@ class ConsoleFragment : Fragment() {
         super.onStart()
 
         commandSend_btn.setOnClickListener {
-            val command = command_input.text.toString()
+            var command = command_input.text.toString()
             lifecycleScope.launch(Dispatchers.Default) {
+                if (command.startsWith("/")) {
+                    command = command.substring(1)
+                }
                 conn.botService.runCommand(command)
             }
             command_input.text.clear()
         }
+        command_input.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(100)
+                main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+            }
+        }
+
         val bindIntent = Intent(activity, BotService::class.java)
         activity?.bindService(bindIntent, conn, 0)
 
@@ -93,7 +104,7 @@ class ConsoleFragment : Fragment() {
                 conn.botService.androidMiraiConsoleUI.logStorage.clear()
                 activity?.startService(intent)
             }
-            R.id.action_setAutoLogin->{
+            R.id.action_setAutoLogin -> {
                 setAutoLogin()
             }
 
@@ -101,23 +112,24 @@ class ConsoleFragment : Fragment() {
         return false
     }
 
-    private fun setAutoLogin(){
-        val alertView = View.inflate(activity,R.layout.alert_autologin,null)
+    private fun setAutoLogin() {
+        val alertView = View.inflate(activity, R.layout.alert_autologin, null)
         val pwdInput = alertView.findViewById<EditText>(R.id.password_input)
         val qqInput = alertView.findViewById<EditText>(R.id.qq_input)
-        val accountStore = activity!!.getSharedPreferences("account",Context.MODE_PRIVATE)
+        val accountStore = activity!!.getSharedPreferences("account", Context.MODE_PRIVATE)
         val dialog = AlertDialog.Builder(activity)
             .setView(alertView)
             .setCancelable(true)
             .setTitle("设置自动登录")
             .setPositiveButton("设置自动登录", DialogInterface.OnClickListener { dialog, which ->
-                accountStore.edit().putString("qq",qqInput.text.toString()).putString("pwd",pwdInput.text.toString()).apply()
-                Toast.makeText(activity,"设置成功,重启后生效",Toast.LENGTH_SHORT).show()
+                accountStore.edit().putString("qq", qqInput.text.toString())
+                    .putString("pwd", pwdInput.text.toString()).apply()
+                Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
             })
 
             .setNegativeButton("取消自动登录", DialogInterface.OnClickListener { dialog, which ->
-                accountStore.edit().putString("qq","").putString("pwd","").apply()
-                Toast.makeText(activity,"设置成功,重启后生效",Toast.LENGTH_SHORT).show()
+                accountStore.edit().putString("qq", "").putString("pwd", "").apply()
+                Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
             })
             .setNeutralButton("取消", DialogInterface.OnClickListener { dialog, which ->
                 dialog.dismiss()
