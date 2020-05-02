@@ -2,9 +2,13 @@ package io.github.mzdluo123.mirai.android.ui.plguin
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
@@ -19,7 +23,6 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -123,8 +126,10 @@ class PluginFragment : Fragment() {
 
             resultData?.data?.also { uri ->
                 viewLifecycleOwner.lifecycleScope.launch {
+                    val path = getRealFilePath(activity!!, uri)
+                    Log.e("PATH", path.toString())
+                    val name = path?.split("/")?.last() ?: uri.lastPathSegment ?: return@launch
                     dialog.show()
-                    val name = uri.lastPathSegment?.replace(":","") ?: return@launch
                     withContext(Dispatchers.IO) {
                         copyToFileDir(uri, name)
                     }
@@ -154,6 +159,33 @@ class PluginFragment : Fragment() {
             }
         }
         output.close()
+    }
+
+    private fun getRealFilePath(context: Context, uri: Uri?): String? {
+        if (null == uri) return null
+        val scheme: String? = uri.scheme
+        var data: String? = null
+        if (ContentResolver.SCHEME_FILE == scheme) {
+            data = uri.getPath()
+        } else if (ContentResolver.SCHEME_CONTENT == scheme) {
+            val cursor: Cursor? = context.getContentResolver().query(
+                uri,
+                arrayOf(MediaStore.Images.ImageColumns.DATA),
+                null,
+                null,
+                null
+            )
+            if (null != cursor) {
+                if (cursor.moveToFirst()) {
+                    val index: Int = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA)
+                    if (index > -1) {
+                        data = cursor.getString(index)
+                    }
+                }
+                cursor.close()
+            }
+        }
+        return data
     }
 
 }

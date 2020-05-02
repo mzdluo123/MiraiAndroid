@@ -27,9 +27,9 @@ public class DexCompiler {
         String outName = jarFile.getName().substring(0, jarFile.getName().length() - 4) +
                 "-android.jar";
         File outFile = new File(tempDir, outName).getAbsoluteFile();
-        if (!outFile.exists()) {
-            outFile.createNewFile();
-        }
+//        if (!outFile.exists()) {
+//            outFile.createNewFile();
+//        }
         Log.e("输出路径", outFile.getAbsolutePath());
         D8Command command = D8Command.builder()
                 .addProgramFiles(jarFile.getAbsoluteFile().toPath())
