@@ -41,8 +41,8 @@ class PluginViewModel : ViewModel() {
 
     suspend fun compilePlugin(file: File) {
         val workDir = BotApplication.context.getExternalFilesDir(null) ?: return
-        val tempDir = File(workDir, "temp")
-        val compiler = DexCompiler(workDir)
+        val tempDir = BotApplication.context.cacheDir
+        val compiler = DexCompiler(workDir, tempDir)
         withContext(Dispatchers.IO) {
             if (tempDir.exists()) {
                 deleteDir(tempDir)

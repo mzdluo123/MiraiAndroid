@@ -55,7 +55,7 @@ class BotService : Service() {
         if (action == START_SERVICE && !isStart) {
             MiraiConsole.start(
                 androidMiraiConsoleUI,
-                path = getExternalFilesDirs(null)[0].absolutePath)
+                path = getExternalFilesDir(null).toString())
             isStart = true
             createNotification()
             val qq = accountStore.getString("qq","")
@@ -65,9 +65,8 @@ class BotService : Service() {
             }
         }
         if (action == STOP_SERVICE) {
-            stopSelf()
             MiraiConsole.stop()
-            Log.d("Service", "停止")
+            stopSelf()
             stopForeground(true)
             System.exit(0)
         }

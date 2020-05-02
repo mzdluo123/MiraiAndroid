@@ -1,5 +1,7 @@
 package io.github.mzdluo123.mirai.android.utils;
 
+import android.util.Log;
+
 import com.android.tools.r8.CompilationFailedException;
 import com.android.tools.r8.D8;
 import com.android.tools.r8.D8Command;
@@ -16,8 +18,8 @@ import java.util.ArrayList;
 public class DexCompiler {
     private File tempDir, pluginDir;
 
-    public DexCompiler(File fileDir) {
-        tempDir = new File(fileDir.getAbsolutePath(), "temp");
+    public DexCompiler(File fileDir, File cache) {
+        tempDir = cache;
         pluginDir = new File(fileDir.getAbsolutePath(), "plugins");
     }
 
@@ -28,11 +30,18 @@ public class DexCompiler {
         if (!outFile.exists()) {
             outFile.createNewFile();
         }
-
+        Log.e("输出路径", outFile.getAbsolutePath());
         D8Command command = D8Command.builder()
                 .addProgramFiles(jarFile.getAbsoluteFile().toPath())
                 .setOutput(outFile.toPath(), OutputMode.DexIndexed)
+                .setDisableDesugaring(true)
+                .setMinApiLevel(26)
                 .build();
+//        String[] cmd = new String[3];
+//        cmd[0] = "--output";
+//        cmd[1] = outFile.getAbsolutePath();
+//        cmd[2] = jarFile.getAbsolutePath();
+//        D8Command command = D8Command.parse(cmd, Origin.root()).build();
         D8.run(command);
         return outFile;
     }
@@ -55,6 +64,7 @@ public class DexCompiler {
             }
         }
         newZip.addFiles(resources);
+        newZip.addFolder(new File(tempDir, "META-INF"));
         newFile.renameTo(new File(pluginDir, newFile.getName()));
     }
 }

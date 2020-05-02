@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -18,6 +19,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.fragment_gallery.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -122,7 +124,7 @@ class PluginFragment : Fragment() {
             resultData?.data?.also { uri ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     dialog.show()
-                    val name = uri.lastPathSegment?: return@launch
+                    val name = uri.lastPathSegment?.replace(":","") ?: return@launch
                     withContext(Dispatchers.IO) {
                         copyToFileDir(uri, name)
                     }
@@ -131,7 +133,7 @@ class PluginFragment : Fragment() {
                         File(activity!!.getExternalFilesDir(null), name).delete()
                     }
                     dialog.dismiss()
-                    Toast.makeText(activity,"安装成功,重启后即可加载",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT).show()
                     pluginViewModel.refreshPluginList()
                 }
 
