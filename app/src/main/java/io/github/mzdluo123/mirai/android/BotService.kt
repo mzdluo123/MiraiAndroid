@@ -1,12 +1,12 @@
 package io.github.mzdluo123.mirai.android
 
+import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.IBinder
-import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.CommandManager
 import net.mamoe.mirai.console.command.ConsoleCommandSender
@@ -18,10 +18,16 @@ class BotService : Service() {
     private val binder = BotBinder()
     private var isStart = false
 
+// 多进程调试辅助
+//  init {
+//        Debug.waitForDebugger()
+//    }
+
     companion object {
         const val START_SERVICE = 0
         const val STOP_SERVICE = 1
         const val NOTIFICATION_ID = 1
+        const val TAG = "BOT_SERVICE"
     }
 
     private fun createNotification() {
@@ -51,23 +57,24 @@ class BotService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.getIntExtra("action", START_SERVICE)
-        val accountStore = this.getSharedPreferences("account",Context.MODE_PRIVATE)
         if (action == START_SERVICE && !isStart) {
             MiraiConsole.start(
                 androidMiraiConsoleUI,
-                path = getExternalFilesDir(null).toString())
+                path = getExternalFilesDir(null).toString()
+            )
             isStart = true
             createNotification()
-            val qq = accountStore.getString("qq","")
-            val pwd = accountStore.getString("pwd","")
-            if (qq != ""){
-                CommandManager.runCommand(ConsoleCommandSender,"login $qq $pwd")
+            val qq = intent.getStringExtra("qq")
+            val pwd = intent.getStringExtra("pwd")
+            if (qq != null) {
+                CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
             }
+
         }
         if (action == STOP_SERVICE) {
             MiraiConsole.stop()
-            stopSelf()
             stopForeground(true)
+            stopSelf()
             System.exit(0)
         }
         return super.onStartCommand(intent, flags, startId)
@@ -79,17 +86,41 @@ class BotService : Service() {
         androidMiraiConsoleUI = AndroidMiraiConsoleUI(baseContext)
     }
 
-    fun runCommand(command: String) {
-
-        CommandManager.runCommand(ConsoleCommandSender, command)
-
-    }
-
-    inner class BotBinder : Binder() {
-        fun getService(): BotService {
-            return this@BotService
+    inner class BotBinder : IbotAidlInterface.Stub() {
+        override fun runCmd(cmd: String?) {
+            if (cmd != null) {
+                CommandManager.runCommand(ConsoleCommandSender, cmd)
+            }
         }
 
+        override fun getLog(): Array<String> {
+            //防止
+            // ClassCastException: java.lang.Object[] cannot be cast to java.lang.String[]
+            // 不知道有没有更好的写法
+            return androidMiraiConsoleUI.logStorage.toArray(
+                arrayOfNulls<String>(
+                    androidMiraiConsoleUI.logStorage.size
+                )
+            )
+        }
+
+        override fun submitCaptcha(captcha: String?) {
+            if (captcha != null) {
+                androidMiraiConsoleUI.loginSolver.captcha.complete(captcha)
+            }
+        }
+
+        override fun clearLog() {
+            androidMiraiConsoleUI.logStorage.clear()
+        }
+
+        override fun getCaptcha(): ByteArray {
+            return androidMiraiConsoleUI.loginSolver.captchaData
+        }
+
+        override fun sendLog(log: String?) {
+            androidMiraiConsoleUI.logStorage.add(log)
+        }
     }
 
 }

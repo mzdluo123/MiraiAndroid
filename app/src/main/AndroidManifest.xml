@@ -21,8 +21,8 @@
             android:name=".BotService"
             android:enabled="true"
             android:exported="false"
+            android:process=":BotProcess"
             android:description="@string/service_description"/>
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

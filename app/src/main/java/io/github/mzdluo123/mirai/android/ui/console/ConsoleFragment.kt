@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
@@ -22,17 +23,15 @@ class ConsoleFragment : Fragment() {
     private lateinit var consoleViewModel: ConsoleViewModel
 
     private val conn = object : ServiceConnection {
-        lateinit var botService: BotService
+        lateinit var botService: IbotAidlInterface
 
         override fun onServiceDisconnected(name: ComponentName?) {}
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            botService = (service as BotService.BotBinder).getService()
+            botService = IbotAidlInterface.Stub.asInterface(service)
             viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
                 while (isActive) {
-                    val text =
-                        botService.androidMiraiConsoleUI.logStorage
-                            .joinToString(separator = "\n")
+                    val text = botService.log.joinToString(separator = "\n")
                     if (isActive) {
                         withContext(Dispatchers.Main) {
                             log_text?.text = text
@@ -67,7 +66,7 @@ class ConsoleFragment : Fragment() {
                 if (command.startsWith("/")) {
                     command = command.substring(1)
                 }
-                conn.botService.runCommand(command)
+                conn.botService.runCmd(command)
             }
             command_input.text.clear()
         }
@@ -79,15 +78,11 @@ class ConsoleFragment : Fragment() {
         }
 
         val bindIntent = Intent(activity, BotService::class.java)
-        activity?.bindService(bindIntent, conn, 0)
-
-        val intent = Intent(activity, BotService::class.java)
-        intent.putExtra("action", BotService.START_SERVICE)
-        activity?.startService(intent)
+        activity?.bindService(bindIntent, conn, Context.BIND_AUTO_CREATE)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroy() {
+        super.onDestroy()
         activity?.unbindService(conn)
     }
 
@@ -101,8 +96,9 @@ class ConsoleFragment : Fragment() {
             R.id.action_exit -> {
                 val intent = Intent(activity, BotService::class.java)
                 intent.putExtra("action", BotService.STOP_SERVICE)
-                conn.botService.androidMiraiConsoleUI.logStorage.clear()
+//                conn.botService.clearLog()
                 activity?.startService(intent)
+                activity?.finish()
             }
             R.id.action_setAutoLogin -> {
                 setAutoLogin()

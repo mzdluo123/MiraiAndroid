@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.Debug
 import android.os.Process
 import java.io.BufferedReader
 import java.io.File
