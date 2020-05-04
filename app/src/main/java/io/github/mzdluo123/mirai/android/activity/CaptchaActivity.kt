@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.activity
 
 import android.content.ComponentName
 import android.content.Context
@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.IbotAidlInterface
+import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.activity_captcha.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +26,10 @@ class CaptchaActivity : AppCompatActivity() {
         override fun onServiceDisconnected(name: ComponentName?) {}
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            botService = IbotAidlInterface.Stub.asInterface(service)
+            botService =
+                IbotAidlInterface.Stub.asInterface(
+                    service
+                )
             val data = botService.captcha
             lifecycleScope.launch(Dispatchers.Main) {
                 val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)

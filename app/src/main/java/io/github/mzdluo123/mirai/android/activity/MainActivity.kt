@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.activity
 
 import android.content.Context
 import android.content.Intent
@@ -12,6 +12,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.R
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,14 +32,18 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_console, R.id.nav_plugins, R.id.nav_slideshow
+                R.id.nav_console,
+                R.id.nav_plugins,
+                R.id.nav_slideshow
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         val intent = Intent(this, BotService::class.java)
-        intent.putExtra("action", BotService.START_SERVICE)
+        intent.putExtra("action",
+            BotService.START_SERVICE
+        )
         val account = getSharedPreferences("account", Context.MODE_PRIVATE)
         val qq = account.getString("qq", null)
         val pwd = account.getString("pwd", null)

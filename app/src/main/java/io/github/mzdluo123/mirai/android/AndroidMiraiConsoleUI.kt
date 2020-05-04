@@ -1,12 +1,12 @@
 package io.github.mzdluo123.mirai.android
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import kotlinx.coroutines.CompletableDeferred
 import net.mamoe.mirai.Bot
