@@ -22,7 +22,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:scrollbars="vertical"
-            android:text="TextView"
+            android:text="正在加载..."
             android:textIsSelectable="false" />
 
     </ScrollView>

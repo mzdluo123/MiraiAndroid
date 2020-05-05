@@ -9,20 +9,12 @@
         android:id="@+id/nav_console"
         android:name="io.github.mzdluo123.mirai.android.ui.console.ConsoleFragment"
         android:label="控制台"
-        tools:layout="@layout/fragment_home">
-
-        <action
-            android:id="@+id/action_HomeFragment_to_HomeSecondFragment"
-            app:destination="@id/nav_home_second" />
-    </fragment>
+        tools:layout="@layout/fragment_home"/>
     <fragment
         android:id="@+id/nav_home_second"
         android:name="io.github.mzdluo123.mirai.android.ui.console.HomeSecondFragment"
         android:label="@string/home_second"
         tools:layout="@layout/fragment_home_second">
-        <action
-            android:id="@+id/action_HomeSecondFragment_to_HomeFragment"
-            app:destination="@id/nav_console" />
 
         <argument
             android:name="myArg"
@@ -40,4 +32,9 @@
         android:name="io.github.mzdluo123.mirai.android.ui.script.ScriptFragment"
         android:label="脚本"
         tools:layout="@layout/fragment_script" />
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="io.github.mzdluo123.mirai.android.ui.about.AboutFragment"
+        android:label="关于"
+        tools:layout="@layout/fragment_about" />
 </navigation>
