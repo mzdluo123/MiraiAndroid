@@ -1,27 +1,31 @@
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
 package io.github.mzdluo123.mirai.android
 
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
-import net.mamoe.mirai.utils.DeviceInfo
+import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
+import net.mamoe.mirai.console.utils.checkManager
+import net.mamoe.mirai.event.subscribeMessages
+import net.mamoe.mirai.utils.SimpleLogger
 import java.text.SimpleDateFormat
 
 
-class BotService : Service(),CommandOwner {
+class BotService : Service(), CommandOwner {
     lateinit var androidMiraiConsoleUI: AndroidMiraiConsoleUI
         private set
     private val binder = BotBinder()
     private var isStart = false
-    private var startTime:Long = 0
+    private var startTime: Long = 0
 
 // 多进程调试辅助
 //  init {
@@ -70,7 +74,7 @@ class BotService : Service(),CommandOwner {
             )
             isStart = true
             createNotification()
-            CommandManager.register(this,object :Command{
+            CommandManager.register(this, object : Command {
                 override val alias: List<String>
                     get() = listOf()
                 override val description: String
@@ -81,22 +85,67 @@ class BotService : Service(),CommandOwner {
                     get() = "/android"
 
                 override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
-                    sender.sendMessage("""MiraiAndroid v${packageManager.getPackageInfo(packageName,0).versionName}
+                    sender.sendMessage(
+                        """MiraiAndroid v${packageManager.getPackageInfo(
+                            packageName,
+                            0
+                        ).versionName}
 MiraiCore v${BuildConfig.COREVERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
 网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
 启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     return true
                 }
 
             })
 
-            val qq = intent.getStringExtra("qq")
+            val qq = intent.getLongExtra("qq", 0)
             val pwd = intent.getStringExtra("pwd")
-            if (qq != null) {
-                CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
+            if (qq != 0L) {
+                //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
+                androidMiraiConsoleUI.pushLog(0L, "开始自动登录....")
+                try {
+                    val bot = Bot(qq, pwd.chunkedHexToBytes()) {
+                        fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
+                        this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
+                        this.botLoggerSupplier = {
+                            SimpleLogger("[BOT $qq]") { _, message, e ->
+                                androidMiraiConsoleUI.pushLog(0L, "[INFO] $message")
+                                if (e != null) {
+                                    androidMiraiConsoleUI.pushLog(0L, "[BOT ERROR $qq] $e")
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                        this.networkLoggerSupplier = {
+                            SimpleLogger("BOT $qq") { _, message, e ->
+                                androidMiraiConsoleUI.pushLog(0L, "[NETWORK] $message")
+                                if (e != null) {
+                                    androidMiraiConsoleUI.pushLog(0L, "[NETWORK ERROR] $e")
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    }
+                    GlobalScope.launch { bot.login() }
+                    bot.subscribeMessages {
+                        startsWith("/") { message ->
+                            if (bot.checkManager(this.sender.id)) {
+                                val sender = ContactCommandSender(this.subject)
+                                CommandManager.runCommand(
+                                    sender, message
+                                )
+                            }
+                        }
+                    }
+                    GlobalScope.launch { sendMessage("$qq login successes") }
+                    MiraiConsole.frontEnd.pushBot(bot)
+                } catch (e: Exception) {
+                    androidMiraiConsoleUI.pushLog(0L, "[ERROR] 自动登录失败 $e")
+                }
             }
         }
         if (action == STOP_SERVICE) {
@@ -150,5 +199,9 @@ MiraiCore v${BuildConfig.COREVERSION}
             androidMiraiConsoleUI.logStorage.add(log)
         }
     }
+
+    private fun String.chunkedHexToBytes(): ByteArray =
+        this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
+            .toList().toByteArray()
 
 }

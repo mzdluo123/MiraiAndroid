@@ -16,6 +16,7 @@ import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
+import java.security.MessageDigest
 
 
 class ConsoleFragment : Fragment() {
@@ -110,13 +111,13 @@ class ConsoleFragment : Fragment() {
             .setCancelable(true)
             .setTitle("设置自动登录")
             .setPositiveButton("设置自动登录", DialogInterface.OnClickListener { dialog, which ->
-                accountStore.edit().putString("qq", qqInput.text.toString())
-                    .putString("pwd", pwdInput.text.toString()).apply()
+                accountStore.edit().putLong("qq", qqInput.text.toString().toLong())
+                    .putString("pwd", md5(pwdInput.text.toString())).apply()
                 Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
             })
 
             .setNegativeButton("取消自动登录", DialogInterface.OnClickListener { dialog, which ->
-                accountStore.edit().putString("qq", "").putString("pwd", "").apply()
+                accountStore.edit().putLong("qq", 0L).putString("pwd", "").apply()
                 Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
             })
             .setNeutralButton("取消", DialogInterface.OnClickListener { dialog, which ->
@@ -139,6 +140,32 @@ class ConsoleFragment : Fragment() {
             }
         }
 
+    }
+
+    fun md5(str: String): String {
+        val digest = MessageDigest.getInstance("MD5")
+        val result = digest.digest(str.toByteArray())
+        //没转16进制之前是16位
+        println("result${result.size}")
+        //转成16进制后是32字节
+        return toHex(result)
+    }
+
+    private fun toHex(byteArray: ByteArray): String {
+        val result = with(StringBuilder()) {
+            byteArray.forEach {
+                val hex = it.toInt() and (0xFF)
+                val hexStr = Integer.toHexString(hex)
+                if (hexStr.length == 1) {
+                    this.append("0").append(hexStr)
+                } else {
+                    this.append(hexStr)
+                }
+            }
+            this.toString()
+        }
+        //转成16进制后是32字节
+        return result
     }
 }
 

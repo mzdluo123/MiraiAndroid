@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="因接口限制，我们只能明文存储你的密码，请注意设备安全" />
+        android:text="我们存储密码的md5值，请注意设备安全" />
 
     <EditText
         android:id="@+id/qq_input"

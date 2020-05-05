@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
             BotService.START_SERVICE
         )
         val account = getSharedPreferences("account", Context.MODE_PRIVATE)
-        val qq = account.getString("qq", null)
+        val qq = account.getLong("qq", 0)
         val pwd = account.getString("pwd", null)
         intent.putExtra("qq", qq)
         intent.putExtra("pwd", pwd)
