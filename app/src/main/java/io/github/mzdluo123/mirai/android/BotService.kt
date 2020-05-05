@@ -3,20 +3,24 @@ package io.github.mzdluo123.mirai.android
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.command.CommandManager
-import net.mamoe.mirai.console.command.ConsoleCommandSender
+import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.utils.DeviceInfo
+import java.text.SimpleDateFormat
 
 
-class BotService : Service() {
+class BotService : Service(),CommandOwner {
     lateinit var androidMiraiConsoleUI: AndroidMiraiConsoleUI
         private set
     private val binder = BotBinder()
     private var isStart = false
+    private var startTime:Long = 0
 
 // 多进程调试辅助
 //  init {
@@ -58,18 +62,40 @@ class BotService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.getIntExtra("action", START_SERVICE)
         if (action == START_SERVICE && !isStart) {
+            startTime = System.currentTimeMillis()
             MiraiConsole.start(
                 androidMiraiConsoleUI,
                 path = getExternalFilesDir(null).toString()
             )
             isStart = true
             createNotification()
+            CommandManager.register(this,object :Command{
+                override val alias: List<String>
+                    get() = listOf()
+                override val description: String
+                    get() = "MiraiAndroid运行状态"
+                override val name: String
+                    get() = "android"
+                override val usage: String
+                    get() = "/android"
+
+                override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
+                    sender.sendMessage("""MiraiAndroid v${packageManager.getPackageInfo(packageName,0).versionName}
+系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
+内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
+网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
+启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}
+                    """.trimIndent())
+                    return true
+                }
+
+            })
+
             val qq = intent.getStringExtra("qq")
             val pwd = intent.getStringExtra("pwd")
             if (qq != null) {
                 CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
             }
-
         }
         if (action == STOP_SERVICE) {
             MiraiConsole.stop()

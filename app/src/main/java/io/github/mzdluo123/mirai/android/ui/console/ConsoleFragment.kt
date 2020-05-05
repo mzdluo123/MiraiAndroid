@@ -29,18 +29,7 @@ class ConsoleFragment : Fragment() {
 
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             botService = IbotAidlInterface.Stub.asInterface(service)
-            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-                while (isActive) {
-                    val text = botService.log.joinToString(separator = "\n")
-                    if (isActive) {
-                        withContext(Dispatchers.Main) {
-                            log_text?.text = text
-//                            main_scroll.scrollTo(0, log_text.bottom)
-                        }
-                    }
-                    delay(200)
-                }
-            }
+            startRefreshLoop()
         }
     }
 
@@ -59,7 +48,6 @@ class ConsoleFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-
         commandSend_btn.setOnClickListener {
             var command = command_input.text.toString()
             lifecycleScope.launch(Dispatchers.Default) {
@@ -76,15 +64,19 @@ class ConsoleFragment : Fragment() {
                 main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
             }
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         val bindIntent = Intent(activity, BotService::class.java)
         activity?.bindService(bindIntent, conn, Context.BIND_AUTO_CREATE)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         activity?.unbindService(conn)
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main, menu)
@@ -131,6 +123,22 @@ class ConsoleFragment : Fragment() {
                 dialog.dismiss()
             })
         dialog.show()
+    }
+
+    private fun startRefreshLoop() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            while (isActive) {
+                val text = conn.botService.log.joinToString(separator = "\n")
+                if (isActive) {
+                    withContext(Dispatchers.Main) {
+                        log_text?.text = text
+//                            main_scroll.scrollTo(0, log_text.bottom)
+                    }
+                }
+                delay(200)
+            }
+        }
+
     }
 }
 

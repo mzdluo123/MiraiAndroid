@@ -41,7 +41,6 @@ class AndroidMiraiConsoleUI(context: Context) : MiraiConsoleUI {
     override fun pushLog(identity: Long, message: String) {
         logStorage.add(message)
         Log.d(TAG, message)
-
     }
 
     override fun pushLog(
