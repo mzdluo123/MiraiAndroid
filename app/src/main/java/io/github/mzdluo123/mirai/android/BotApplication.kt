@@ -3,9 +3,8 @@ package io.github.mzdluo123.mirai.android
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Debug
 import android.os.Process
 import java.io.BufferedReader
 import java.io.File
@@ -15,9 +14,10 @@ class BotApplication : Application() {
     companion object {
         const val SERVICE_NOTIFICATION = "service"
         const val CAPTCHA_NOTIFICATION = "captcha"
-        lateinit var context: Context
+        lateinit var context: BotApplication
             private set
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -64,4 +64,5 @@ class BotApplication : Application() {
             null
         }
     }
+
 }

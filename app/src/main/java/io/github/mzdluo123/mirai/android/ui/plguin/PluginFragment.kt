@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.activity.PluginImportActivity
-import kotlinx.android.synthetic.main.fragment_gallery.*
+import kotlinx.android.synthetic.main.fragment_plugin.*
 import java.io.File
 
 
@@ -34,7 +33,7 @@ class PluginFragment : Fragment() {
     ): View? {
         pluginViewModel =
             ViewModelProvider(this).get(PluginViewModel::class.java)
-        val root = inflater.inflate(R.layout.fragment_gallery, container, false)
+        val root = inflater.inflate(R.layout.fragment_plugin, container, false)
         setHasOptionsMenu(true)
         adapter = PluginsAdapter()
 

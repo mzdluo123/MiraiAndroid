@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.utils.DeviceInfo
@@ -81,6 +82,7 @@ class BotService : Service(),CommandOwner {
 
                 override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
                     sender.sendMessage("""MiraiAndroid v${packageManager.getPackageInfo(packageName,0).versionName}
+MiraiCore v${BuildConfig.COREVERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
 网络 ${DeviceStatus.getCurrentNetType(applicationContext)}

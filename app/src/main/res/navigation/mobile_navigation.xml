@@ -25,12 +25,12 @@
         android:id="@+id/nav_plugins"
         android:name="io.github.mzdluo123.mirai.android.ui.plguin.PluginFragment"
         android:label="插件管理"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_plugin" />
 
     <fragment
         android:id="@+id/nav_scripts"
         android:name="io.github.mzdluo123.mirai.android.ui.script.ScriptFragment"
-        android:label="脚本"
+        android:label="脚本管理"
         tools:layout="@layout/fragment_script" />
     <fragment
         android:id="@+id/nav_about"
