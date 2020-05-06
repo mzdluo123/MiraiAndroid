@@ -2,11 +2,17 @@
 
 package io.github.mzdluo123.mirai.android
 
+import android.Manifest
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.ooooonly.luaMirai.lua.MiraiGlobals
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,6 +23,7 @@ import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
 import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
+import java.io.PrintStream
 import java.text.SimpleDateFormat
 
 
@@ -74,6 +81,7 @@ class BotService : Service(), CommandOwner {
             )
             isStart = true
             createNotification()
+
             CommandManager.register(this, object : Command {
                 override val alias: List<String>
                     get() = listOf()
@@ -85,6 +93,7 @@ class BotService : Service(), CommandOwner {
                     get() = "/android"
 
                 override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
+
                     sender.sendMessage(
                         """MiraiAndroid v${packageManager.getPackageInfo(
                             packageName,
@@ -97,6 +106,38 @@ MiraiCore v${BuildConfig.COREVERSION}
 启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}
                     """.trimIndent()
                     )
+                    return true
+                }
+
+            })
+            CommandManager.register(this, object : Command {
+                override val alias: List<String>
+                    get() = listOf()
+                override val description: String
+                    get() = "执行lua脚本"
+                override val name: String
+                    get() = "loadlua"
+                override val usage: String
+                    get() = "/loadlua"
+
+                override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
+                    System.setOut(
+                        object : PrintStream(System.out) {
+                            override fun write(buf: ByteArray, off: Int, len: Int) {
+                                val message = String(buf, off, len);
+                                GlobalScope.launch {
+                                    sender.sendMessage(message)
+                                }
+                            }
+
+                        }
+                    )
+                    sender.sendMessage("准备载入脚本：${args[0]}")
+                    GlobalScope.launch {
+                        val globals = MiraiGlobals()
+                        val chunk = globals.loadfile(args[0])
+                        chunk.call()
+                    }
                     return true
                 }
 
@@ -162,6 +203,7 @@ MiraiCore v${BuildConfig.COREVERSION}
         super.onCreate()
         androidMiraiConsoleUI = AndroidMiraiConsoleUI(baseContext)
     }
+
 
     inner class BotBinder : IbotAidlInterface.Stub() {
         override fun runCmd(cmd: String?) {
