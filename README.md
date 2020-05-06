@@ -15,11 +15,52 @@
 * 兼容mirai-console插件(实验性)
 * 带验证码的登录处理
 * 内置Google d8 dex编译器，可直接编译JVM的console插件在Android运行(实验性)
+* lua脚本接口（测试版）
 
 # 计划功能
 
 * 带设备锁需要验证的登录处理
-* lua脚本接口
+
+# 安装脚本
+
+目前MiraiAndroid已支持lua脚本，感谢[lua-mirai](https://github.com/only52607/lua-mirai)项目
+
+以下是一个简单的示例
+
+```lua
+Event.onLoad = function (bot)
+        print("载入bot",bot:getId(),"成功")
+        bot:subscribeGroupMsg(
+            function(bot, msg, group, sender)
+
+                if tostring(msg):find("夸我") then
+                    group:sendMsg( net.get("https://chp.shadiao.app/api.php"))
+                end
+
+                if tostring(msg):find("骂我") then
+                    group:sendMsg(net.get("https://nmsl.shadiao.app/api.php?level=min&lang=zh_cn"))
+                end
+
+                if tostring(msg):find("复读") then
+                    group:sendMsg(msg)
+                end
+            end
+        )
+    end
+
+
+Event.onFinish = 
+    function ()
+        print("脚本被卸载！")
+    end
+```
+
+这个脚本实现了最简单的回复和网络请求功能，更多功能请看[lua-mirai](https://github.com/only52607/lua-mirai)项目介绍
+
+你可以在脚本管理界面点击右上角直接添加脚本到MiraiAndroid
+
+目前该功能仍在开发中
+
 
 # 安装插件
 
