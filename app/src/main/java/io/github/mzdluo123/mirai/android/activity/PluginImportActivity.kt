@@ -23,6 +23,7 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileReader
 import java.io.IOException
+import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 
 
 class PluginImportActivity : AppCompatActivity() {
@@ -90,20 +91,6 @@ class PluginImportActivity : AppCompatActivity() {
     }
 
 
-    @Throws(IOException::class)
-    private fun copyToFileDir(uri: Uri, name: String, path: String) {
-        val plugin = File(path, name)
-        plugin.createNewFile()
-        val output = plugin.outputStream()
-        this.contentResolver?.openInputStream(uri)?.use {
-            val buf = ByteArray(1024)
-            var bytesRead: Int
-            while (it.read(buf).also { bytesRead = it } > 0) {
-                output.write(buf, 0, bytesRead)
-            }
-        }
-        output.close()
-    }
 
 
     private suspend fun loadPluginData() {
@@ -120,7 +107,7 @@ class PluginImportActivity : AppCompatActivity() {
             }
             return
         }
-        copyToFileDir(uri, realFileName, cacheDir.absolutePath)
+        baseContext.copyToFileDir(uri, realFileName, cacheDir.absolutePath)
         val cacheFile = File(cacheDir.absolutePath, realFileName)
         val zipFile = ZipFile(cacheFile)
         zipFile.extractFile("plugin.yml", cacheDir.absolutePath)

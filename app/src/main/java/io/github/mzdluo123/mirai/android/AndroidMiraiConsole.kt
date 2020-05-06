@@ -3,20 +3,27 @@ package io.github.mzdluo123.mirai.android
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
+import io.github.mzdluo123.mirai.android.script.ScriptManager
+import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
+import java.io.File
 
-class AndroidMiraiConsoleUI(context: Context) : MiraiConsoleUI {
-    val logStorage = LoopQueue<String>(200)
+class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
+    val logStorage = LoopQueue<String>(300)
     val loginSolver = AndroidLoginSolver(context)
+    private val scriptDir = context.getExternalFilesDir("scripts")!!
+    private val scriptManager: ScriptManager = ScriptManager(File(scriptDir, "data"), scriptDir)
 
     companion object {
         val TAG = AndroidLoginSolver::class.java.name
@@ -31,7 +38,9 @@ class AndroidMiraiConsoleUI(context: Context) : MiraiConsoleUI {
     }
 
     override fun pushBot(bot: Bot) {
-        return
+        bot.launch {
+            scriptManager.enable(bot)
+        }
     }
 
     override fun pushBotAdminStatus(identity: Long, admins: List<Long>) {
@@ -54,12 +63,26 @@ class AndroidMiraiConsoleUI(context: Context) : MiraiConsoleUI {
     }
 
     override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
-        logStorage.add("正在启动")
-        Log.d(TAG, "正在启动")
+        val applicationContext = BotApplication.context
+        logStorage.add(
+            """MiraiAndroid v${applicationContext.packageManager.getPackageInfo(
+                applicationContext.packageName,
+                0
+            ).versionName}
+MiraiCore v${BuildConfig.COREVERSION}
+系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
+内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
+网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
+                    """.trimIndent()
+        )
     }
 
     override suspend fun requestInput(hint: String): String {
         return ""
+    }
+
+    fun stop() {
+        scriptManager.disable()
     }
 
 }
@@ -95,7 +118,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 .setContentTitle("本次登录需要验证码")
                 .setContentText("点击这里输入验证码")
         NotificationManagerCompat.from(context).apply {
-            notify(CAPTCHA_NOTIFICATION_ID,builder.build())
+            notify(CAPTCHA_NOTIFICATION_ID, builder.build())
         }
         return captcha.await()
     }
