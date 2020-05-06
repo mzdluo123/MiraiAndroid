@@ -166,6 +166,30 @@ MiraiCore v${BuildConfig.COREVERSION}
                 return true
             }
         })
+
+        CommandManager.register(this, object : Command {
+            override val alias: List<String>
+                get() = listOf()
+            override val description: String
+                get() = "查看已加载的脚本"
+            override val name: String
+                get() = "script"
+            override val usage: String
+                get() = "script"
+
+            override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
+                sender.sendMessage(buildString {
+                    append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
+                    androidMiraiConsole.scriptManager.scriptHosts.forEach {
+                        append(it.file.name)
+                        append("\n")
+                    }
+                })
+                return true
+            }
+
+
+        })
     }
 
 

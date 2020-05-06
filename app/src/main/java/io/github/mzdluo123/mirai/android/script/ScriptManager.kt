@@ -7,7 +7,7 @@ import java.lang.Exception
 
 class ScriptManager(private val dataDir: File, private val scriptDir: File) {
     private val scripts: Array<File>? = scriptDir.listFiles()
-    private val scriptHosts = mutableListOf<BaseScriptHost>()
+    val scriptHosts = mutableListOf<BaseScriptHost>()
 
     init {
         if (!dataDir.exists()) {
