@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -41,6 +42,24 @@ class ScriptFragment : Fragment() {
             adapter.data = it.toMutableList()
             adapter.notifyDataSetChanged()
         })
+        adapter.setOnItemClickListener { _, view, position ->
+            val menu = PopupMenu(activity, view)
+            menu.gravity = Gravity.END
+            menu.menuInflater.inflate(R.menu.plugin_manage, menu.menu)
+            menu.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_delete -> {
+                        scriptViewModel.deleteScript(position)
+                        Toast.makeText(activity, "删除成功，重启后生效", Toast.LENGTH_SHORT).show()
+                        return@setOnMenuItemClickListener true
+                    }
+
+                    else -> return@setOnMenuItemClickListener true
+                }
+            }
+            menu.show()
+        }
+
 
         return root
     }

@@ -23,7 +23,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     val logStorage = LoopQueue<String>(300)
     val loginSolver = AndroidLoginSolver(context)
     private val scriptDir = context.getExternalFilesDir("scripts")!!
-    private val scriptManager: ScriptManager = ScriptManager(File(scriptDir, "data"), scriptDir)
+    private val scriptManager: ScriptManager by lazy {
+        ScriptManager(File(scriptDir, "data"), scriptDir)
+    }
 
     companion object {
         val TAG = AndroidLoginSolver::class.java.name
