@@ -9,17 +9,12 @@
 
 更多信息请加QQ群`655057127`了解
 
-
 # 已实现的功能
 
 * 兼容mirai-console插件(实验性)
 * 带验证码的登录处理
 * 内置Google d8 dex编译器，可直接编译JVM的console插件在Android运行(实验性)
 * lua脚本接口（测试版）
-
-# 计划功能
-
-* 带设备锁需要验证的登录处理
 
 # 安装脚本
 
@@ -96,3 +91,13 @@ d8.bat --output 输出文件.jar 源文件
 将上一步的新的jar文件复制到手机的`/sdcard/Android/data/io.github.mzdluo123.mirai.android/files/plugins/`
 
 重启即可使用插件，当然部分插件可能也会存在兼容性问题
+
+
+# Console插件兼容不完全列表
+
+以下插件由群友测试未发现问题，你可以到群内下载
+
+* mirai-api-http
+* HsoSe
+* keywordReply
+* forward
