@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.R
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,6 +55,14 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra("qq", qq)
         intent.putExtra("pwd", pwd)
         startService(intent)
+        stopService_btn.setOnClickListener {
+            val stopIntent = Intent(this, BotService::class.java)
+            stopIntent.putExtra("action",
+                BotService.STOP_SERVICE
+            )
+            startService(stopIntent)
+            finish()
+        }
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {

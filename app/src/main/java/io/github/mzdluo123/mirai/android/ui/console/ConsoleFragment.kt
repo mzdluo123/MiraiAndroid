@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.DeadObjectException
 import android.os.IBinder
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -18,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.utils.paste
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
@@ -89,17 +91,43 @@ class ConsoleFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         when (item.itemId) {
-            R.id.action_exit -> {
-                val intent = Intent(activity, BotService::class.java)
-                intent.putExtra("action", BotService.STOP_SERVICE)
-//                conn.botService.clearLog()
-                activity?.startService(intent)
-                activity?.finish()
-            }
+//            R.id.action_exit -> {
+//                val intent = Intent(activity, BotService::class.java)
+//                intent.putExtra("action", BotService.STOP_SERVICE)
+////                conn.botService.clearLog()
+//                activity?.startService(intent)
+//                activity?.finish()
+//            }
             R.id.action_setAutoLogin -> {
                 setAutoLogin()
             }
+            R.id.action_report -> {
+                lifecycleScope.launch {
+                    val log = conn.botService.log.joinToString(separator = "\n")
+                    val alertDialog = AlertDialog.Builder(activity)
+                        .setTitle("正在上传日志")
+                        .setMessage("请稍后")
+                        .setCancelable(false)
+                        .create()
+                    alertDialog.show()
+                    val errorHandle = CoroutineExceptionHandler { coroutineContext, throwable ->
+                            alertDialog.dismiss()
+                            Toast.makeText(activity, "日志上传失败", Toast.LENGTH_SHORT).show()
+                    }
+                    val url = async(errorHandle) { paste(log) }
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "text/plain"
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "MiraiAndroid日志分享")
+                    intent.putExtra(Intent.EXTRA_TEXT, url.await())
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    withContext(Dispatchers.Main) {
+                        alertDialog.dismiss()
+                        startActivity(Intent.createChooser(intent, "分享到"));
+                    }
 
+                }
+
+            }
         }
         return false
     }
@@ -142,15 +170,19 @@ class ConsoleFragment : Fragment() {
 
     private fun startRefreshLoop() {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            while (isActive) {
-                val text = conn.botService.log.joinToString(separator = "\n")
-                if (isActive) {
-                    withContext(Dispatchers.Main) {
-                        log_text?.text = text
+            try {
+                while (isActive) {
+                    val text = conn.botService.log.joinToString(separator = "\n")
+                    if (isActive) {
+                        withContext(Dispatchers.Main) {
+                            log_text?.text = text
 //                            main_scroll.scrollTo(0, log_text.bottom)
+                        }
                     }
+                    delay(200)
                 }
-                delay(200)
+            }catch (e:DeadObjectException){
+                return@launch
             }
         }
 
