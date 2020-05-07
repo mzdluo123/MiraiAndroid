@@ -182,12 +182,10 @@ MiraiCore v${BuildConfig.COREVERSION}
             override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
                 sender.sendMessage(buildString {
                     append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
-                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n")
+                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n") { it.file.name }
                 })
                 return true
             }
-
-
         })
     }
 
