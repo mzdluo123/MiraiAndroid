@@ -1,7 +1,10 @@
 package io.github.mzdluo123.mirai.android.ui.console
 
 import android.app.AlertDialog
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
@@ -9,7 +12,7 @@ import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -41,7 +44,7 @@ class ConsoleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         consoleViewModel =
-            ViewModelProviders.of(this).get(ConsoleViewModel::class.java)
+            ViewModelProvider(this).get(ConsoleViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         setHasOptionsMenu(true)
         return root
@@ -110,19 +113,19 @@ class ConsoleFragment : Fragment() {
             .setView(alertView)
             .setCancelable(true)
             .setTitle("设置自动登录")
-            .setPositiveButton("设置自动登录", DialogInterface.OnClickListener { dialog, which ->
+            .setPositiveButton("设置自动登录") { _, _ ->
                 accountStore.edit().putLong("qq", qqInput.text.toString().toLong())
                     .putString("pwd", md5(pwdInput.text.toString())).apply()
                 Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
-            })
+            }
 
-            .setNegativeButton("取消自动登录", DialogInterface.OnClickListener { dialog, which ->
+            .setNegativeButton("取消自动登录") { _, _ ->
                 accountStore.edit().putLong("qq", 0L).putString("pwd", "").apply()
                 Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
-            })
-            .setNeutralButton("取消", DialogInterface.OnClickListener { dialog, which ->
+            }
+            .setNeutralButton("取消") { dialog, _ ->
                 dialog.dismiss()
-            })
+            }
         dialog.show()
     }
 
@@ -142,7 +145,7 @@ class ConsoleFragment : Fragment() {
 
     }
 
-    fun md5(str: String): String {
+    private fun md5(str: String): String {
         val digest = MessageDigest.getInstance("MD5")
         val result = digest.digest(str.toByteArray())
         //没转16进制之前是16位
@@ -152,20 +155,19 @@ class ConsoleFragment : Fragment() {
     }
 
     private fun toHex(byteArray: ByteArray): String {
-        val result = with(StringBuilder()) {
+        //转成16进制后是32字节
+        return with(StringBuilder()) {
             byteArray.forEach {
                 val hex = it.toInt() and (0xFF)
                 val hexStr = Integer.toHexString(hex)
                 if (hexStr.length == 1) {
-                    this.append("0").append(hexStr)
+                    append("0").append(hexStr)
                 } else {
-                    this.append(hexStr)
+                    append(hexStr)
                 }
             }
-            this.toString()
+            toString()
         }
-        //转成16进制后是32字节
-        return result
     }
 }
 

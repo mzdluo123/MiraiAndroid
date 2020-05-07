@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
@@ -99,7 +100,10 @@ class BotService : Service(), CommandOwner {
         if (qq != 0L) {
             //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
             androidMiraiConsole.pushLog(0L, "开始自动登录....")
-            try {
+            val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
+            }
+
                 val bot = Bot(qq, pwd.chunkedHexToBytes()) {
                     fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
                     this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
@@ -122,7 +126,7 @@ class BotService : Service(), CommandOwner {
                         }
                     }
                 }
-                GlobalScope.launch { bot.login() }
+                GlobalScope.launch(handler) { bot.login() }
                 bot.subscribeMessages {
                     startsWith("/") { message ->
                         if (bot.checkManager(this.sender.id)) {
@@ -133,11 +137,9 @@ class BotService : Service(), CommandOwner {
                         }
                     }
                 }
-                GlobalScope.launch { sendMessage("$qq login successes") }
+                GlobalScope.launch(handler) { sendMessage("$qq login successes") }
                 MiraiConsole.frontEnd.pushBot(bot)
-            } catch (e: Exception) {
-                androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $e")
-            }
+
         }
     }
 

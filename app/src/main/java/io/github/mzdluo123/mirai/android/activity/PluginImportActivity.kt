@@ -13,6 +13,7 @@ import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.databinding.ActivityPluginImportBinding
 import io.github.mzdluo123.mirai.android.ui.plguin.PluginViewModel
 import io.github.mzdluo123.mirai.android.utils.FileUtils
+import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,8 +23,6 @@ import net.mamoe.mirai.console.plugins.PluginDescription
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileReader
-import java.io.IOException
-import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 
 
 class PluginImportActivity : AppCompatActivity() {
