@@ -32,17 +32,32 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="请输入命令"
+        android:imeOptions="actionSend"
+        android:singleLine="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/commandSend_btn"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toEndOf="@+id/shortcutBottom_btn">
 
     </EditText>
 
-    <Button
+    <ImageButton
         android:id="@+id/commandSend_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:text="发送"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_keyboard_return_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/command_input" />
+
+    <ImageButton
+        android:id="@+id/shortcutBottom_btn"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/command_input">
+
+    </ImageButton>
 </androidx.constraintlayout.widget.ConstraintLayout>

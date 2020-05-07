@@ -104,41 +104,41 @@ class BotService : Service(), CommandOwner {
                 androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
             }
 
-                val bot = Bot(qq, pwd.chunkedHexToBytes()) {
-                    fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
-                    this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
-                    this.botLoggerSupplier = {
-                        SimpleLogger("[BOT $qq]") { _, message, e ->
-                            androidMiraiConsole.pushLog(0L, "[INFO] $message")
-                            if (e != null) {
-                                androidMiraiConsole.pushLog(0L, "[BOT ERROR $qq] $e")
-                                e.printStackTrace()
-                            }
-                        }
-                    }
-                    this.networkLoggerSupplier = {
-                        SimpleLogger("BOT $qq") { _, message, e ->
-                            androidMiraiConsole.pushLog(0L, "[NETWORK] $message")
-                            if (e != null) {
-                                androidMiraiConsole.pushLog(0L, "[NETWORK ERROR] $e")
-                                e.printStackTrace()
-                            }
+            val bot = Bot(qq, pwd!!.chunkedHexToBytes()) {
+                fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
+                this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
+                this.botLoggerSupplier = {
+                    SimpleLogger("[BOT $qq]") { _, message, e ->
+                        androidMiraiConsole.pushLog(0L, "[INFO] $message")
+                        if (e != null) {
+                            androidMiraiConsole.pushLog(0L, "[BOT ERROR $qq] $e")
+                            e.printStackTrace()
                         }
                     }
                 }
-                GlobalScope.launch(handler) { bot.login() }
-                bot.subscribeMessages {
-                    startsWith("/") { message ->
-                        if (bot.checkManager(this.sender.id)) {
-                            val sender = ContactCommandSender(this.subject)
-                            CommandManager.runCommand(
-                                sender, message
-                            )
+                this.networkLoggerSupplier = {
+                    SimpleLogger("BOT $qq") { _, message, e ->
+                        androidMiraiConsole.pushLog(0L, "[NETWORK] $message")
+                        if (e != null) {
+                            androidMiraiConsole.pushLog(0L, "[NETWORK ERROR] $e")
+                            e.printStackTrace()
                         }
                     }
                 }
-                GlobalScope.launch(handler) { sendMessage("$qq login successes") }
-                MiraiConsole.frontEnd.pushBot(bot)
+            }
+            GlobalScope.launch(handler) { bot.login() }
+            bot.subscribeMessages {
+                startsWith("/") { message ->
+                    if (bot.checkManager(this.sender.id)) {
+                        val sender = ContactCommandSender(this.subject)
+                        CommandManager.runCommand(
+                            sender, message
+                        )
+                    }
+                }
+            }
+            GlobalScope.launch(handler) { sendMessage("$qq login successes") }
+            MiraiConsole.frontEnd.pushBot(bot)
 
         }
     }
@@ -182,10 +182,7 @@ MiraiCore v${BuildConfig.COREVERSION}
             override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
                 sender.sendMessage(buildString {
                     append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
-                    androidMiraiConsole.scriptManager.scriptHosts.forEach {
-                        append(it.file.name)
-                        append("\n")
-                    }
+                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n")
                 })
                 return true
             }

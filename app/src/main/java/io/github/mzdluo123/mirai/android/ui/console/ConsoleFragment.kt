@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
@@ -53,20 +54,19 @@ class ConsoleFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         commandSend_btn.setOnClickListener {
-            var command = command_input.text.toString()
-            lifecycleScope.launch(Dispatchers.Default) {
-                if (command.startsWith("/")) {
-                    command = command.substring(1)
-                }
-                conn.botService.runCmd(command)
-            }
-            command_input.text.clear()
+            submitCmd()
         }
-        command_input.setOnClickListener {
+        shortcutBottom_btn.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(100)
                 main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
             }
+        }
+        command_input.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                submitCmd()
+            }
+            return@setOnEditorActionListener false
         }
     }
 
@@ -102,6 +102,17 @@ class ConsoleFragment : Fragment() {
 
         }
         return false
+    }
+
+    private fun submitCmd() {
+        var command = command_input.text.toString()
+        lifecycleScope.launch(Dispatchers.Default) {
+            if (command.startsWith("/")) {
+                command = command.substring(1)
+            }
+            conn.botService.runCmd(command)
+        }
+        command_input.text.clear()
     }
 
     private fun setAutoLogin() {
