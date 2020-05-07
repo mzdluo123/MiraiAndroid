@@ -1,11 +1,9 @@
 package io.github.mzdluo123.mirai.android.utils;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -34,7 +32,9 @@ public final class FileUtils {
                 }
                 cursor.close();
             }
-            return path;
+            if (path != null) {
+                return path;
+            }
         }
         // 4.4及之后的 是以 content:// 开头的，比如 content://com.android.providers.media.documents/document/image%3A235700
         if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {

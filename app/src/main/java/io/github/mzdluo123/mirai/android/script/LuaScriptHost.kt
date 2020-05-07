@@ -18,14 +18,13 @@ class LuaScriptHost(file: File, dataFolder: File) : BaseScriptHost(file, dataFol
 
     override fun load(bot: Bot) {
         MiraiConsole.frontEnd.pushLog(0L, "[Lua] 正在加载lua脚本 ${file.name}")
-        bot.launch {
-            globals.loadfile(file.absolutePath).call()
-            globals.onLoad(bot)
-        }
+        globals.loadfile(file.absolutePath).call()
+        globals.onLoad(bot)
     }
 
     override fun disable() {
         globals.onFinish()
+        globals.unSubsribeAll()
     }
 
 }

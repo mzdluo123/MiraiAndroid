@@ -109,13 +109,16 @@ class ScriptFragment : Fragment() {
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
             data?.data?.also { uri ->
-                val name = uri.lastPathSegment?.replace(":","-")
+
+                val realPath = FileUtils.getFilePathByUri(context, uri)
+                val name = realPath?.split("/")?.last()
+
                 if (name?.split(".")?.last() ?: "" != "lua") {
                     Toast.makeText(context, "非法文件", Toast.LENGTH_LONG).show()
                     return
                 }
                 context?.copyToFileDir(
-                    uri,
+                     uri,
                     name!!,
                     context!!.getExternalFilesDir("scripts")!!.absolutePath
                 )

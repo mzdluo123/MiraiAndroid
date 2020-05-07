@@ -1,10 +1,5 @@
 package io.github.mzdluo123.mirai.android.ui.plguin
 
-import android.content.ContentResolver
-import android.content.Context
-import android.database.Cursor
-import android.net.Uri
-import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,7 +40,7 @@ class PluginViewModel : ViewModel() {
         }
     }
 
-    suspend fun compilePlugin(file: File) {
+    suspend fun compilePlugin(file: File, desugaring: Boolean) {
         val workDir = BotApplication.context.getExternalFilesDir(null) ?: return
         val tempDir = BotApplication.context.cacheDir
         val compiler = DexCompiler(workDir, tempDir)
@@ -56,7 +51,7 @@ class PluginViewModel : ViewModel() {
             tempDir.mkdir()
         }
         withContext(Dispatchers.Default) {
-            val out = compiler.compile(file)
+            val out = compiler.compile(file,desugaring)
             compiler.copyResourcesAndMove(file, out)
         }
     }

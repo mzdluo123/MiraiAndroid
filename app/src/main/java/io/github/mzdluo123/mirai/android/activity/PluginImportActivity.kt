@@ -14,6 +14,7 @@ import io.github.mzdluo123.mirai.android.databinding.ActivityPluginImportBinding
 import io.github.mzdluo123.mirai.android.ui.plguin.PluginViewModel
 import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
+import kotlinx.android.synthetic.main.activity_plugin_import.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,15 +36,22 @@ class PluginImportActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_plugin_import)
 //        uri = Uri.parse(intent.getStringExtra("uri"))
-        uri = intent.data ?: return
+        try {
+            uri = intent.data ?: return
 
-        pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
-        activityPluginImportBinding =
-            DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)
-        lifecycleScope.launch(Dispatchers.IO) { loadPluginData() }
-        activityPluginImportBinding.importBtn.setOnClickListener {
-            startImport()
+            pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
+            activityPluginImportBinding =
+                DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)
+            lifecycleScope.launch(Dispatchers.IO) { loadPluginData() }
+            activityPluginImportBinding.importBtn.setOnClickListener {
+                startImport()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "无法打开这个文件，请检查这是不是一个合法的插件jar文件", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
+
     }
 
     private fun createDialog() {
@@ -56,7 +64,7 @@ class PluginImportActivity : AppCompatActivity() {
 
     private fun startImport() {
         createDialog()
-        val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             lifecycleScope.launch(Dispatchers.Main) {
                 dialog.dismiss()
                 Toast.makeText(
@@ -66,30 +74,52 @@ class PluginImportActivity : AppCompatActivity() {
                 ).show()
             }
         }
-        lifecycleScope.launch(exceptionHandler) {
-            val path = FileUtils.getFilePathByUri(this@PluginImportActivity, uri)
-            Log.e("PATH", path.toString())
-            val name = path?.split("/")?.last() ?: uri.lastPathSegment ?: return@launch
-            dialog.show()
-            withContext(Dispatchers.IO) {
-                copyToFileDir(
-                    uri,
-                    name,
-                    this@PluginImportActivity.getExternalFilesDir(null)!!.absolutePath
-                )
+
+        val path = FileUtils.getFilePathByUri(this@PluginImportActivity, uri)
+        Log.e("PATH", path.toString())
+        val name = path?.split("/")?.last() ?: uri.lastPathSegment ?: return
+        dialog.show()
+        when (import_radioGroup.checkedRadioButtonId) {
+            R.id.compile_radioButton -> {
+                lifecycleScope.launch(exceptionHandler) {
+                    withContext(Dispatchers.IO) {
+                        copyToFileDir(
+                            uri,
+                            name,
+                            this@PluginImportActivity.getExternalFilesDir(null)!!.absolutePath
+                        )
+                    }
+                    pluginViewModel.compilePlugin(
+                        File(baseContext.getExternalFilesDir(null), name),
+                        desugaring_checkBox.isChecked
+                    )
+                    withContext(Dispatchers.IO) {
+                        File(this@PluginImportActivity.getExternalFilesDir(null), name).delete()
+                    }
+                    dialog.dismiss()
+                    Toast.makeText(this@PluginImportActivity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT)
+                        .show()
+                    finish()
+                }
             }
-            pluginViewModel.compilePlugin(File(baseContext.getExternalFilesDir(null), name))
-            withContext(Dispatchers.IO) {
-                File(this@PluginImportActivity.getExternalFilesDir(null), name).delete()
+            R.id.copy_radioButton -> {
+                lifecycleScope.launch(exceptionHandler) {
+                    withContext(Dispatchers.IO) {
+                        copyToFileDir(
+                            uri,
+                            name,
+                            this@PluginImportActivity.getExternalFilesDir("plugins")!!.absolutePath
+                        )
+                    }
+                    dialog.dismiss()
+                    Toast.makeText(this@PluginImportActivity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT)
+                        .show()
+                    finish()
+                }
             }
-            dialog.dismiss()
-            Toast.makeText(this@PluginImportActivity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT).show()
-            finish()
         }
 
     }
-
-
 
 
     private suspend fun loadPluginData() {

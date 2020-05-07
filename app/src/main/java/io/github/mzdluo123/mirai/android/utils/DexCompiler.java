@@ -20,10 +20,13 @@ public class DexCompiler {
 
     public DexCompiler(File fileDir, File cache) {
         tempDir = cache;
+        if (!tempDir.exists()){
+            tempDir.mkdir();
+        }
         pluginDir = new File(fileDir.getAbsolutePath(), "plugins");
     }
 
-    public File compile(File jarFile) throws CompilationFailedException, IOException {
+    public File compile(File jarFile, Boolean desugaring) throws CompilationFailedException, IOException {
         String outName = jarFile.getName().substring(0, jarFile.getName().length() - 4) +
                 "-android.jar";
         File outFile = new File(tempDir, outName).getAbsoluteFile();
@@ -31,18 +34,21 @@ public class DexCompiler {
 //            outFile.createNewFile();
 //        }
         Log.e("输出路径", outFile.getAbsolutePath());
-        D8Command command = D8Command.builder()
+        D8Command.Builder command = D8Command.builder()
                 .addProgramFiles(jarFile.getAbsoluteFile().toPath())
                 .setOutput(outFile.toPath(), OutputMode.DexIndexed)
-                .setDisableDesugaring(true)
-                .setMinApiLevel(26)
-                .build();
+                .setMinApiLevel(26);
+
+        if (!desugaring) {
+            command.setDisableDesugaring(true);
+        }
+
 //        String[] cmd = new String[3];
 //        cmd[0] = "--output";
 //        cmd[1] = outFile.getAbsolutePath();
 //        cmd[2] = jarFile.getAbsolutePath();
 //        D8Command command = D8Command.parse(cmd, Origin.root()).build();
-        D8.run(command);
+        D8.run(command.build());
         return outFile;
     }
 

@@ -3,7 +3,6 @@ package io.github.mzdluo123.mirai.android.script
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
-import java.lang.Exception
 
 class ScriptManager(private val dataDir: File, private val scriptDir: File) {
     private val scripts: Array<File>? = scriptDir.listFiles()
@@ -28,8 +27,8 @@ class ScriptManager(private val dataDir: File, private val scriptDir: File) {
                     "lua" -> scriptHosts.add(LuaScriptHost(it, dataFolder))
                     // TODO 其他脚本支持
                 }
-            }catch (e:Exception){
-                MiraiConsole.frontEnd.pushLog(0L,"[ERROR] 无法加载脚本 $e")
+            } catch (e: Exception) {
+                MiraiConsole.frontEnd.pushLog(0L, "[ERROR] 加载脚本时出现内部错误 $e")
             }
 
         }
@@ -37,11 +36,16 @@ class ScriptManager(private val dataDir: File, private val scriptDir: File) {
 
     fun enable(bot: Bot) {
         scriptHosts.forEach {
-            it.load(bot)
+            try {
+                it.load(bot)
+            } catch (e: Exception) {
+                MiraiConsole.frontEnd.pushLog(0L, "[ERROR] 无法加载脚本 $e")
+                scriptHosts.remove(it)
+            }
         }
     }
 
-    fun disable(){
+    fun disable() {
         scriptHosts.forEach {
             it.disable()
         }
