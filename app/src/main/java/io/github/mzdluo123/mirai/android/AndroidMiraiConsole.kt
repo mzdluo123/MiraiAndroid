@@ -15,6 +15,10 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
+import net.mamoe.mirai.event.Listener
+import net.mamoe.mirai.event.events.BotOfflineEvent
+import net.mamoe.mirai.event.events.BotReloginEvent
+import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
@@ -43,6 +47,30 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         bot.launch {
             scriptManager.enable(bot)
         }
+
+        bot.subscribeAlways<BotOfflineEvent.Dropped>(priority = Listener.EventPriority.HIGHEST) {
+            pushLog(0L, "[INFO] 发送离线通知....")
+            val builder =
+                NotificationCompat.Builder(BotApplication.context, BotApplication.OFFLINE_NOTIFICATION)
+                    .setAutoCancel(false)
+                    //禁止滑动删除
+                    .setOngoing(true)
+                    //右上角的时间显示
+                    .setShowWhen(true)
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.drawable.ic_info_black_24dp)
+                    .setContentTitle("Mirai离线")
+                    .setContentText("请检查网络环境")
+            NotificationManagerCompat.from(BotApplication.context).apply {
+                notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+            }
+        }
+
+        bot.subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
+            pushLog(0L, "[INFO] 发送上线通知....")
+            NotificationManagerCompat.from(BotApplication.context).cancel(BotService.OFFLINE_NOTIFICATION_ID)
+        }
+
     }
 
     override fun pushBotAdminStatus(identity: Long, admins: List<Long>) {

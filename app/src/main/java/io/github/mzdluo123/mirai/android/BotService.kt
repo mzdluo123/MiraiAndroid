@@ -7,8 +7,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import io.github.mzdluo123.mirai.android.BotApplication.Companion.context
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
@@ -18,11 +16,6 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
 import net.mamoe.mirai.console.utils.checkManager
-import net.mamoe.mirai.event.Listener.EventPriority
-import net.mamoe.mirai.event.events.BotOfflineEvent
-import net.mamoe.mirai.event.events.BotOnlineEvent
-import net.mamoe.mirai.event.events.BotReloginEvent
-import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
 import java.text.SimpleDateFormat
@@ -144,29 +137,6 @@ class BotService : Service(), CommandOwner {
                         )
                     }
                 }
-            }
-
-            bot.subscribeAlways<BotOfflineEvent.Dropped>(priority = EventPriority.HIGHEST) {
-                androidMiraiConsole.pushLog(0L, "[INFO] 离线Event....")
-                val builder =
-                    NotificationCompat.Builder(context, BotApplication.OFFLINE_NOTIFICATION)
-                        .setAutoCancel(false)
-                        //禁止滑动删除
-                        .setOngoing(true)
-                        //右上角的时间显示
-                        .setShowWhen(true)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.ic_info_black_24dp)
-                        .setContentTitle("Mirai离线")
-                        .setContentText("请检查网络环境")
-                NotificationManagerCompat.from(context).apply {
-                    notify(OFFLINE_NOTIFICATION_ID, builder.build())
-                }
-            }
-
-            bot.subscribeAlways<BotReloginEvent>(priority = EventPriority.HIGHEST) {
-                androidMiraiConsole.pushLog(0L, "[INFO] 上线Event....")
-                NotificationManagerCompat.from(context).cancel(OFFLINE_NOTIFICATION_ID)
             }
 
             GlobalScope.launch(handler) { sendMessage("$qq login successes") }
