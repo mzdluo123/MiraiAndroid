@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import io.github.mzdluo123.mirai.android.BotApplication.Companion.context
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
@@ -16,9 +18,15 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
 import net.mamoe.mirai.console.utils.checkManager
+import net.mamoe.mirai.event.Listener.EventPriority
+import net.mamoe.mirai.event.events.BotOfflineEvent
+import net.mamoe.mirai.event.events.BotOnlineEvent
+import net.mamoe.mirai.event.events.BotReloginEvent
+import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
 import java.text.SimpleDateFormat
+import kotlin.system.exitProcess
 
 
 class BotService : Service(), CommandOwner {
@@ -37,12 +45,13 @@ class BotService : Service(), CommandOwner {
         const val START_SERVICE = 0
         const val STOP_SERVICE = 1
         const val NOTIFICATION_ID = 1
+        const val OFFLINE_NOTIFICATION_ID = 3
         const val TAG = "BOT_SERVICE"
     }
 
     private fun createNotification() {
         //使用兼容版本
-        val builder = NotificationCompat.Builder(this, BotApplication.SERVICE_NOTIFICATION)
+        val notification = NotificationCompat.Builder(this, BotApplication.SERVICE_NOTIFICATION)
             //设置状态栏的通知图标
             .setSmallIcon(R.drawable.ic_extension_black_24dp)
             //禁止用户点击删除按钮删除
@@ -52,11 +61,11 @@ class BotService : Service(), CommandOwner {
             //右上角的时间显示
             .setShowWhen(true)
             .setContentTitle("MiraiAndroid正在运行")
-            .setContentText("请将软件添加到系统后台运行白名单确保能及时处理消息")
+            .setContentText("请将软件添加到系统后台运行白名单确保能及时处理消息").build()
 
         //创建通知
         //设置为前台服务
-        startForeground(NOTIFICATION_ID, builder.build())
+        startForeground(NOTIFICATION_ID, notification)
     }
 
 
@@ -77,13 +86,12 @@ class BotService : Service(), CommandOwner {
             createNotification()
             registerDefaultCommand()
             autoLogin(intent)
-        }
-        if (action == STOP_SERVICE) {
+        } else if (action == STOP_SERVICE) {
             androidMiraiConsole.stop()
             MiraiConsole.stop()
             stopForeground(true)
             stopSelf()
-            System.exit(0)
+            exitProcess(0)
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -99,7 +107,7 @@ class BotService : Service(), CommandOwner {
         val pwd = intent.getStringExtra("pwd")
         if (qq != 0L) {
             //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
-            androidMiraiConsole.pushLog(0L, "开始自动登录....")
+            androidMiraiConsole.pushLog(0L, "[INFO] 自动登录....")
             val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
                 androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
             }
@@ -137,9 +145,32 @@ class BotService : Service(), CommandOwner {
                     }
                 }
             }
+
+            bot.subscribeAlways<BotOfflineEvent.Dropped>(priority = EventPriority.HIGHEST) {
+                androidMiraiConsole.pushLog(0L, "[INFO] 离线Event....")
+                val builder =
+                    NotificationCompat.Builder(context, BotApplication.OFFLINE_NOTIFICATION)
+                        .setAutoCancel(false)
+                        //禁止滑动删除
+                        .setOngoing(true)
+                        //右上角的时间显示
+                        .setShowWhen(true)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_info_black_24dp)
+                        .setContentTitle("Mirai离线")
+                        .setContentText("请检查网络环境")
+                NotificationManagerCompat.from(context).apply {
+                    notify(OFFLINE_NOTIFICATION_ID, builder.build())
+                }
+            }
+
+            bot.subscribeAlways<BotReloginEvent>(priority = EventPriority.HIGHEST) {
+                androidMiraiConsole.pushLog(0L, "[INFO] 上线Event....")
+                NotificationManagerCompat.from(context).cancel(OFFLINE_NOTIFICATION_ID)
+            }
+
             GlobalScope.launch(handler) { sendMessage("$qq login successes") }
             MiraiConsole.frontEnd.pushBot(bot)
-
         }
     }
 
@@ -155,15 +186,13 @@ class BotService : Service(), CommandOwner {
                 get() = "/android"
 
             override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
-
                 sender.sendMessage(
                     """MiraiAndroid v${packageManager.getPackageInfo(packageName, 0).versionName}
 MiraiCore v${BuildConfig.COREVERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
 网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
-启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}
-                    """.trimIndent()
+启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}"""
                 )
                 return true
             }
@@ -182,7 +211,10 @@ MiraiCore v${BuildConfig.COREVERSION}
             override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
                 sender.sendMessage(buildString {
                     append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
-                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n") { it.file.name }
+                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(
+                        this,
+                        "\n"
+                    ) { it.file.name }
                 })
                 return true
             }

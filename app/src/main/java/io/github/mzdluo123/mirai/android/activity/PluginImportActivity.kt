@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.databinding.ActivityPluginImportBinding
-import io.github.mzdluo123.mirai.android.ui.plguin.PluginViewModel
+import io.github.mzdluo123.mirai.android.ui.plugin.PluginViewModel
 import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.android.synthetic.main.activity_plugin_import.*

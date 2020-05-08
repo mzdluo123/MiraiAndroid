@@ -14,6 +14,7 @@ class BotApplication : Application() {
     companion object {
         const val SERVICE_NOTIFICATION = "service"
         const val CAPTCHA_NOTIFICATION = "captcha"
+        const val OFFLINE_NOTIFICATION = "offline"
         lateinit var context: BotApplication
             private set
     }
@@ -28,33 +29,37 @@ class BotApplication : Application() {
             myGetProcessName()
         }
         // 防止服务进程多次初始化
-        if (processName?.isEmpty() == false && processName.equals(packageName)) {
+        if (processName?.isEmpty() == false && processName == packageName) {
 
-            // Create the NotificationChannel
-            val name = "bot通知"
-            val descriptionText = "接受bot的信息"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(SERVICE_NOTIFICATION, name, importance)
-            mChannel.description = descriptionText
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            // Create the NotificationChannel
+            val mChannel = NotificationChannel(
+                SERVICE_NOTIFICATION, "状态通知",
+                NotificationManager.IMPORTANCE_DEFAULT)
+            mChannel.description = "Mirai正在运行的通知"
 
             val captchaChannel = NotificationChannel(
-                CAPTCHA_NOTIFICATION, "需输入验证码",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            captchaChannel.description = "当你需要输入验证码才能登录时，你将会收到这条通知"
+                CAPTCHA_NOTIFICATION, "验证码通知",
+                NotificationManager.IMPORTANCE_HIGH)
+            captchaChannel.description = "登录需要输入验证码时的通知"
+
+            val offlineChannel = NotificationChannel(
+                OFFLINE_NOTIFICATION, "离线通知",
+                NotificationManager.IMPORTANCE_HIGH)
+            captchaChannel.description = "Mirai因网络原因离线的通知"
 
             notificationManager.createNotificationChannel(mChannel)
             notificationManager.createNotificationChannel(captchaChannel)
+            notificationManager.createNotificationChannel(offlineChannel)
 
         }
     }
 
     private fun myGetProcessName(): String? {
         return try {
-            val file = File("/proc/" + Process.myPid() + "/" + "cmdline")
+            val file = File("/proc/" + Process.myPid() + "/cmdline")
             val mBufferedReader = BufferedReader(FileReader(file))
             val processName: String = mBufferedReader.readLine().trim()
             mBufferedReader.close()

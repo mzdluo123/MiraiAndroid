@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android.ui.plguin
+package io.github.mzdluo123.mirai.android.ui.plugin
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
