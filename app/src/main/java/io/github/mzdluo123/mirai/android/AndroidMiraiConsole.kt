@@ -74,8 +74,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 MiraiCore v${BuildConfig.COREVERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
-网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
-                    """.trimIndent()
+网络 ${DeviceStatus.getCurrentNetType(applicationContext)}"""
         )
     }
 
@@ -116,7 +115,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 //右上角的时间显示
                 .setShowWhen(true)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_info_black_24dp)
                 .setContentTitle("本次登录需要验证码")
                 .setContentText("点击这里输入验证码")
         NotificationManagerCompat.from(context).apply {
