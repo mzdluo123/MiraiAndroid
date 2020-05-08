@@ -3,15 +3,21 @@ package io.github.mzdluo123.mirai.android
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
+import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
@@ -19,17 +25,20 @@ import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotOfflineEvent
 import net.mamoe.mirai.event.events.BotReloginEvent
 import net.mamoe.mirai.event.subscribeAlways
+import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     val logStorage = LoopQueue<String>(300)
     val loginSolver = AndroidLoginSolver(context)
     private val scriptDir = context.getExternalFilesDir("scripts")!!
-     val scriptManager: ScriptManager by lazy {
+    val scriptManager: ScriptManager by lazy {
         ScriptManager(File(scriptDir, "data"), scriptDir)
     }
+    private val messageSpeedStore = AtomicInteger()
 
     companion object {
         val TAG = AndroidLoginSolver::class.java.name
@@ -47,20 +56,28 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         bot.launch {
             scriptManager.enable(bot)
         }
-
-        bot.subscribeAlways<BotOfflineEvent.Dropped>(priority = Listener.EventPriority.HIGHEST) {
+        bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             pushLog(0L, "[INFO] 发送离线通知....")
             val builder =
-                NotificationCompat.Builder(BotApplication.context, BotApplication.OFFLINE_NOTIFICATION)
+                NotificationCompat.Builder(
+                    BotApplication.context,
+                    BotApplication.OFFLINE_NOTIFICATION
+                )
                     .setAutoCancel(false)
                     //禁止滑动删除
-                    .setOngoing(true)
+                    .setOngoing(false)
                     //右上角的时间显示
                     .setShowWhen(true)
-                    .setAutoCancel(true)
                     .setSmallIcon(R.drawable.ic_info_black_24dp)
                     .setContentTitle("Mirai离线")
-                    .setContentText("请检查网络环境")
+            when (this) {
+                is BotOfflineEvent.Dropped -> builder.setContentText("请检查网络环境")
+                is BotOfflineEvent.Force -> {
+                    builder.setStyle(NotificationCompat.BigTextStyle())
+                    builder.setContentText(this.message)
+                }
+                else -> return@subscribeAlways
+            }
             NotificationManagerCompat.from(BotApplication.context).apply {
                 notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
             }
@@ -68,9 +85,11 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
         bot.subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
             pushLog(0L, "[INFO] 发送上线通知....")
-            NotificationManagerCompat.from(BotApplication.context).cancel(BotService.OFFLINE_NOTIFICATION_ID)
+            NotificationManagerCompat.from(BotApplication.context)
+                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
         }
 
+        startRefreshNotificationJob(bot)
     }
 
     override fun pushBotAdminStatus(identity: Long, admins: List<Long>) {
@@ -114,6 +133,45 @@ MiraiCore v${BuildConfig.COREVERSION}
         scriptManager.disable()
     }
 
+    private fun startRefreshNotificationJob(bot: Bot) {
+        messageSpeedStore.set(0)
+        bot.subscribeMessages { always { messageSpeedStore.addAndGet(1) } }
+        bot.launch {
+            val avatarData = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
+            val avatar = BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
+            //点击进入主页
+            val notifyIntent = Intent(BotApplication.context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            val notifyPendingIntent = PendingIntent.getActivity(
+                BotApplication.context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            while (isActive) {
+                val notification = NotificationCompat.Builder(
+                    BotApplication.context,
+                    BotApplication.SERVICE_NOTIFICATION
+                )
+                    //设置状态栏的通知图标
+                    .setSmallIcon(R.drawable.ic_extension_black_24dp)
+                    //禁止用户点击删除按钮删除
+                    .setAutoCancel(false)
+                    //禁止滑动删除
+                    .setOngoing(true)
+                    //右上角的时间显示
+                    .setShowWhen(true)
+                    .setOnlyAlertOnce(true)
+                    .setLargeIcon(avatar).setContentIntent(notifyPendingIntent)
+                    .setContentTitle("MiraiAndroid正在运行")
+                    .setContentText("消息速度 ${messageSpeedStore.get() * 6}/min").build()
+                messageSpeedStore.set(0)
+                NotificationManagerCompat.from(BotApplication.context).apply {
+                    notify(BotService.NOTIFICATION_ID, notification)
+                }
+                delay(10 * 1000)
+            }
+        }
+    }
 }
 
 class AndroidLoginSolver(private val context: Context) : LoginSolver() {

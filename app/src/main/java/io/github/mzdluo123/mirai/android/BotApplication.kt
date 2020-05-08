@@ -37,7 +37,7 @@ class BotApplication : Application() {
             // Create the NotificationChannel
             val mChannel = NotificationChannel(
                 SERVICE_NOTIFICATION, "状态通知",
-                NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationManager.IMPORTANCE_MIN)
             mChannel.description = "Mirai正在运行的通知"
 
             val captchaChannel = NotificationChannel(
@@ -48,7 +48,7 @@ class BotApplication : Application() {
             val offlineChannel = NotificationChannel(
                 OFFLINE_NOTIFICATION, "离线通知",
                 NotificationManager.IMPORTANCE_HIGH)
-            captchaChannel.description = "Mirai因网络原因离线的通知"
+            captchaChannel.description = "Mirai因各种原因离线的通知"
 
             notificationManager.createNotificationChannel(mChannel)
             notificationManager.createNotificationChannel(captchaChannel)

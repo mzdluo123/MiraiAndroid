@@ -5,6 +5,7 @@ package io.github.mzdluo123.mirai.android
 import android.app.Service
 import android.content.Intent
 import android.os.Build
+import android.os.Debug
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
@@ -53,9 +54,10 @@ class BotService : Service(), CommandOwner {
             .setOngoing(true)
             //右上角的时间显示
             .setShowWhen(true)
-            .setContentTitle("MiraiAndroid正在运行")
-            .setContentText("请将软件添加到系统后台运行白名单确保能及时处理消息").build()
-
+            .setOnlyAlertOnce(true)
+            .setStyle(NotificationCompat.BigTextStyle())
+            .setContentTitle("MiraiAndroid未登录")
+            .setContentText("请完成登录并将软件添加到系统后台运行白名单确保能及时处理消息").build()
         //创建通知
         //设置为前台服务
         startForeground(NOTIFICATION_ID, notification)
@@ -101,7 +103,7 @@ class BotService : Service(), CommandOwner {
         if (qq != 0L) {
             //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
             androidMiraiConsole.pushLog(0L, "[INFO] 自动登录....")
-            val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+            val handler = CoroutineExceptionHandler { _, throwable ->
                 androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
             }
 
@@ -191,7 +193,6 @@ MiraiCore v${BuildConfig.COREVERSION}
         })
     }
 
-
     inner class BotBinder : IbotAidlInterface.Stub() {
         override fun runCmd(cmd: String?) {
             if (cmd != null) {
@@ -229,8 +230,8 @@ MiraiCore v${BuildConfig.COREVERSION}
         }
     }
 
-    private fun String.chunkedHexToBytes(): ByteArray =
-        this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
+    private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()
+
 
 }
