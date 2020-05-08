@@ -1,4 +1,11 @@
 # MiraiAndroid
+
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android Pull Request & Master CI?style=flat-square">
+
+<img alt="GitHub issues" src="https://img.shields.io/github/issues/mzdluo123/MiraiAndroid?style=flat-square">
+
+<img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
+
 （实验性）在Android上运行Mirai-console
 
 关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
@@ -15,7 +22,7 @@
 * 带验证码的登录处理
 * 内置Google d8 dex编译器，可直接编译JVM的console插件在Android运行(实验性)
 * lua脚本接口（测试版）
-* 自动登录后网络掉线提醒
+* 网络掉线提醒
 
 # 安装脚本
 
