@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.plguin.PluginFragment">
+    tools:context=".ui.plugin.PluginFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/plugin_recycler"
