@@ -3,6 +3,7 @@ package io.github.mzdluo123.mirai.android
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
@@ -73,6 +74,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
             when (this) {
                 is BotOfflineEvent.Dropped -> builder.setContentText("请检查网络环境")
                 is BotOfflineEvent.Force -> {
+                    //设置长消息的style
                     builder.setStyle(NotificationCompat.BigTextStyle())
                     builder.setContentText(this.message)
                 }
@@ -137,8 +139,9 @@ MiraiCore v${BuildConfig.COREVERSION}
         messageSpeedStore.set(0)
         bot.subscribeMessages { always { messageSpeedStore.addAndGet(1) } }
         bot.launch {
-            val avatarData = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
-            val avatar = BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
+            // 获取通知展示用的头像
+            val avatar = downloadAvatar(bot)
+
             //点击进入主页
             val notifyIntent = Intent(BotApplication.context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -170,6 +173,17 @@ MiraiCore v${BuildConfig.COREVERSION}
                 }
                 delay(10 * 1000)
             }
+        }
+    }
+
+    private suspend fun downloadAvatar(bot: Bot): Bitmap {
+        return try {
+            pushLog(0L,"[INFO] 正在加载头像....")
+            val avatarData: ByteArray = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
+            BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
+        } catch (e: Exception) {
+            delay(200)
+            downloadAvatar(bot)
         }
     }
 }
