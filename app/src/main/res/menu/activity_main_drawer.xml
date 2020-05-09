@@ -18,6 +18,10 @@
             android:title="脚本管理" />
 
         <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="设置" />
+        <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="关于" />

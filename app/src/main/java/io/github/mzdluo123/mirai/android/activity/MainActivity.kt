@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_console,
                 R.id.nav_plugins,
                 R.id.nav_scripts,
+                R.id.nav_setting,
                 R.id.nav_about
             ), drawerLayout
         )

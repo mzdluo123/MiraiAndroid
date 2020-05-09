@@ -33,7 +33,10 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
-    val logStorage = LoopQueue<String>(300)
+    private val logBuffer = BotApplication.getSettingPreference()
+        .getString("log_buffer_preference", "100")!!.toInt()
+
+    val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver = AndroidLoginSolver(context)
     private val scriptDir = context.getExternalFilesDir("scripts")!!
     val scriptManager: ScriptManager by lazy {
@@ -123,7 +126,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 MiraiCore v${BuildConfig.COREVERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
-网络 ${DeviceStatus.getCurrentNetType(applicationContext)}"""
+网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
+日志缓存行数 $logBuffer"""
         )
     }
 
@@ -178,11 +182,11 @@ MiraiCore v${BuildConfig.COREVERSION}
 
     private suspend fun downloadAvatar(bot: Bot): Bitmap {
         return try {
-            pushLog(0L,"[INFO] 正在加载头像....")
+            pushLog(0L, "[INFO] 正在加载头像....")
             val avatarData: ByteArray = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
             BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
         } catch (e: Exception) {
-            delay(200)
+            delay(1000)
             downloadAvatar(bot)
         }
     }

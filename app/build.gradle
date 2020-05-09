@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 def CORE_VERSION = "1.0-RC"
-def LUA_MIRAI_VERSION = "0.1.5"
+def LUAMIRAI_VERSION = "0.1.6"
 
 android {
     compileSdkVersion 29
@@ -13,10 +13,11 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 29
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
+        buildConfigField("String","LUAMIRAI_VERSION","\"$LUAMIRAI_VERSION\"")
     }
     dataBinding {
         enabled = true
@@ -70,9 +71,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.4'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    implementation 'androidx.preference:preference:1.1.0-alpha04'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
     implementation 'net.lingala.zip4j:zip4j:2.5.2'
-    implementation "com.ooooonly:luaMirai:$LUA_MIRAI_VERSION"
+    implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
 //    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 //

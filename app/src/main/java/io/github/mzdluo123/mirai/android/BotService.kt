@@ -161,6 +161,7 @@ class BotService : Service(), CommandOwner {
                 sender.sendMessage(
                     """MiraiAndroid v${packageManager.getPackageInfo(packageName, 0).versionName}
 MiraiCore v${BuildConfig.COREVERSION}
+LuaMirai v${BuildConfig.LUAMIRAI_VERSION}
 系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
 内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
 网络 ${DeviceStatus.getCurrentNetType(applicationContext)}

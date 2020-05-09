@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="基本设置">
+
+        <EditTextPreference
+            android:defaultValue="300"
+            android:key="log_buffer_preference"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true"
+            android:title="日志缓存行数" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="start_on_boot_preference"
+            android:summary="请加入开机自启白名单以确保能够正常开机启动"
+            android:title="开机启动" />
+    </PreferenceCategory>
+</PreferenceScreen>
