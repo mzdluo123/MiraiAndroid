@@ -1,3 +1,11 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: sueRimn
+ * @Date: 2020-05-08 16:45:00
+ * @LastEditors: sueRimn
+ * @LastEditTime: 2020-05-09 12:22:15
+ -->
 # MiraiAndroid
 
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android Pull Request & Master CI?style=flat-square">
@@ -31,87 +39,16 @@
 以下是一个简单的示例
 
 ```lua
-Event.onLoad = function(bot)
-
-    print("载入bot" .. bot:getId() .. "成功")
-
-    -- 好友消息监听
-    bot:subscribeFriendMsg(function(bot, msg, sender)
-        if msg:find("夸我") then
-            sender:sendMsg(Msg():setQuote(msg) ..
-                               net.get("https://chp.shadiao.app/api.php"))
+Event.onLoad = function (bot)
+    bot:subscribeGroupMsg(
+        function(bot, msg, group, sender)
+            group:sendMsg( msg )
         end
-
-        if msg:find("骂我") then
-            sender:sendMsg(Msg():setQuote(msg) ..
-                               net.get(
-                                   "https://nmsl.shadiao.app/api.php?level=min&lang=zh_cn"))
-        end
-
-    end)
-
-    -- 群消息监听
-    bot:subscribeGroupMsg(function(bot, msg, group, sender)
-        if msg:find("夸我") then
-            group:sendMsg(Msg():setQuote(msg):appendAt(sender) +
-                              net.get("https://chp.shadiao.app/api.php"))
-        end
-
-        if msg:find("骂我") then
-            group:sendMsg(Msg():setQuote(msg):appendAt(sender) ..
-                              net.get(
-                                  "https://nmsl.shadiao.app/api.php?level=min&lang=zh_cn"))
-        end
-
-        if msg:find("骂他") then
-            local at
-            for k, v in pairs(msg:toTable()) do
-                if v:find("mirai:at") then
-                    at = v
-                    break
-                end
-            end
-
-            group:sendMsg(at ..
-                              net.get(
-                                  "https://nmsl.shadiao.app/api.php?lang=zh_cn"))
-        end
-
-        if msg:find("复读") then group:sendMsg(msg:setQuote(msg)) end
-
-        if msg:find("撤回") then
-            msg:recall()
-            -- 或 msg:getSource():recall()
-            -- 或 group:recall(msg)
-        end
-
-        if msg:find("hso") or msg:find("色图") or msg:find("不够色") then
-            local hso = net.get("https://api.lolicon.app/setu/"):match(
-                            '"url":"(.-)"'):gsub("\\", "")
-            group:sendMsg(Msg():appendImage(hso, group))
-        end
-
-    end)
-
+    )   
 end
-
-Event.onFinish = function() print("脚本被卸载！") end
-
---[[
-    消息构造方式：使用Msg() 或 Msg("内容") 或 字符串 "纯文本消息"
-
-    消息拼接方式：使用appendXXX 或 + 或 .. 进行拼接
-        如 Msg("hello"):appendText("world") + "lua" .. Msg():appendImage("http://xxxxx",sender)
-
-    消息处理：支持使用lua的所有标准字符串处理函数
-        如：msg:find("pattern") --寻找文本
-            或 string.find(msg,"pattern")
-
-]]
-
 ```
 
-这个脚本实现了最简单的回复和网络请求功能，更多功能请看[lua-mirai](https://github.com/only52607/lua-mirai)项目介绍
+这个脚本实现了最简单的"复读机"功能，更多API请看[lua-mirai android api](https://github.com/only52607/lua-mirai/blob/master/docs/miraiandroid.md)
 
 你可以在脚本管理界面点击右上角直接添加脚本到MiraiAndroid
 
