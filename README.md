@@ -4,7 +4,7 @@
  * @Author: sueRimn
  * @Date: 2020-05-08 16:45:00
  * @LastEditors: sueRimn
- * @LastEditTime: 2020-05-09 12:20:19
+ * @LastEditTime: 2020-05-09 12:22:15
  -->
 # MiraiAndroid
 
@@ -39,13 +39,13 @@
 以下是一个简单的示例
 
 ```lua
-    Event.onLoad = function (bot)
-        bot:subscribeGroupMsg(
-            function(bot, msg, group, sender)
-                group:sendMsg( msg )
-            end
-        )   
-    end
+Event.onLoad = function (bot)
+    bot:subscribeGroupMsg(
+        function(bot, msg, group, sender)
+            group:sendMsg( msg )
+        end
+    )   
+end
 ```
 
 这个脚本实现了最简单的"复读机"功能，更多API请看[lua-mirai android api](https://github.com/only52607/lua-mirai/blob/master/docs/miraiandroid.md)
