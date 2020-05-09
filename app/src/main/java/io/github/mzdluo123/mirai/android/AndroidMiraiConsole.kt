@@ -39,7 +39,12 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     val scriptManager: ScriptManager by lazy {
         ScriptManager(File(scriptDir, "data"), scriptDir)
     }
-    private val messageSpeedStore = AtomicInteger()
+
+    // 使用一个[60s/refreshPerMinute]的数组存放每4秒消息条数
+    // 读取时求和 // TODO增加最新一分钟，减去最老一分钟
+    private val refreshPerMinute = 15 // 4s
+    private val msgSpeeds = IntArray(refreshPerMinute)
+    private var refreshCurrentPos = 0
 
     companion object {
         val TAG = AndroidLoginSolver::class.java.name
@@ -58,6 +63,12 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
             scriptManager.enable(bot)
         }
         bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
+            // 防止一闪而过得掉线
+            delay(200)
+            if (this.bot.isActive) {
+                return@subscribeAlways
+            }
+
             pushLog(0L, "[INFO] 发送离线通知....")
             val builder =
                 NotificationCompat.Builder(
@@ -136,8 +147,7 @@ MiraiCore v${BuildConfig.COREVERSION}
     }
 
     private fun startRefreshNotificationJob(bot: Bot) {
-        messageSpeedStore.set(0)
-        bot.subscribeMessages { always { messageSpeedStore.addAndGet(1) } }
+        bot.subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
         bot.launch {
             // 获取通知展示用的头像
             val avatar = downloadAvatar(bot)
@@ -151,6 +161,8 @@ MiraiCore v${BuildConfig.COREVERSION}
             )
 
             while (isActive) {
+                var msgSpeed = 0
+                for (i in msgSpeeds) msgSpeed += i
                 val notification = NotificationCompat.Builder(
                     BotApplication.context,
                     BotApplication.SERVICE_NOTIFICATION
@@ -166,19 +178,23 @@ MiraiCore v${BuildConfig.COREVERSION}
                     .setOnlyAlertOnce(true)
                     .setLargeIcon(avatar).setContentIntent(notifyPendingIntent)
                     .setContentTitle("MiraiAndroid正在运行")
-                    .setContentText("消息速度 ${messageSpeedStore.get() * 6}/min").build()
-                messageSpeedStore.set(0)
+                    .setContentText("消息速度 ${msgSpeed}/min").build()
+                if (refreshCurrentPos != refreshPerMinute - 1)
+                    refreshCurrentPos += 1
+                else
+                    refreshCurrentPos = 0
+                msgSpeeds[refreshCurrentPos] = 0
                 NotificationManagerCompat.from(BotApplication.context).apply {
                     notify(BotService.NOTIFICATION_ID, notification)
                 }
-                delay(10 * 1000)
+                delay(60L / refreshPerMinute * 1000)
             }
         }
     }
 
     private suspend fun downloadAvatar(bot: Bot): Bitmap {
         return try {
-            pushLog(0L,"[INFO] 正在加载头像....")
+            pushLog(0L, "[INFO] 正在加载头像....")
             val avatarData: ByteArray = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
             BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
         } catch (e: Exception) {
