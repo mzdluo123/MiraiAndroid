@@ -30,7 +30,6 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private val logBuffer = BotApplication.getSettingPreference()
@@ -44,8 +43,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     }
 
     // 使用一个[60s/refreshPerMinute]的数组存放每4秒消息条数
-    // 读取时求和 // TODO增加最新一分钟，减去最老一分钟
-    private val refreshPerMinute = 15 // 4s
+    // 读取时增加最新一分钟，减去最老一分钟
+    private val refreshPerMinute = BotApplication.getSettingPreference()
+        .getString("status_refresh_count", "15")!!.toInt() // 4s
     private val msgSpeeds = IntArray(refreshPerMinute)
     private var refreshCurrentPos = 0
 
@@ -163,10 +163,21 @@ MiraiCore v${BuildConfig.COREVERSION}
             val notifyPendingIntent = PendingIntent.getActivity(
                 BotApplication.context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
-
+            var msgSpeed = 0
+            val startTime = System.currentTimeMillis()
             while (isActive) {
-                var msgSpeed = 0
-                for (i in msgSpeeds) msgSpeed += i
+                /*
+                * 总速度+=最新速度 [0] [1] ... [14]
+                * 总速度-=最老速度 [1] [2] ... [0]
+                */
+                msgSpeed += msgSpeeds[refreshCurrentPos]
+                if (refreshCurrentPos != refreshPerMinute - 1){
+                    refreshCurrentPos += 1
+                } else{
+                    refreshCurrentPos = 0
+                }
+                msgSpeed -= msgSpeeds[refreshCurrentPos]
+                msgSpeeds[refreshCurrentPos] = 0
                 val notification = NotificationCompat.Builder(
                     BotApplication.context,
                     BotApplication.SERVICE_NOTIFICATION
@@ -178,16 +189,11 @@ MiraiCore v${BuildConfig.COREVERSION}
                     //禁止滑动删除
                     .setOngoing(true)
                     //右上角的时间显示
-                    .setShowWhen(true)
+                    .setShowWhen(true).setWhen(startTime)
                     .setOnlyAlertOnce(true)
                     .setLargeIcon(avatar).setContentIntent(notifyPendingIntent)
                     .setContentTitle("MiraiAndroid正在运行")
                     .setContentText("消息速度 ${msgSpeed}/min").build()
-                if (refreshCurrentPos != refreshPerMinute - 1)
-                    refreshCurrentPos += 1
-                else
-                    refreshCurrentPos = 0
-                msgSpeeds[refreshCurrentPos] = 0
                 NotificationManagerCompat.from(BotApplication.context).apply {
                     notify(BotService.NOTIFICATION_ID, notification)
                 }
