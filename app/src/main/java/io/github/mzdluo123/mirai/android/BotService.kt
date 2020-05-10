@@ -5,7 +5,6 @@ package io.github.mzdluo123.mirai.android
 import android.app.Service
 import android.content.Intent
 import android.os.Build
-import android.os.Debug
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
@@ -212,14 +211,18 @@ LuaMirai v${BuildConfig.LUAMIRAI_VERSION}
             )
         }
 
-        override fun submitCaptcha(captcha: String?) {
-            if (captcha != null) {
-                androidMiraiConsole.loginSolver.captcha.complete(captcha)
+        override fun submitVerificationResult(result: String?) {
+            if (result != null) {
+                androidMiraiConsole.loginSolver.verificationResult.complete(result)
             }
         }
 
         override fun clearLog() {
             androidMiraiConsole.logStorage.clear()
+        }
+
+        override fun getUrl(): String {
+           return androidMiraiConsole.loginSolver.url
         }
 
         override fun getCaptcha(): ByteArray {

@@ -7,12 +7,14 @@ import android.content.ServiceConnection
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.IBinder
+import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.android.synthetic.main.activity_captcha.*
+import kotlinx.android.synthetic.main.activity_unsafe_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,7 +22,7 @@ class CaptchaActivity : AppCompatActivity() {
     private val conn = object : ServiceConnection {
         lateinit var botService: IbotAidlInterface
         fun sendCaptcha(captcha: String) {
-           botService.submitCaptcha(captcha)
+            botService.submitVerificationResult(captcha)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {}
@@ -46,7 +48,7 @@ class CaptchaActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         val intent = Intent(baseContext, BotService::class.java)
-        bindService(intent, conn,  Context.BIND_AUTO_CREATE)
+        bindService(intent, conn, Context.BIND_AUTO_CREATE)
         captchaConfirm_btn.setOnClickListener {
             conn.sendCaptcha(captcha_input.text.toString())
             finish()

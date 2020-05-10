@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.activity.MainActivity
+import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
@@ -50,7 +51,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private var refreshCurrentPos = 0
 
     companion object {
-        val TAG = AndroidLoginSolver::class.java.name
+        val TAG ="MiraiAndroid"
     }
 
     override fun createLoginSolver(): LoginSolver {
@@ -215,8 +216,9 @@ MiraiCore v${BuildConfig.COREVERSION}
 }
 
 class AndroidLoginSolver(private val context: Context) : LoginSolver() {
-    lateinit var captcha: CompletableDeferred<String>
+    lateinit var verificationResult: CompletableDeferred<String>
     lateinit var captchaData: ByteArray
+    lateinit var url:String
 
     companion object {
         const val CAPTCHA_NOTIFICATION_ID = 2
@@ -224,7 +226,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
 
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
 
-        captcha = CompletableDeferred()
+        verificationResult = CompletableDeferred()
         captchaData = data
         val notifyIntent = Intent(context, CaptchaActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -247,7 +249,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
         NotificationManagerCompat.from(context).apply {
             notify(CAPTCHA_NOTIFICATION_ID, builder.build())
         }
-        return captcha.await()
+        return verificationResult.await()
     }
 
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? {
@@ -255,7 +257,31 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     }
 
     override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? {
-        return ""
+        verificationResult = CompletableDeferred()
+        this.url = url
+        val notifyIntent = Intent(context, UnsafeLoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val notifyPendingIntent = PendingIntent.getActivity(
+            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val builder =
+            NotificationCompat.Builder(context, BotApplication.CAPTCHA_NOTIFICATION)
+                .setContentIntent(notifyPendingIntent)
+                .setAutoCancel(false)
+                //禁止滑动删除
+                .setOngoing(true)
+                //右上角的时间显示
+                .setShowWhen(true)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_info_black_24dp)
+                .setContentTitle("本次登录需要进行登录验证")
+                .setContentText("点击这里开始验证")
+        NotificationManagerCompat.from(context).apply {
+            notify(CAPTCHA_NOTIFICATION_ID, builder.build())
+        }
+
+        return verificationResult.await()
     }
 
 }

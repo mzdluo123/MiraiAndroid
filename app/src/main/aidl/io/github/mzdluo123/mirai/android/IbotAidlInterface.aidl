@@ -8,12 +8,10 @@ interface IbotAidlInterface {
      * and return values in AIDL.
      */
     String[] getLog();
-
     void clearLog();
     void sendLog(String log);
     void runCmd(String cmd);
-
     byte[] getCaptcha();
-
-    void submitCaptcha(String captcha);
+    String getUrl();
+    void submitVerificationResult(String result);
 }

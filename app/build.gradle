@@ -13,11 +13,11 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
-        buildConfigField("String","LUAMIRAI_VERSION","\"$LUAMIRAI_VERSION\"")
+        buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
     }
     dataBinding {
         enabled = true
