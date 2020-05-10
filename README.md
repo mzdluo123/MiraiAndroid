@@ -18,7 +18,7 @@
 
 关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
 
-**仅Android 8及以上可用**
+**仅Android 6及以上可用**
 
 相比使用`Termux`或者是`Linux Deploy`等应用运行mirai的方案，该项目提供的方案具有更好的性能以及更少的资源占用，但可能存在兼容性问题
 
