@@ -17,6 +17,11 @@ class SettingFragment : PreferenceFragmentCompat() {
             it.inputType = InputType.TYPE_CLASS_NUMBER
         }
 
+        val refreshCount = findPreference<EditTextPreference>("status_refresh_count")
+        refreshCount?.summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
+        refreshCount?.setOnBindEditTextListener {
+            it.inputType = InputType.TYPE_CLASS_NUMBER
+        }
     }
 
 
