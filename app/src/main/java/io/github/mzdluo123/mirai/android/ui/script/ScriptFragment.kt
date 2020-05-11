@@ -133,8 +133,7 @@ class ScriptFragment : Fragment() {
 class ScriptAdapter : BaseQuickAdapter<File, BaseViewHolder>(R.layout.item_plugin) {
     override fun convert(holder: BaseViewHolder, item: File) {
         holder.setText(R.id.pluginName_text, item.name)
-        holder.setText(R.id.pluginSize_text, "${item.length() / 1024}kb")
+        holder.setText(R.id.pluginSize_text, FileUtils.formatFileLength(item.length()))
     }
-
 
 }

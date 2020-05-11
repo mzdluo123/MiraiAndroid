@@ -23,5 +23,4 @@ class LuaScriptHost(file: File, dataFolder: File) : BaseScriptHost(file, dataFol
         globals.onFinish()
         globals.unSubsribeAll()
     }
-
 }
