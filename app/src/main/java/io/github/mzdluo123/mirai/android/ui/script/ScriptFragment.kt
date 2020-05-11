@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
+import io.github.mzdluo123.mirai.android.utils.FileUtils
+
 import kotlinx.android.synthetic.main.fragment_script.*
 import java.io.File
 
@@ -132,8 +133,10 @@ class ScriptFragment : Fragment() {
 
 class ScriptAdapter : BaseQuickAdapter<File, BaseViewHolder>(R.layout.item_plugin) {
     override fun convert(holder: BaseViewHolder, item: File) {
-        holder.setText(R.id.pluginName_text, item.name)
-        holder.setText(R.id.pluginSize_text, FileUtils.formatFileLength(item.length()))
+        with(holder){
+            setText(R.id.pluginName_text, item.name)
+            setText(R.id.pluginSize_text, FileUtils.formatFileLength(item.length()))
+        }
     }
 
 }
