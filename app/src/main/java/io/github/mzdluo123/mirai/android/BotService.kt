@@ -4,14 +4,14 @@ package io.github.mzdluo123.mirai.android
 
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
+import io.github.mzdluo123.mirai.android.utils.register
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
@@ -19,7 +19,6 @@ import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
 import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
-import java.text.SimpleDateFormat
 import kotlin.system.exitProcess
 
 
@@ -150,49 +149,23 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun registerDefaultCommand() {
-        CommandManager.register(this, object : Command {
-            override val alias: List<String>
-                get() = listOf()
-            override val description: String
-                get() = "显示MiraiAndroid运行状态"
-            override val name: String
-                get() = "android"
-            override val usage: String
-                get() = "/android"
-
-            override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
-                sender.sendMessage(MiraiAndroidStatus.recentStatus(this@BotService).format())
-                return true
-            }
-        })
-
-        CommandManager.register(this, object : Command {
-            override val alias: List<String>
-                get() = listOf()
-            override val description: String
-                get() = "查看已加载的脚本"
-            override val name: String
-                get() = "script"
-            override val usage: String
-                get() = "script"
-
-            override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
-                sender.sendMessage(buildString {
-                    append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
-                    androidMiraiConsole.scriptManager.scriptHosts.joinTo(
-                        this,
-                        "\n"
-                    ) { it.file.name }
-                })
-                return true
-            }
-        })
+        register(_description = "显示MiraiAndroid运行状态", _name = "android") { sender, args ->
+            sender.sendMessage(MiraiAndroidStatus.recentStatus().format())
+            true
+        }
+        register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, args ->
+            sender.sendMessage(buildString {
+                append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
+                androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n") { it.file.name }
+            })
+            true
+        }
     }
 
     inner class BotBinder : IbotAidlInterface.Stub() {
         override fun runCmd(cmd: String?) {
-            if (cmd != null) {
-                CommandManager.runCommand(ConsoleCommandSender, cmd)
+            cmd?.let {
+                CommandManager.runCommand(ConsoleCommandSender, it)
             }
         }
 
@@ -200,6 +173,7 @@ class BotService : Service(), CommandOwner {
             //防止
             // ClassCastException: java.lang.Object[] cannot be cast to java.lang.String[]
             // 不知道有没有更好的写法
+
             return androidMiraiConsole.logStorage.toArray(
                 arrayOfNulls<String>(
                     androidMiraiConsole.logStorage.size
@@ -208,8 +182,8 @@ class BotService : Service(), CommandOwner {
         }
 
         override fun submitVerificationResult(result: String?) {
-            if (result != null) {
-                androidMiraiConsole.loginSolver.verificationResult.complete(result)
+            result?.let {
+                androidMiraiConsole.loginSolver.verificationResult.complete(it)
             }
         }
 
@@ -217,13 +191,9 @@ class BotService : Service(), CommandOwner {
             androidMiraiConsole.logStorage.clear()
         }
 
-        override fun getUrl(): String {
-           return androidMiraiConsole.loginSolver.url
-        }
+        override fun getUrl(): String = androidMiraiConsole.loginSolver.url
 
-        override fun getCaptcha(): ByteArray {
-            return androidMiraiConsole.loginSolver.captchaData
-        }
+        override fun getCaptcha(): ByteArray = androidMiraiConsole.loginSolver.captchaData
 
         override fun sendLog(log: String?) {
             androidMiraiConsole.logStorage.add(log)
