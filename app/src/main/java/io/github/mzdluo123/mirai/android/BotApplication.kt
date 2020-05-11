@@ -41,7 +41,7 @@ class BotApplication : Application() {
             // Create the NotificationChannel
             val mChannel = NotificationChannel(
                 SERVICE_NOTIFICATION, "状态通知",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_MIN
             )
             mChannel.description = "Mirai正在运行的通知"
 
