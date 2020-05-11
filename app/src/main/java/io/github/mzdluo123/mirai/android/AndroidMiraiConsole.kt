@@ -15,6 +15,7 @@ import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
+import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import kotlinx.coroutines.CompletableDeferred
@@ -129,18 +130,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     }
 
     override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
-        val applicationContext = BotApplication.context
-        logStorage.add(
-            """MiraiAndroid v${applicationContext.packageManager.getPackageInfo(
-                applicationContext.packageName,
-                0
-            ).versionName}
-MiraiCore v${BuildConfig.COREVERSION}
-系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
-内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
-网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
-日志缓存行数 $logBuffer"""
-        )
+        logStorage.add(MiraiAndroidStatus.recentStatus().format())
     }
 
     override suspend fun requestInput(hint: String): String {

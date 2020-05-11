@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.utils.DeviceStatus
+import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,7 +28,6 @@ class BotService : Service(), CommandOwner {
         private set
     private val binder = BotBinder()
     private var isStart = false
-    private var startTime: Long = 0
 
 // 多进程调试辅助
 //  init {
@@ -72,7 +72,7 @@ class BotService : Service(), CommandOwner {
         try {
             val action = intent?.getIntExtra("action", START_SERVICE)
             if (action == START_SERVICE && !isStart) {
-                startTime = System.currentTimeMillis()
+                MiraiAndroidStatus.startTime = System.currentTimeMillis()
                 MiraiConsole.start(
                     androidMiraiConsole,
                     path = getExternalFilesDir(null).toString()
@@ -161,15 +161,7 @@ class BotService : Service(), CommandOwner {
                 get() = "/android"
 
             override suspend fun onCommand(sender: CommandSender, args: List<String>): Boolean {
-                sender.sendMessage(
-                    """MiraiAndroid v${packageManager.getPackageInfo(packageName, 0).versionName}
-MiraiCore v${BuildConfig.COREVERSION}
-LuaMirai v${BuildConfig.LUAMIRAI_VERSION}
-系统版本 ${Build.VERSION.RELEASE} SDK ${Build.VERSION.SDK_INT}
-内存可用 ${DeviceStatus.getSystemAvaialbeMemorySize(applicationContext)}
-网络 ${DeviceStatus.getCurrentNetType(applicationContext)}
-启动时间 ${SimpleDateFormat.getDateTimeInstance().format(startTime)}"""
-                )
+                sender.sendMessage(MiraiAndroidStatus.recentStatus(this@BotService).format())
                 return true
             }
         })
