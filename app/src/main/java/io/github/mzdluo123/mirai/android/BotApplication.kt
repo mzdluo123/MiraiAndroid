@@ -1,5 +1,6 @@
 package io.github.mzdluo123.mirai.android
 
+import android.app.ActivityManager
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,10 +8,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
-import androidx.preference.Preference
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
+
 
 class BotApplication : Application() {
     companion object {
@@ -37,14 +35,13 @@ class BotApplication : Application() {
         }
         // 防止服务进程多次初始化
         if (processName?.isEmpty() == false && processName == packageName) {
-
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             // Create the NotificationChannel
             val mChannel = NotificationChannel(
                 SERVICE_NOTIFICATION, "状态通知",
-                NotificationManager.IMPORTANCE_MIN
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             mChannel.description = "Mirai正在运行的通知"
 
@@ -63,21 +60,17 @@ class BotApplication : Application() {
             notificationManager.createNotificationChannel(mChannel)
             notificationManager.createNotificationChannel(captchaChannel)
             notificationManager.createNotificationChannel(offlineChannel)
-
         }
     }
 
     private fun myGetProcessName(): String? {
-        return try {
-            val file = File("/proc/" + Process.myPid() + "/cmdline")
-            val mBufferedReader = BufferedReader(FileReader(file))
-            val processName: String = mBufferedReader.readLine().trim()
-            mBufferedReader.close()
-            processName
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+        val pid = Process.myPid()
+        for (appProcess in (getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).runningAppProcesses) {
+            if (appProcess.pid == pid) {
+                return appProcess.processName
+            }
         }
+        return null
     }
 
 

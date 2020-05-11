@@ -154,7 +154,7 @@ class BotService : Service(), CommandOwner {
             override val alias: List<String>
                 get() = listOf()
             override val description: String
-                get() = "MiraiAndroid运行状态"
+                get() = "显示MiraiAndroid运行状态"
             override val name: String
                 get() = "android"
             override val usage: String
