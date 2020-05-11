@@ -34,7 +34,7 @@ import java.io.File
 
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private val logBuffer = BotApplication.getSettingPreference()
-        .getString("log_buffer_preference", "100")!!.toInt()
+        .getString("log_buffer_preference", "300")!!.toInt()
 
     val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver = AndroidLoginSolver(context)
@@ -51,7 +51,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private var refreshCurrentPos = 0
 
     companion object {
-        val TAG ="MiraiAndroid"
+        val TAG = "MiraiAndroid"
     }
 
     override fun createLoginSolver(): LoginSolver {
@@ -172,9 +172,9 @@ MiraiCore v${BuildConfig.COREVERSION}
                 * 总速度-=最老速度 [1] [2] ... [0]
                 */
                 msgSpeed += msgSpeeds[refreshCurrentPos]
-                if (refreshCurrentPos != refreshPerMinute - 1){
+                if (refreshCurrentPos != refreshPerMinute - 1) {
                     refreshCurrentPos += 1
-                } else{
+                } else {
                     refreshCurrentPos = 0
                 }
                 msgSpeed -= msgSpeeds[refreshCurrentPos]
@@ -218,7 +218,7 @@ MiraiCore v${BuildConfig.COREVERSION}
 class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     lateinit var verificationResult: CompletableDeferred<String>
     lateinit var captchaData: ByteArray
-    lateinit var url:String
+    lateinit var url: String
 
     companion object {
         const val CAPTCHA_NOTIFICATION_ID = 2
@@ -253,12 +253,20 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     }
 
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? {
-        return ""
+        verificationResult = CompletableDeferred()
+        this.url = url
+        sendVerifyNotification()
+        return verificationResult.await()
     }
 
     override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? {
         verificationResult = CompletableDeferred()
         this.url = url
+        sendVerifyNotification()
+        return verificationResult.await()
+    }
+
+    private fun sendVerifyNotification() {
         val notifyIntent = Intent(context, UnsafeLoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -280,8 +288,6 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
         NotificationManagerCompat.from(context).apply {
             notify(CAPTCHA_NOTIFICATION_ID, builder.build())
         }
-
-        return verificationResult.await()
     }
 
 }

@@ -69,23 +69,27 @@ class BotService : Service(), CommandOwner {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val action = intent?.getIntExtra("action", START_SERVICE)
-        if (action == START_SERVICE && !isStart) {
-            startTime = System.currentTimeMillis()
-            MiraiConsole.start(
-                androidMiraiConsole,
-                path = getExternalFilesDir(null).toString()
-            )
-            isStart = true
-            createNotification()
-            registerDefaultCommand()
-            autoLogin(intent)
-        } else if (action == STOP_SERVICE) {
-            androidMiraiConsole.stop()
-            MiraiConsole.stop()
-            stopForeground(true)
-            stopSelf()
-            exitProcess(0)
+        try {
+            val action = intent?.getIntExtra("action", START_SERVICE)
+            if (action == START_SERVICE && !isStart) {
+                startTime = System.currentTimeMillis()
+                MiraiConsole.start(
+                    androidMiraiConsole,
+                    path = getExternalFilesDir(null).toString()
+                )
+                isStart = true
+                createNotification()
+                registerDefaultCommand()
+                autoLogin(intent)
+            } else if (action == STOP_SERVICE) {
+                androidMiraiConsole.stop()
+                MiraiConsole.stop()
+                stopForeground(true)
+                stopSelf()
+                exitProcess(0)
+            }
+        }catch (e:Exception){
+            androidMiraiConsole.pushLog(0L, "发生错误 $e")
         }
         return super.onStartCommand(intent, flags, startId)
     }

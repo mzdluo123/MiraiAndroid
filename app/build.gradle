@@ -2,8 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-def CORE_VERSION = "1.0-RC"
-def LUAMIRAI_VERSION = "0.1.6"
+def CORE_VERSION = "1.0-RC2-1"
+def LUAMIRAI_VERSION = "0.2.0"
 
 android {
     compileSdkVersion 29
@@ -14,7 +14,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 10
-        versionName "1.9"
+        versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
