@@ -69,7 +69,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             // 防止一闪而过得掉线
             delay(200)
-            if (this.bot.isActive) {
+            if (this.bot.network.areYouOk()) {
                 return@subscribeAlways
             }
 
