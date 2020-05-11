@@ -8,13 +8,10 @@ import java.io.File
 
 
 class LuaScriptHost(file: File, dataFolder: File) : BaseScriptHost(file, dataFolder) {
-    private val scriptOut = object : MiraiGlobals.Printable {
-        override fun print(msg: String?) {
-            MiraiConsole.frontEnd.pushLog(0L, "[Lua] $msg")
-        }
 
+    private val globals = MiraiGlobals {
+        MiraiConsole.frontEnd.pushLog(0L, "[Lua] $it")
     }
-    private val globals = MiraiGlobals(scriptOut)
 
     override fun load(bot: Bot) {
         MiraiConsole.frontEnd.pushLog(0L, "[Lua] 正在加载lua脚本 ${file.name}")
