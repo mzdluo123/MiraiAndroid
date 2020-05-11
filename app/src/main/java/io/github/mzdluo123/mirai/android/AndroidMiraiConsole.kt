@@ -55,24 +55,18 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         val TAG = "MiraiAndroid"
     }
 
-    override fun createLoginSolver(): LoginSolver {
-        return loginSolver
-    }
+    fun stop() = scriptManager.disableAll()
 
-    override fun prePushBot(identity: Long) {
-        return
-    }
+    override fun createLoginSolver(): LoginSolver = loginSolver
+
+    override fun prePushBot(identity: Long) = Unit
 
     override fun pushBot(bot: Bot) {
-        bot.launch {
-            scriptManager.enable(bot)
-        }
+        bot.launch {scriptManager.enableAll(bot)}
         bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             // 防止一闪而过得掉线
             delay(200)
-            if (this.bot.network.areYouOk()) {
-                return@subscribeAlways
-            }
+            if (this.bot.network.areYouOk()) return@subscribeAlways
 
             pushLog(0L, "[INFO] 发送离线通知....")
             val builder =
@@ -110,9 +104,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         startRefreshNotificationJob(bot)
     }
 
-    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) {
-        return
-    }
+    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
 
     override fun pushLog(identity: Long, message: String) {
         logStorage.add(message)
@@ -133,13 +125,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         logStorage.add(MiraiAndroidStatus.recentStatus().format())
     }
 
-    override suspend fun requestInput(hint: String): String {
-        return ""
-    }
-
-    fun stop() {
-        scriptManager.disable()
-    }
+    override suspend fun requestInput(hint: String): String = ""
 
     private fun startRefreshNotificationJob(bot: Bot) {
         bot.subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
