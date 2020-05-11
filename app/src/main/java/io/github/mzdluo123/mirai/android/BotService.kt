@@ -62,10 +62,7 @@ class BotService : Service(), CommandOwner {
     }
 
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
-
+    override fun onBind(intent: Intent): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
@@ -102,50 +99,44 @@ class BotService : Service(), CommandOwner {
     private fun autoLogin(intent: Intent) {
         val qq = intent.getLongExtra("qq", 0)
         val pwd = intent.getStringExtra("pwd")
-        if (qq != 0L) {
-            //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
-            androidMiraiConsole.pushLog(0L, "[INFO] 自动登录....")
-            val handler = CoroutineExceptionHandler { _, throwable ->
-                androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
-            }
+        if (qq == 0L) return
 
-            val bot = Bot(qq, pwd!!.chunkedHexToBytes()) {
-                fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
-                this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
-                this.botLoggerSupplier = {
-                    SimpleLogger("[BOT $qq]") { _, message, e ->
-                        androidMiraiConsole.pushLog(0L, "[INFO] $message")
-                        if (e != null) {
-                            androidMiraiConsole.pushLog(0L, "[BOT ERROR $qq] $e")
-                            e.printStackTrace()
-                        }
-                    }
-                }
-                this.networkLoggerSupplier = {
-                    SimpleLogger("BOT $qq") { _, message, e ->
-                        androidMiraiConsole.pushLog(0L, "[NETWORK] $message")
-                        if (e != null) {
-                            androidMiraiConsole.pushLog(0L, "[NETWORK ERROR] $e")
-                            e.printStackTrace()
-                        }
-                    }
-                }
-            }
-            GlobalScope.launch(handler) { bot.login() }
-            bot.subscribeMessages {
-                startsWith("/") { message ->
-                    if (bot.checkManager(this.sender.id)) {
-                        val sender = ContactCommandSender(this.subject)
-                        CommandManager.runCommand(
-                            sender, message
-                        )
-                    }
-                }
-            }
-
-            GlobalScope.launch(handler) { sendMessage("$qq login successes") }
-            MiraiConsole.frontEnd.pushBot(bot)
+        //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
+        androidMiraiConsole.pushLog(0L, "[INFO] 自动登录....")
+        val handler = CoroutineExceptionHandler { _, throwable ->
+            androidMiraiConsole.pushLog(0L, "[ERROR] 自动登录失败 $throwable")
         }
+
+        val bot = Bot(qq, pwd!!.chunkedHexToBytes()) {
+            fileBasedDeviceInfo(getExternalFilesDir(null)!!.absolutePath + "/device.json")
+            this.loginSolver = MiraiConsole.frontEnd.createLoginSolver()
+            this.botLoggerSupplier = {
+                SimpleLogger("[BOT $qq]") { _, message, e ->
+                    androidMiraiConsole.pushLog(0L, "[INFO] $message")
+                    e?.also {
+                        androidMiraiConsole.pushLog(0L, "[BOT ERROR $qq] $it")
+                    }?.printStackTrace()
+                }
+            }
+            this.networkLoggerSupplier = {
+                SimpleLogger("BOT $qq") { _, message, e ->
+                    androidMiraiConsole.pushLog(0L, "[NETWORK] $message")
+                    e?.also {
+                        androidMiraiConsole.pushLog(0L, "[NETWORK ERROR] $it")
+                    }?.printStackTrace()
+                }
+            }
+        }
+        GlobalScope.launch(handler) { bot.login() }
+        bot.subscribeMessages {
+            startsWith("/") { message ->
+                if (bot.checkManager(this.sender.id))
+                    CommandManager.runCommand(ContactCommandSender(this.subject), message)
+            }
+        }
+
+        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
+        MiraiConsole.frontEnd.pushBot(bot)
     }
 
     private fun registerDefaultCommand() {
@@ -202,6 +193,4 @@ class BotService : Service(), CommandOwner {
 
     private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()
-
-
 }
