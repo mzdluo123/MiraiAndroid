@@ -14,6 +14,22 @@ class ScriptManager(private val dataDir: File, private val scriptDir: File) {
         loadScripts()
     }
 
+    private fun loadConfigs():Array<ScriptConfig>{
+        TODO("增加配置读取")
+    }
+
+    private fun loadAllScripts(scriptConfigs: Array<ScriptConfig>){
+        scriptConfigs.forEach {
+            try{
+                when(it.type){
+                    //ScriptConfig.LUA -> scriptHosts.add(LuaScriptHost())
+                }
+            }catch (e: Exception) {
+                MiraiConsole.frontEnd.pushLog(0L, "[ERROR] 加载脚本时出现内部错误 $e")
+            }
+        }
+    }
+
     private fun loadScripts() {
         scripts?.forEach {
             try {
@@ -57,6 +73,17 @@ class ScriptManager(private val dataDir: File, private val scriptDir: File) {
     }
     fun disable(index : Int) = scriptHosts[index].disable()
     fun disableAll() = scriptHosts.forEach {it.disable()}
+}
+
+data class ScriptConfig(
+    var type:Int, //脚本类型
+    var path:String, //脚本路径
+    var enable:Boolean, //开启状态
+    var data: String //脚本保存数据
+){
+    companion object{
+        val LUA = 0;
+    }
 }
 
 abstract class BaseScriptHost(val file: File, val dataFolder: File) {
