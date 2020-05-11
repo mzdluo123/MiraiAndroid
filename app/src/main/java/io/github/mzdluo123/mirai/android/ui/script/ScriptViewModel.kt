@@ -36,7 +36,4 @@ class ScriptViewModel : ViewModel() {
             pluginList.postValue(loadScriptList())
         }
     }
-
-
-
 }

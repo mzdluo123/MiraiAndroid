@@ -108,4 +108,15 @@ public final class FileUtils {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
+    public static String formatFileLength(long length) {
+        String[] suffixs = new String[]{"B", "K", "M", "G", "T", "P"};
+        int suffixIndex = 0;
+        float remain = 0;
+        while (length >= 1024) {
+            remain = (remain + length % 1024) / 1024;
+            length /= 1024;
+            suffixIndex++;
+        }
+        return String.format("%0.2f%s", remain + length, suffixs[suffixIndex]);
+    }
 }
