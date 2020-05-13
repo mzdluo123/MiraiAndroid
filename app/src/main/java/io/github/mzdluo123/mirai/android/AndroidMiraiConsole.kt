@@ -62,7 +62,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     override fun prePushBot(identity: Long) = Unit
 
     override fun pushBot(bot: Bot) {
-        bot.launch {scriptManager.enableAll(bot)}
+        bot.launch {scriptManager.pushBot(bot)}
         bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             // 防止一闪而过得掉线
             delay(200)
@@ -94,7 +94,6 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
                 notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
             }
         }
-
         bot.subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
             pushLog(0L, "[INFO] 发送上线通知....")
             NotificationManagerCompat.from(BotApplication.context)

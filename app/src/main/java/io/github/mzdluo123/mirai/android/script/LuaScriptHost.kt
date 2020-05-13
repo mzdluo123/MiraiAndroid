@@ -4,22 +4,24 @@ import com.ooooonly.luaMirai.lua.MiraiGlobals
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
+import org.luaj.vm2.Globals
 import java.io.File
 
 
-class LuaScriptHost(file: File, dataFolder: File) : BaseScriptHost(file, dataFolder) {
+class LuaScriptHost(scriptFile: File,configFile:File) : BaseScriptHost(scriptFile, configFile) {
+    private lateinit var globals : MiraiGlobals
 
-    private val globals = MiraiGlobals {
-        MiraiConsole.frontEnd.pushLog(0L, "[Lua] $it")
+    override fun onLoad() :ScriptInfo {
+        globals = MiraiGlobals(log)
+        globals.loadfile(scriptFile.absolutePath).call()
+        return ScriptInfo("","","","")
     }
 
-    override fun load(bot: Bot) {
-        MiraiConsole.frontEnd.pushLog(0L, "[Lua] 正在加载lua脚本 ${file.name}")
-        globals.loadfile(file.absolutePath).call()
+    override fun onFetchBot(bot: Bot) {
         globals.onLoad(bot)
     }
 
-    override fun disable() {
+    override fun onDisable() {
         globals.onFinish()
         globals.unSubsribeAll()
     }
