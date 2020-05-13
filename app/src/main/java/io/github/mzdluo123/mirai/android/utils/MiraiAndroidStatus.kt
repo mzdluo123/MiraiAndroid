@@ -32,14 +32,39 @@ class MiraiAndroidStatus (
         )
     }
 
-    fun format():String = StringBuilder().apply{
-        append("MiraiAndroid v${miraiAndroidVersion}\n")
-        append("MiraiCore v${coreVersion}\n")
-        append("LuaMirai v${luaMiraiVersion}\n")
-        append("系统版本 ${releaseVersion} SDK ${sdkVersion}\n")
-        append("内存可用 ${memorySize}\n")
-        append("网络 ${netType}\n")
-        append("启动时间 ${startTime}\n")
-        append("日志缓存行数 $logBuffer")
-    }.toString()
+    fun format():String = buildString{
+        append("MiraiAndroid v")
+        append(miraiAndroidVersion)
+        append("\n")
+
+        append("MiraiCore v")
+        append(coreVersion)
+        append("\n")
+
+        append("LuaMirai v")
+        append(luaMiraiVersion)
+        append("\n")
+
+        append("系统版本 ")
+        append(releaseVersion)
+        append(" SDK ")
+        append(sdkVersion)
+        append("\n")
+
+        append("内存可用 ")
+        append(memorySize)
+        append("\n")
+
+        append("网络 ")
+        append(netType)
+        append("\n")
+
+        append("启动时间 ")
+        append(startTime)
+        append("\n")
+
+        append("日志缓存行数 ")
+        append(logBuffer)
+        append("\n")
+    }
 }
