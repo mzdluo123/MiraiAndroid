@@ -1,13 +1,8 @@
 package io.github.mzdluo123.mirai.android.script
 
-import android.accounts.AuthenticatorDescription
-import com.alibaba.fastjson.JSON
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import org.json.JSONObject
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
