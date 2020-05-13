@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_captcha.*
 import kotlinx.android.synthetic.main.activity_unsafe_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ImplicitReflectionSerializer
 
 class CaptchaActivity : AppCompatActivity() {
     private val conn = object : ServiceConnection {
@@ -45,6 +46,7 @@ class CaptchaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_captcha)
     }
 
+    @ImplicitReflectionSerializer
     override fun onStart() {
         super.onStart()
         val intent = Intent(baseContext, BotService::class.java)

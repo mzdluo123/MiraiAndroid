@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ImplicitReflectionSerializer
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
@@ -20,7 +21,6 @@ import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
 import kotlin.system.exitProcess
-
 
 class BotService : Service(), CommandOwner {
     lateinit var androidMiraiConsole: AndroidMiraiConsole
@@ -146,8 +146,8 @@ class BotService : Service(), CommandOwner {
         }
         register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, args ->
             sender.sendMessage(buildString {
-                append("已加载 ${androidMiraiConsole.scriptManager.scriptHosts.size}个脚本\n")
-                androidMiraiConsole.scriptManager.scriptHosts.joinTo(this, "\n") { it.file.name }
+                append("已加载 ${androidMiraiConsole.scriptManager.hosts.size}个脚本\n")
+                androidMiraiConsole.scriptManager.hosts.joinTo(this, "\n") { it.scriptFile.name }
             })
             true
         }

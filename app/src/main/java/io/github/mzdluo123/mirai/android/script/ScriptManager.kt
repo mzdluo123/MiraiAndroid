@@ -1,15 +1,26 @@
 package io.github.mzdluo123.mirai.android.script
 
 import com.google.gson.Gson
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.parse
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import kotlin.collections.HashMap
+import kotlin.collections.first
+import kotlin.collections.forEach
+import kotlin.collections.last
+import kotlin.collections.mutableListOf
+import kotlin.collections.set
+
 
 class ScriptManager(private val configDir: File, private val scriptDir: File) {
 
-    //private val scripts: Array<File,File>? = scriptDir.listFiles()
     private val scripts: HashMap<File,File> = HashMap() // 主文件，配置文件
     val hosts = mutableListOf<BaseScriptHost>()
 
@@ -37,7 +48,6 @@ class ScriptManager(private val configDir: File, private val scriptDir: File) {
         }
     }
 
-
     fun pushBot(bot:Bot) = hosts.forEach { it.installBot(bot) }
 
     fun enable(bot: Bot,index:Int) = hosts[index].enable()
@@ -50,7 +60,8 @@ class ScriptManager(private val configDir: File, private val scriptDir: File) {
     fun reloadAll() = hosts.forEach {it.reload()}
 }
 
-abstract class BaseScriptHost(val scriptFile: File,val configFile:File) {
+
+abstract class BaseScriptHost(val scriptFile: File, val configFile:File) {
     companion object{
         val LUA = 0
         val JAVASCRIPT = 1
@@ -66,16 +77,23 @@ abstract class BaseScriptHost(val scriptFile: File,val configFile:File) {
         }
     }
 
+
+    @Serializable
     data class ScriptConfig(
         var type:Int,
-        var alias:String,
-        var available:Boolean,
-        var data: String
+        var alias:String = "",
+        var available:Boolean = false,
+        var data: String = ""
     ){
         companion object{
+
             fun fromFile(configFile:File):ScriptConfig =
                 try{
-                    Gson().fromJson(FileReader(configFile),ScriptConfig::class.java)
+                    var obj:ScriptConfig
+                    FileReader(configFile).also{
+                        obj = Json.parse(ScriptConfig.serializer(),it.readText())
+                    }.close()
+                    obj
                 }catch(e:Exception){
                     ScriptConfig(
                         getType(configFile.name.split(".").last()),

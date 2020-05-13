@@ -22,6 +22,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ImplicitReflectionSerializer
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
 import net.mamoe.mirai.event.Listener
@@ -33,6 +34,7 @@ import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
 
+
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private val logBuffer = BotApplication.getSettingPreference()
         .getString("log_buffer_preference", "300")!!.toInt()
@@ -40,6 +42,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver = AndroidLoginSolver(context)
     private val scriptDir = context.getExternalFilesDir("scripts")!!
+
     val scriptManager: ScriptManager by lazy {
         ScriptManager(File(scriptDir, "data"), scriptDir)
     }

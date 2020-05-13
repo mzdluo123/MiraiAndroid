@@ -3,7 +3,9 @@ package io.github.mzdluo123.mirai.android
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import kotlinx.serialization.ImplicitReflectionSerializer
 
+@ImplicitReflectionSerializer
 class BootReceiver : BroadcastReceiver() {
 //    companion object{
 //        const val TAG = "BootReceiver"
