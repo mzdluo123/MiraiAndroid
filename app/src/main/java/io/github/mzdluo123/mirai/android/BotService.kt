@@ -2,9 +2,12 @@
 
 package io.github.mzdluo123.mirai.android
 
+import android.annotation.SuppressLint
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
@@ -24,12 +27,19 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
 import kotlin.system.exitProcess
 
+
 class BotService : Service(), CommandOwner {
     lateinit var androidMiraiConsole: AndroidMiraiConsole
         private set
-
-    private val binder by lazy { BotBinder() }
+    private val binder = BotBinder()
     private var isStart = false
+    private lateinit var powerManager: PowerManager
+    private lateinit var wakeLock: PowerManager.WakeLock
+
+// 多进程调试辅助
+//  init {
+//        Debug.waitForDebugger()
+//    }
 
     companion object {
         const val START_SERVICE = 0
@@ -56,6 +66,7 @@ class BotService : Service(), CommandOwner {
             }
     }
 
+
     override fun onBind(intent: Intent): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -72,9 +83,13 @@ class BotService : Service(), CommandOwner {
         return super.onStartCommand(intent, flags, startId)
     }
 
+
+    @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
         androidMiraiConsole = AndroidMiraiConsole(baseContext)
+        powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
 
     private fun autoLogin(intent: Intent) {
@@ -134,9 +149,11 @@ class BotService : Service(), CommandOwner {
         }
     }
 
+    @SuppressLint("WakelockTimeout")
     private fun startConsole(intent: Intent?) {
         if (isStart) return
         isStart = true
+        wakeLock.acquire()
         MiraiAndroidStatus.startTime = System.currentTimeMillis()
         MiraiConsole.start(
             androidMiraiConsole,
@@ -149,6 +166,8 @@ class BotService : Service(), CommandOwner {
 
     private fun stopConsole() {
         ScriptManager.instance.disableAll()
+        wakeLock.release()
+        androidMiraiConsole.stop()
         MiraiConsole.stop()
         stopForeground(true)
         stopSelf()
@@ -195,11 +214,4 @@ class BotService : Service(), CommandOwner {
 
     private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()
-
-    /* 多进程调试辅助
-    init {
-        Debug.waitForDebugger()
-    }
-    */
-
 }

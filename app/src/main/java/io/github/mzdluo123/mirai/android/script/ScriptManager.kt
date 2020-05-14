@@ -1,13 +1,14 @@
 package io.github.mzdluo123.mirai.android.script
 
-import android.content.Context
-import android.net.Uri
-import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.utils.FileUtils
-import io.github.mzdluo123.mirai.android.utils.copyToFileDir
+import com.google.gson.Gson
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import kotlin.collections.set
 
 class ScriptManager(var context: Context = BotApplication.context) {
     private val scripts: HashMap<File,File> = HashMap() // 主文件，配置文件
