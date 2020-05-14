@@ -1,40 +1,35 @@
 package io.github.mzdluo123.mirai.android.script
 
-import com.google.gson.Gson
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.parse
+import android.content.Context
+import android.net.Uri
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.utils.FileUtils
+import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
-import kotlin.collections.HashMap
-import kotlin.collections.first
-import kotlin.collections.forEach
-import kotlin.collections.last
-import kotlin.collections.mutableListOf
-import kotlin.collections.set
 
-
-class ScriptManager(private val configDir: File, private val scriptDir: File) {
-
+class ScriptManager(var context: Context = BotApplication.context) {
     private val scripts: HashMap<File,File> = HashMap() // 主文件，配置文件
-    val hosts = mutableListOf<BaseScriptHost>()
+    val hosts = mutableListOf<ScriptHost>()
+
+    private val scriptDir = context.getExternalFilesDir("scripts")!!
+    private val configDir = File(scriptDir, "data")
+
+    companion object {
+        val instance: ScriptManager by lazy {
+            ScriptManager()
+        }
+    }
 
     init {
         if (!configDir.exists()) configDir.mkdir()
         if (!scriptDir.exists()) scriptDir.mkdir()
-        scriptDir.listFiles()?.forEach {
-            scripts[it] = File(configDir,it.name)
-        }
         loadScripts()
     }
 
     private fun loadScripts() {
-        scripts?.forEach {scriptFile,configFile ->
+        scripts.forEach { (scriptFile, configFile) ->
             try {
                 val type = scriptFile.name.split(".").last()
                 when (type) {
@@ -43,10 +38,20 @@ class ScriptManager(private val configDir: File, private val scriptDir: File) {
                 }
             } catch (e: Exception) {
                 MiraiConsole.frontEnd.pushLog(0L, "[ERROR] 加载脚本时出现内部错误 $e")
-                scriptFile.delete()
             }
         }
     }
+
+    private fun createScriptFromUri(fromUri: Uri) {
+        fromUri.getName(context)?.let {
+            context.copyToFileDir(
+                fromUri,
+                it, context.getExternalFilesDir("scripts")!!.absolutePath
+            )
+        }
+    }
+
+    fun getConfigFile(scriptFile: File) = File(configDir, scriptFile.name)
 
     fun pushBot(bot:Bot) = hosts.forEach { it.installBot(bot) }
 
@@ -60,92 +65,7 @@ class ScriptManager(private val configDir: File, private val scriptDir: File) {
     fun reloadAll() = hosts.forEach {it.reload()}
 }
 
-
-abstract class BaseScriptHost(val scriptFile: File, val configFile:File) {
-    companion object{
-        val LUA = 0
-        val JAVASCRIPT = 1
-        val PYTHON = 2
-        val KOTLINSCRIPT = 3
-        val NAMES = arrayOf("Lua","Js","Python","Kts")
-        fun getType(suffix:String) = when(suffix){
-            "lua" -> LUA
-            "js" -> JAVASCRIPT
-            "py" -> PYTHON
-            "kts" -> KOTLINSCRIPT
-            else -> -1
-        }
-    }
-
-
-    @Serializable
-    data class ScriptConfig(
-        var type:Int,
-        var alias:String = "",
-        var available:Boolean = false,
-        var data: String = ""
-    ){
-        companion object{
-
-            fun fromFile(configFile:File):ScriptConfig =
-                try{
-                    var obj:ScriptConfig
-                    FileReader(configFile).also{
-                        obj = Json.parse(ScriptConfig.serializer(),it.readText())
-                    }.close()
-                    obj
-                }catch(e:Exception){
-                    ScriptConfig(
-                        getType(configFile.name.split(".").last()),
-                        configFile.name.split(".").first(),
-                        true,
-                        ""
-                    )
-                }
-        }
-    }
-
-    data class ScriptInfo(
-        val name:String,
-        val author:String,
-        val version:String,
-        val description: String
-    )
-
-    val log : (String) -> Unit = { MiraiConsole.frontEnd.pushLog(0L, "[${NAMES[config.type]}] $it") }
-    var config :ScriptConfig
-    var info : ScriptInfo
-    var bots = HashMap<Bot,Boolean>() //bot对象，是否已传入脚本
-
-    init{
-        info = onLoad() //载入脚本，读取脚本名称，描述等信息。
-        config = ScriptConfig.fromFile(configFile)
-    }
-
-    fun reload() {
-        info = onLoad()
-        disable()
-        enable()
-    }
-    fun disable(){
-        config.available = false
-        bots.forEach{bot,_-> bots[bot] = false }
-        onDisable() //取消脚本内的所有消息订阅
-    }
-    fun enable() {
-        config.available = true
-        bots.forEach{bot,isFetched ->
-            if(!isFetched) onFetchBot(bot)
-        }
-    }
-    fun installBot(bot : Bot) {
-        bots[bot] = false
-        if(config.available) enable()
-    }
-
-    abstract fun onFetchBot(bot : Bot)//传入bot事件
-    abstract fun onLoad():ScriptInfo //载入事件，用于初始化环境，并读取脚本内信息到ScriptConfig
-    abstract fun onDisable() //脚本被禁用事件
-
-    fun saveConfig() = FileWriter(configFile).write(Gson().toJson(config))
-}
+private fun String.getSuffix() = split(".").last()
+private fun File.getSuffix() = name.getSuffix()
+private fun Uri.getName(context: Context) =
+    FileUtils.getFilePathByUri(context, this)?.split("/")?.last()

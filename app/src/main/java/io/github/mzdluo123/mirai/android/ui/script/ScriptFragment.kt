@@ -39,6 +39,7 @@ class ScriptFragment : Fragment() {
 
         scriptViewModel.pluginList.observe(viewLifecycleOwner, Observer {
             adapter.data = it.toMutableList()
+
             adapter.notifyDataSetChanged()
         })
         adapter.setOnItemClickListener { _, view, position ->
@@ -78,52 +79,47 @@ class ScriptFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            return false
-        }
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        if (item.itemId == android.R.id.home) return false
+        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             // Filter to only show results that can be "opened", such as a
             // file (as opposed to a list of contacts or timezones)
-            addCategory(Intent.CATEGORY_OPENABLE)
-
             // Filter to show only images, using the image MIME data type.
             // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
             // To search for all documents available via installed storage providers,
             // it would be "*/*".
+            addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
+            startActivityForResult(this, SELECT_SCRIPT)
         }
-
-        startActivityForResult(intent, SELECT_SCRIPT)
-
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
         if (requestCode == SELECT_SCRIPT && resultCode == Activity.RESULT_OK) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
-            data?.data?.also { uri ->
+
+            intent?.data?.also { uri ->
 
                 val realPath = FileUtils.getFilePathByUri(context, uri)
                 val name = realPath?.split("/")?.last()
-
                 /*if (name?.split(".")?.last() ?: "" != "lua") {
                     Toast.makeText(context, "非法文件", Toast.LENGTH_LONG).show()
                     return
                 }*/
                 context?.copyToFileDir(
-                     uri,
+                    uri,
                     name!!,
                     context!!.getExternalFilesDir("scripts")!!.absolutePath
                 )
-                Toast.makeText(context, "导入成功", Toast.LENGTH_LONG).show()
 
+                Toast.makeText(context, "导入成功", Toast.LENGTH_LONG).show()
             }
         }
-
     }
 }
 

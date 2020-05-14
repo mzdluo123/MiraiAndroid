@@ -10,7 +10,7 @@ import java.io.File
 
 class ScriptViewModel : ViewModel() {
     val pluginList = MutableLiveData<List<File>>()
-    private var scriptFileList: List<File>? = null
+    private val scriptFileList: List<File>
         get() = mutableListOf<File>().apply {
             BotApplication.context.getExternalFilesDir("scripts")?.listFiles()?.forEach {
                 if (it.isFile) add(it)

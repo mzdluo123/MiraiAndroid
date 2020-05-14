@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.github.mzdluo123.mirai.android.utils.register
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -26,6 +27,7 @@ import kotlin.system.exitProcess
 class BotService : Service(), CommandOwner {
     lateinit var androidMiraiConsole: AndroidMiraiConsole
         private set
+
     private val binder by lazy { BotBinder() }
     private var isStart = false
 
@@ -125,8 +127,8 @@ class BotService : Service(), CommandOwner {
         }
         register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, args ->
             sender.sendMessage(buildString {
-                append("已加载 ${androidMiraiConsole.scriptManager.hosts.size}个脚本\n")
-                androidMiraiConsole.scriptManager.hosts.joinTo(this, "\n") { it.scriptFile.name }
+                append("已加载 ${ScriptManager.instance.hosts.size}个脚本\n")
+                ScriptManager.instance.hosts.joinTo(this, "\n") { it.scriptFile.name }
             })
             true
         }
@@ -146,7 +148,7 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun stopConsole() {
-        androidMiraiConsole.stop()
+        ScriptManager.instance.disableAll()
         MiraiConsole.stop()
         stopForeground(true)
         stopSelf()

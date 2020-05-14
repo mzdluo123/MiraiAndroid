@@ -29,7 +29,6 @@ import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
-import java.io.File
 
 
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
@@ -38,11 +37,6 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver = AndroidLoginSolver(context)
-    private val scriptDir = context.getExternalFilesDir("scripts")!!
-
-    val scriptManager: ScriptManager by lazy {
-        ScriptManager(File(scriptDir, "data"), scriptDir)
-    }
 
     // 使用一个[60s/refreshPerMinute]的数组存放每4秒消息条数
     // 读取时增加最新一分钟，减去最老一分钟
@@ -52,17 +46,15 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private var refreshCurrentPos = 0
 
     companion object {
-        val TAG = "MiraiAndroid"
+        const val TAG = "MiraiAndroid"
     }
-
-    fun stop() = scriptManager.disableAll()
 
     override fun createLoginSolver(): LoginSolver = loginSolver
 
     override fun prePushBot(identity: Long) = Unit
 
     override fun pushBot(bot: Bot) {
-        bot.pushToScriptManager(scriptManager)
+        bot.pushToScriptManager(ScriptManager.instance)
         bot.subscribeBotLifeEvent()
         bot.startRefreshNotificationJob()
     }
@@ -188,7 +180,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     }
 
     private fun Bot.pushToScriptManager(manager: ScriptManager) {
-        launch { scriptManager.pushBot(this@pushToScriptManager) }
+        launch { manager.pushBot(this@pushToScriptManager) }
     }
 }
 
