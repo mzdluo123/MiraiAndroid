@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import io.github.mzdluo123.mirai.android.utils.FileUtils
-
+import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.android.synthetic.main.fragment_script.*
 import java.io.File
 
@@ -33,8 +32,7 @@ class ScriptFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        scriptViewModel =
-            ViewModelProvider(this).get(ScriptViewModel::class.java)
+        scriptViewModel = ViewModelProvider(this).get(ScriptViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_script, container, false)
         setHasOptionsMenu(true)
         adapter = ScriptAdapter()
@@ -44,24 +42,23 @@ class ScriptFragment : Fragment() {
             adapter.notifyDataSetChanged()
         })
         adapter.setOnItemClickListener { _, view, position ->
-            val menu = PopupMenu(activity, view)
-            menu.gravity = Gravity.END
-            menu.menuInflater.inflate(R.menu.plugin_manage, menu.menu)
-            menu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_delete -> {
-                        scriptViewModel.deleteScript(position)
-                        Toast.makeText(activity, "删除成功，重启后生效", Toast.LENGTH_SHORT).show()
-                        return@setOnMenuItemClickListener true
+            PopupMenu(activity, view).apply {
+                gravity = Gravity.END
+                menuInflater.inflate(R.menu.plugin_manage, menu)
+                setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        R.id.action_delete -> {
+                            scriptViewModel.deleteScript(position)
+                            Toast.makeText(activity, "删除成功，重启后生效", Toast.LENGTH_SHORT).show()
+                            return@setOnMenuItemClickListener true
+                        }
+
+                        else -> return@setOnMenuItemClickListener true
                     }
-
-                    else -> return@setOnMenuItemClickListener true
                 }
+                show()
             }
-            menu.show()
         }
-
-
         return root
     }
 
@@ -79,7 +76,6 @@ class ScriptFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.plugin_add, menu)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
@@ -114,10 +110,10 @@ class ScriptFragment : Fragment() {
                 val realPath = FileUtils.getFilePathByUri(context, uri)
                 val name = realPath?.split("/")?.last()
 
-                if (name?.split(".")?.last() ?: "" != "lua") {
+                /*if (name?.split(".")?.last() ?: "" != "lua") {
                     Toast.makeText(context, "非法文件", Toast.LENGTH_LONG).show()
                     return
-                }
+                }*/
                 context?.copyToFileDir(
                      uri,
                     name!!,

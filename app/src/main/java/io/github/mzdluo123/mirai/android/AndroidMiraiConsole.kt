@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -13,7 +12,6 @@ import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
-import io.github.mzdluo123.mirai.android.utils.DeviceStatus
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient
@@ -22,7 +20,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.serialization.ImplicitReflectionSerializer
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
 import net.mamoe.mirai.event.Listener
@@ -65,45 +62,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     override fun prePushBot(identity: Long) = Unit
 
     override fun pushBot(bot: Bot) {
-        bot.launch {scriptManager.pushBot(bot)}
-        bot.subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
-            // 防止一闪而过得掉线
-            delay(200)
-            if (this.bot.network.areYouOk()) return@subscribeAlways
-
-            pushLog(0L, "[INFO] 发送离线通知....")
-            val builder =
-                NotificationCompat.Builder(
-                    BotApplication.context,
-                    BotApplication.OFFLINE_NOTIFICATION
-                )
-                    .setAutoCancel(false)
-                    //禁止滑动删除
-                    .setOngoing(false)
-                    //右上角的时间显示
-                    .setShowWhen(true)
-                    .setSmallIcon(R.drawable.ic_info_black_24dp)
-                    .setContentTitle("Mirai离线")
-            when (this) {
-                is BotOfflineEvent.Dropped -> builder.setContentText("请检查网络环境")
-                is BotOfflineEvent.Force -> {
-                    //设置长消息的style
-                    builder.setStyle(NotificationCompat.BigTextStyle())
-                    builder.setContentText(this.message)
-                }
-                else -> return@subscribeAlways
-            }
-            NotificationManagerCompat.from(BotApplication.context).apply {
-                notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
-            }
-        }
-        bot.subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
-            pushLog(0L, "[INFO] 发送上线通知....")
-            NotificationManagerCompat.from(BotApplication.context)
-                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
-        }
-
-        startRefreshNotificationJob(bot)
+        bot.pushToScriptManager(scriptManager)
+        bot.subscribeBotLifeEvent()
+        bot.startRefreshNotificationJob()
     }
 
     override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
@@ -119,8 +80,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         identity: Long,
         message: String
     ) {
-        logStorage.add("[${priority}] $message")
-        Log.d(TAG, "[${priority}] $message")
+        logStorage.add("[${identityStr}] $message")
+        Log.d(TAG, "[${identityStr}] $message")
     }
 
     override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
@@ -129,12 +90,10 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     override suspend fun requestInput(hint: String): String = ""
 
-    private fun startRefreshNotificationJob(bot: Bot) {
-        bot.subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
-        bot.launch {
-            // 获取通知展示用的头像
-            val avatar = downloadAvatar(bot)
-
+    private fun Bot.startRefreshNotificationJob() {
+        subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
+        launch {
+            val avatar = downloadAvatar()  // 获取通知展示用的头像
             //点击进入主页
             val notifyIntent = Intent(BotApplication.context, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -181,15 +140,55 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         }
     }
 
-    private suspend fun downloadAvatar(bot: Bot): Bitmap {
-        return try {
+    private suspend fun Bot.downloadAvatar(): Bitmap =
+        try {
             pushLog(0L, "[INFO] 正在加载头像....")
-            val avatarData: ByteArray = HttpClient().get<ByteArray>(bot.selfQQ.avatarUrl)
-            BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
+            HttpClient().get<ByteArray>(selfQQ.avatarUrl).let { avatarData ->
+                BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
+            }
         } catch (e: Exception) {
             delay(1000)
-            downloadAvatar(bot)
+            downloadAvatar()
         }
+
+    private fun Bot.subscribeBotLifeEvent() {
+        subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
+            // 防止一闪而过得掉线
+            delay(200)
+            if (this.bot.network.areYouOk()) return@subscribeAlways
+            pushLog(0L, "[INFO] 发送离线通知....")
+            val builder =
+                NotificationCompat.Builder(
+                    BotApplication.context,
+                    BotApplication.OFFLINE_NOTIFICATION
+                )
+                    .setAutoCancel(false)
+                    .setOngoing(false)
+                    .setShowWhen(true)
+                    .setSmallIcon(R.drawable.ic_info_black_24dp)
+                    .setContentTitle("Mirai离线")
+            when (this) {
+                is BotOfflineEvent.Dropped -> builder.setContentText("请检查网络环境")
+                is BotOfflineEvent.Force -> {
+                    //设置长消息的style
+                    builder.setStyle(NotificationCompat.BigTextStyle())
+                    builder.setContentText(this.message)
+                }
+                else -> return@subscribeAlways
+            }
+            NotificationManagerCompat.from(BotApplication.context).apply {
+                notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+            }
+        }
+        subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
+            pushLog(0L, "[INFO] 发送上线通知....")
+            NotificationManagerCompat.from(BotApplication.context)
+                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
+        }
+    }
+
+    private fun Bot.pushToScriptManager(manager: ScriptManager) {
+        launch { scriptManager.pushBot(this@pushToScriptManager) }
     }
 }
 

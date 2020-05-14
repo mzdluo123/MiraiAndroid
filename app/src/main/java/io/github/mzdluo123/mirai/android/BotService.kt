@@ -11,12 +11,13 @@ import io.github.mzdluo123.mirai.android.utils.register
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.ImplicitReflectionSerializer
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.console.command.CommandManager
+import net.mamoe.mirai.console.command.CommandOwner
+import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
+import net.mamoe.mirai.console.command.ContactCommandSender
 import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
@@ -25,13 +26,8 @@ import kotlin.system.exitProcess
 class BotService : Service(), CommandOwner {
     lateinit var androidMiraiConsole: AndroidMiraiConsole
         private set
-    private val binder = BotBinder()
+    private val binder by lazy { BotBinder() }
     private var isStart = false
-
-// 多进程调试辅助
-//  init {
-//        Debug.waitForDebugger()
-//    }
 
     companion object {
         const val START_SERVICE = 0
@@ -43,53 +39,36 @@ class BotService : Service(), CommandOwner {
 
     private fun createNotification() {
         //使用兼容版本
-        val notification = NotificationCompat.Builder(this, BotApplication.SERVICE_NOTIFICATION)
-            //设置状态栏的通知图标
-            .setSmallIcon(R.drawable.ic_extension_black_24dp)
-            //禁止用户点击删除按钮删除
-            .setAutoCancel(false)
-            //禁止滑动删除
-            .setOngoing(true)
-            //右上角的时间显示
-            .setShowWhen(true)
+        NotificationCompat.Builder(this, BotApplication.SERVICE_NOTIFICATION)
+            .setSmallIcon(R.drawable.ic_extension_black_24dp)//设置状态栏的通知图标
+            .setAutoCancel(false) //禁止用户点击删除按钮删除
+            .setOngoing(true) //禁止滑动删除
+            .setShowWhen(true) //右上角的时间显示
             .setOnlyAlertOnce(true)
             .setStyle(NotificationCompat.BigTextStyle())
-            .setContentTitle("MiraiAndroid未登录")
-            .setContentText("请完成登录并将软件添加到系统后台运行白名单确保能及时处理消息").build()
-        //创建通知
-        //设置为前台服务
-        startForeground(NOTIFICATION_ID, notification)
+            .setContentTitle("MiraiAndroid未登录") //创建通知
+            .setContentText("请完成登录并将软件添加到系统后台运行白名单确保能及时处理消息")
+            .build()
+            .let {
+                startForeground(NOTIFICATION_ID, it) //设置为前台服务
+            }
     }
-
 
     override fun onBind(intent: Intent): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
-            val action = intent?.getIntExtra("action", START_SERVICE)
-            if (action == START_SERVICE && !isStart) {
-                MiraiAndroidStatus.startTime = System.currentTimeMillis()
-                MiraiConsole.start(
-                    androidMiraiConsole,
-                    path = getExternalFilesDir(null).toString()
-                )
-                isStart = true
-                createNotification()
-                registerDefaultCommand()
-                autoLogin(intent)
-            } else if (action == STOP_SERVICE) {
-                androidMiraiConsole.stop()
-                MiraiConsole.stop()
-                stopForeground(true)
-                stopSelf()
-                exitProcess(0)
+            intent?.getIntExtra("action", START_SERVICE).let { action ->
+                when (action) {
+                    START_SERVICE -> startConsole(intent)
+                    STOP_SERVICE -> stopConsole()
+                }
             }
         }catch (e:Exception){
             androidMiraiConsole.pushLog(0L, "发生错误 $e")
         }
         return super.onStartCommand(intent, flags, startId)
     }
-
 
     override fun onCreate() {
         super.onCreate()
@@ -153,6 +132,27 @@ class BotService : Service(), CommandOwner {
         }
     }
 
+    private fun startConsole(intent: Intent?) {
+        if (isStart) return
+        isStart = true
+        MiraiAndroidStatus.startTime = System.currentTimeMillis()
+        MiraiConsole.start(
+            androidMiraiConsole,
+            path = getExternalFilesDir(null).toString()
+        )
+        createNotification()
+        registerDefaultCommand()
+        intent?.let { autoLogin(it) }
+    }
+
+    private fun stopConsole() {
+        androidMiraiConsole.stop()
+        MiraiConsole.stop()
+        stopForeground(true)
+        stopSelf()
+        exitProcess(0)
+    }
+
     inner class BotBinder : IbotAidlInterface.Stub() {
         override fun runCmd(cmd: String?) {
             cmd?.let {
@@ -193,4 +193,11 @@ class BotService : Service(), CommandOwner {
 
     private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()
+
+    /* 多进程调试辅助
+    init {
+        Debug.waitForDebugger()
+    }
+    */
+
 }

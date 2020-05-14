@@ -10,30 +10,23 @@ import java.io.File
 
 class ScriptViewModel : ViewModel() {
     val pluginList = MutableLiveData<List<File>>()
+    private var scriptFileList: List<File>? = null
+        get() = mutableListOf<File>().apply {
+            BotApplication.context.getExternalFilesDir("scripts")?.listFiles()?.forEach {
+                if (it.isFile) add(it)
+            }
+        }
 
     init {
         refreshScriptList()
     }
 
-    private fun loadScriptList(): List<File> {
-        val fileList = mutableListOf<File>()
-        BotApplication.context.getExternalFilesDir("scripts")?.listFiles()?.forEach {
-            if (it.isFile) {
-                fileList.add(it)
-            }
-        }
-        return fileList
-    }
-
-    fun deleteScript(pos: Int) {
-        val file = pluginList.value?.get(pos) ?: return
-        file.delete()
+    fun deleteScript(pos: Int) = pluginList.value?.get(pos)?.apply {
+        delete()
         refreshScriptList()
     }
 
-    fun refreshScriptList() {
-        viewModelScope.launch {
-            pluginList.postValue(loadScriptList())
-        }
+    fun refreshScriptList() = viewModelScope.launch {
+        pluginList.postValue(scriptFileList)
     }
 }

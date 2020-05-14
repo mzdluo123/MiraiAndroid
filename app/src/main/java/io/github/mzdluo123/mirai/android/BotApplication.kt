@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
+import androidx.annotation.RequiresApi
 
 
 class BotApplication : Application() {
@@ -25,6 +26,7 @@ class BotApplication : Application() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         context = this
@@ -72,6 +74,4 @@ class BotApplication : Application() {
         }
         return null
     }
-
-
 }
