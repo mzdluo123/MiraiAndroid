@@ -2,20 +2,12 @@ package io.github.mzdluo123.mirai.android.script
 
 import com.google.gson.Gson
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import kotlinx.serialization.parse
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
-import kotlin.collections.HashMap
-import kotlin.collections.first
-import kotlin.collections.forEach
-import kotlin.collections.last
-import kotlin.collections.mutableListOf
 import kotlin.collections.set
 
 
