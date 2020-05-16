@@ -35,8 +35,14 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
     @OptIn(UnstableDefault::class)
     fun load() {
         info = onCreate()
-        config = Json.parse(ScriptConfig.serializer(), FileReader(configFile).readText())
-        if (config.alias.isBlank()) config.alias = info.name
+        if (configFile.exists()) {
+            val reader = FileReader(configFile)
+            var text = reader.readText()
+            reader.close()
+            config = Json.parse(ScriptConfig.serializer(), text)
+        } else {
+            if (!info.name.isBlank()) config.alias = info.name
+        }
         saveConfig()
     }
 
@@ -54,6 +60,12 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
     protected abstract fun onEnable() //脚本被启用事件
 
     @OptIn(UnstableDefault::class)
-    fun saveConfig() =
-        FileWriter(configFile).write(Json.stringify(ScriptConfig.serializer(), config))
+    fun saveConfig() {
+        val data = Json.stringify(ScriptConfig.serializer(), config)
+        if (!configFile.exists()) configFile.createNewFile()
+        val writer = FileWriter(configFile)
+        writer.write(data)
+        writer.flush()
+        writer.close()
+    }
 }

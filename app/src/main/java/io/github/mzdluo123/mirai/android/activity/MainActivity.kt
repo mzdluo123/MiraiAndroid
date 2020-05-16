@@ -3,6 +3,7 @@ package io.github.mzdluo123.mirai.android.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -32,35 +33,33 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         findNavController(R.id.nav_host_fragment).let {
             setupActionBarWithNavController(it, appBarConfiguration)
             nav_view.setupWithNavController(it)
         }
 
+
         val account = getSharedPreferences("account", Context.MODE_PRIVATE)
-        Intent(this, BotService::class.java).apply {
+
+        startService(Intent(this, BotService::class.java).apply {
             putExtra("action", BotService.START_SERVICE)
             putExtra("qq", account.getLong("qq", 0))
             putExtra("pwd", account.getString("pwd", null))
-            startService(this)
-        }
+        })
 
-        stopService_btn.setOnClickListener {
-            Intent(this, BotService::class.java).apply {
+        btn_stopService.setOnClickListener {
+            startService(Intent(this, BotService::class.java).apply {
                 putExtra("action", BotService.STOP_SERVICE)
-                startService(this)
-            }
+            })
             finish()
         }
 
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
+    override fun onSupportNavigateUp(): Boolean =
+        findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+
 /*
     fun requestPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -82,11 +81,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 */
-/*
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
         return true
     }
-*/
+
 }

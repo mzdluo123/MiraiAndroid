@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android.ui
+package io.github.mzdluo123.mirai.android.ui.setting
 
 import android.os.Bundle
 import android.text.InputType

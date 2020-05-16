@@ -17,8 +17,12 @@ class ScriptViewModel : ViewModel() {
     fun observe(owner: LifecycleOwner, observer: Observer<in List<ScriptHost>>) =
         hosts.observe(owner, observer)
 
-    fun createScriptFromUri(fromUri: Uri) =
-        manager.createScriptFromUri(fromUri).also { refreshScriptList() }
+    fun createScriptFromUri(fromUri: Uri, type: Int): Boolean {
+        var result = manager.createScriptFromUri(fromUri, type)
+        if (!result) return false
+        refreshScriptList()
+        return true
+    }
     fun refreshScriptList() = viewModelScope.launch {
         hosts.postValue(manager.hosts)
     }
@@ -26,5 +30,10 @@ class ScriptViewModel : ViewModel() {
     fun editConfig(index: Int, editor: ScriptHost.ScriptConfig.() -> Unit) =
         manager.editConfig(index, editor).also { refreshScriptList() }
 
+    fun reloadScript(index: Int) =
+        manager.reload(index).also { refreshScriptList() }
+
     fun deleteScript(pos: Int) = manager.delete(pos).also { refreshScriptList() }
+
+    fun getScriptFile(pos: Int) = manager.hosts[pos].scriptFile
 }
