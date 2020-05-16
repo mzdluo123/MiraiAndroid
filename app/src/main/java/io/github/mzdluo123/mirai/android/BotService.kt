@@ -209,6 +209,10 @@ class BotService : Service(), CommandOwner {
         override fun sendLog(log: String?) {
             androidMiraiConsole.logStorage.add(log)
         }
+
+        override fun getBotInfo(): String {
+            return MiraiAndroidStatus.recentStatus().format()
+        }
     }
 
     private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }

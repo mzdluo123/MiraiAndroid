@@ -14,4 +14,5 @@ interface IbotAidlInterface {
     byte[] getCaptcha();
     String getUrl();
     void submitVerificationResult(String result);
+    String getBotInfo();
 }
