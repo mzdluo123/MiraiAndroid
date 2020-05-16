@@ -13,10 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.script.ScriptHost
 import io.github.mzdluo123.mirai.android.utils.FileUtils
-import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.android.synthetic.main.fragment_script.*
-import java.io.File
 
 class ScriptFragment : Fragment() {
 
@@ -36,10 +35,8 @@ class ScriptFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_script, container, false)
         setHasOptionsMenu(true)
         adapter = ScriptAdapter()
-
-        scriptViewModel.pluginList.observe(viewLifecycleOwner, Observer {
+        scriptViewModel.hosts.observe(viewLifecycleOwner, Observer {
             adapter.data = it.toMutableList()
-
             adapter.notifyDataSetChanged()
         })
         adapter.setOnItemClickListener { _, view, position ->
@@ -53,12 +50,10 @@ class ScriptFragment : Fragment() {
                             Toast.makeText(activity, "删除成功，重启后生效", Toast.LENGTH_SHORT).show()
                             return@setOnMenuItemClickListener true
                         }
-
                         else -> return@setOnMenuItemClickListener true
                     }
                 }
-                show()
-            }
+            }.show()
         }
         return root
     }
@@ -69,11 +64,6 @@ class ScriptFragment : Fragment() {
         script_recycler.layoutManager = LinearLayoutManager(activity)
     }
 
-    override fun onResume() {
-        super.onResume()
-        scriptViewModel.refreshScriptList()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.plugin_add, menu)
     }
@@ -81,54 +71,30 @@ class ScriptFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) return false
         Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            // Filter to only show results that can be "opened", such as a
-            // file (as opposed to a list of contacts or timezones)
-            // Filter to show only images, using the image MIME data type.
-            // If one wanted to search for ogg vorbis files, the type would be "audio/ogg".
-            // To search for all documents available via installed storage providers,
-            // it would be "*/*".
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
-            startActivityForResult(this, SELECT_SCRIPT)
+        }.let {
+            startActivityForResult(it, SELECT_SCRIPT)
         }
         return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-
         if (requestCode == SELECT_SCRIPT && resultCode == Activity.RESULT_OK) {
-            // The document selected by the user won't be returned in the intent.
-            // Instead, a URI to that document will be contained in the return intent
-            // provided to this method as a parameter.
-            // Pull that URI using resultData.getData().
-
             intent?.data?.also { uri ->
-
-                val realPath = FileUtils.getFilePathByUri(context, uri)
-                val name = realPath?.split("/")?.last()
-                /*if (name?.split(".")?.last() ?: "" != "lua") {
-                    Toast.makeText(context, "非法文件", Toast.LENGTH_LONG).show()
-                    return
-                }*/
-                context?.copyToFileDir(
-                    uri,
-                    name!!,
-                    context!!.getExternalFilesDir("scripts")!!.absolutePath
-                )
-
+                scriptViewModel.createScriptFromUri(uri)
                 Toast.makeText(context, "导入成功", Toast.LENGTH_LONG).show()
             }
         }
     }
 }
 
-class ScriptAdapter : BaseQuickAdapter<File, BaseViewHolder>(R.layout.item_plugin) {
-    override fun convert(holder: BaseViewHolder, item: File) {
+class ScriptAdapter : BaseQuickAdapter<ScriptHost, BaseViewHolder>(R.layout.item_plugin) {
+    override fun convert(holder: BaseViewHolder, item: ScriptHost) {
         with(holder){
-            setText(R.id.pluginName_text, item.name)
-            setText(R.id.pluginSize_text, FileUtils.formatFileLength(item.length()))
+            setText(R.id.pluginName_text, item.config.alias)
+            setText(R.id.pluginSize_text, FileUtils.formatFileLength(item.info.fileLength))
         }
     }
-
 }

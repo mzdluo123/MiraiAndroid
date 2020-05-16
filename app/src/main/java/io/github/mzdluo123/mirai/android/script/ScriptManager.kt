@@ -1,25 +1,28 @@
 package io.github.mzdluo123.mirai.android.script
 
-import com.google.gson.Gson
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import android.content.Context
+import android.net.Uri
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.utils.FileUtils
+import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
-import kotlin.collections.set
 
-class ScriptManager(var context: Context = BotApplication.context) {
-    private val scripts: HashMap<File,File> = HashMap() // 主文件，配置文件
+class ScriptManager(
+    private var context: Context,
+    private var scriptDir: File,
+    private var configDir: File
+) {
     val hosts = mutableListOf<ScriptHost>()
-
-    private val scriptDir = context.getExternalFilesDir("scripts")!!
-    private val configDir = File(scriptDir, "data")
-
+    private val bots = mutableListOf<Bot>()
+    val botsSize: Int
+        get() = bots.size
     companion object {
         val instance: ScriptManager by lazy {
-            ScriptManager()
+            val context: Context = BotApplication.context
+            val configDir = context.getExternalFilesDir("scripts")
+            val scriptDir = context.getExternalFilesDir("data")
+            ScriptManager(context, scriptDir!!, configDir!!)
         }
     }
 
@@ -29,44 +32,83 @@ class ScriptManager(var context: Context = BotApplication.context) {
         loadScripts()
     }
 
-    private fun loadScripts() {
-        scripts.forEach { (scriptFile, configFile) ->
-            try {
-                val type = scriptFile.name.split(".").last()
-                when (type) {
-                    "lua" -> hosts.add(LuaScriptHost(scriptFile, configFile))
-                    // TODO 其他脚本支持
-                }
-            } catch (e: Exception) {
-                MiraiConsole.frontEnd.pushLog(0L, "[ERROR] 加载脚本时出现内部错误 $e")
-            }
-        }
+    fun addBot(bot: Bot) = hosts.forEach { it.installBot(bot) }
+    fun editConfig(index: Int, editor: ScriptHost.ScriptConfig.() -> Unit) {
+        hosts[index].config.editor()
     }
 
-    private fun createScriptFromUri(fromUri: Uri) {
-        fromUri.getName(context)?.let {
-            context.copyToFileDir(
-                fromUri,
-                it, context.getExternalFilesDir("scripts")!!.absolutePath
+    fun delete(index: Int) {
+        hosts.removeAt(index)
+    }
+
+    private fun loadScripts() {
+        scriptDir.listFiles()?.forEach { scriptFile ->
+            hosts.addHost(
+                ScriptHostFactory.getScriptHost(
+                    scriptFile,
+                    scriptFile.getConfigFile(),
+                    ScriptHostFactory.UNKNOWN
+                )
             )
         }
     }
 
-    fun getConfigFile(scriptFile: File) = File(configDir, scriptFile.name)
+    fun createScriptFromUri(fromUri: Uri) {
+        fromUri.getName(context).let { name ->
+            context.copyToFileDir(
+                fromUri,
+                name!!,
+                context.getExternalFilesDir("scripts")!!.absolutePath
+            )
+            val scriptFile = File(scriptDir, name)
+            hosts.addHost(
+                ScriptHostFactory.getScriptHost(
+                    scriptFile,
+                    scriptFile.getConfigFile(),
+                    ScriptHostFactory.UNKNOWN
+                )
+            ).also { host ->
+                bots.forEach { bot -> host.installBot(bot) }
+            }
+        }
 
-    fun pushBot(bot:Bot) = hosts.forEach { it.installBot(bot) }
+    }
 
-    fun enable(bot: Bot,index:Int) = hosts[index].enable()
+    fun enable(index: Int) = hosts[index].enable()
     fun enableAll() = hosts.forEach { host -> host.enable() }
 
     fun disable(index : Int) = hosts[index].disable()
     fun disableAll() = hosts.forEach {it.disable()}
 
-    fun reload(index : Int) = hosts[index].reload()
-    fun reloadAll() = hosts.forEach {it.reload()}
-}
+    fun reload(index: Int) {
+        hosts[index].disable()
+        hosts[index].load()
+        hosts[index].enableIfPossible()
+        bots.forEach {
+            hosts[index].installBot(it)
+        }
+    }
 
-private fun String.getSuffix() = split(".").last()
-private fun File.getSuffix() = name.getSuffix()
-private fun Uri.getName(context: Context) =
-    FileUtils.getFilePathByUri(context, this)?.split("/")?.last()
+    fun reloadAll() = hosts.forEach {
+        it.disable()
+        it.load()
+        it.enableIfPossible()
+        bots.forEach { bot ->
+            it.installBot(bot)
+        }
+    }
+
+    private fun List<ScriptHost>.addHost(host: ScriptHost): ScriptHost {
+        try {
+            host.load()
+            host.enableIfPossible()
+        } catch (e: Exception) {
+
+        }
+        return host
+    }
+
+    private fun File.getConfigFile() = File(configDir, name)
+    private fun Uri.getName(context: Context) =
+        FileUtils.getFilePathByUri(context, this)?.split("/")?.last()
+}

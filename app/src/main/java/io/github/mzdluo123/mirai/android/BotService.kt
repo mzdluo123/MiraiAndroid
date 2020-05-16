@@ -167,7 +167,6 @@ class BotService : Service(), CommandOwner {
     private fun stopConsole() {
         ScriptManager.instance.disableAll()
         wakeLock.release()
-        androidMiraiConsole.stop()
         MiraiConsole.stop()
         stopForeground(true)
         stopSelf()

@@ -180,7 +180,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     }
 
     private fun Bot.pushToScriptManager(manager: ScriptManager) {
-        launch { manager.pushBot(this@pushToScriptManager) }
+        launch { manager.addBot(this@pushToScriptManager) }
     }
 }
 

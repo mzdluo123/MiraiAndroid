@@ -19,19 +19,23 @@ object ScriptHostFactory {
         else -> UNKNOWN
     }
 
-    fun getScriptHost(scriptFile: File, configFile: File) {
-        val config: ScriptHost.ScriptConfig
-        if (configFile.exists()) {
-            FileReader(configFile).also {
-                config = Json.parse(ScriptHost.ScriptConfig.serializer(), it.readText())
-            }.close()
-        } else {
-            config = ScriptHost.ScriptConfig(
-                getTypeFromSuffix(configFile.name.split(".").last()),
-                configFile.name.split(".").first(),
-                true,
-                ""
-            )
+    fun getScriptHost(scriptFile: File, configFile: File, type: Int): ScriptHost {
+        var trueType: Int = type
+        if (trueType == UNKNOWN) {
+            if (configFile.exists()) {
+                FileReader(configFile).apply {
+                    trueType = Json.parse(ScriptHost.ScriptConfig.serializer(), readText()).type
+                }.close()
+            } else {
+                trueType = getTypeFromSuffix(scriptFile.getSuffix())
+            }
+        }
+        return when (type) {
+            LUA -> LuaScriptHost(scriptFile, configFile)
+            else -> throw Exception("Unknown script type!")
         }
     }
+
+    private fun File.getSuffix() = name.split(".").last()
+
 }

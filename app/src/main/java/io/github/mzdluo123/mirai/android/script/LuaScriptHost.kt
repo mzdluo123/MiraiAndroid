@@ -11,7 +11,7 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
     private lateinit var globals : MiraiGlobals
 
     override fun onCreate(): ScriptInfo {
-        globals = MiraiGlobals(log)
+        globals = MiraiGlobals(logger)
         globals.loadfile(scriptFile.absolutePath).call()
         var name = scriptFile.name.split(".").first()
         var author = "MiraiAndroid"
@@ -24,7 +24,7 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
             version = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:version
             description = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:description
         }
-        return ScriptInfo(name,author, version, description)
+        return ScriptInfo(name, author, version, description, scriptFile.length())
     }
 
     override fun onFetchBot(bot: Bot) {
@@ -34,5 +34,9 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
     override fun onDisable() {
         globals.onFinish()
         globals.unSubsribeAll()
+    }
+
+    override fun onEnable() {
+
     }
 }

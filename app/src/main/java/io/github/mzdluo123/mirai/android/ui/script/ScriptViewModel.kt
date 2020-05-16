@@ -1,32 +1,30 @@
 package io.github.mzdluo123.mirai.android.ui.script
 
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import io.github.mzdluo123.mirai.android.BotApplication
+import android.net.Uri
+import androidx.lifecycle.*
+import io.github.mzdluo123.mirai.android.script.ScriptHost
+import io.github.mzdluo123.mirai.android.script.ScriptManager
 import kotlinx.coroutines.launch
-import java.io.File
 
 class ScriptViewModel : ViewModel() {
-    val pluginList = MutableLiveData<List<File>>()
-    private val scriptFileList: List<File>
-        get() = mutableListOf<File>().apply {
-            BotApplication.context.getExternalFilesDir("scripts")?.listFiles()?.forEach {
-                if (it.isFile) add(it)
-            }
-        }
-
+    val hosts = MutableLiveData<List<ScriptHost>>()
+    private val manager = ScriptManager.instance
     init {
         refreshScriptList()
     }
 
-    fun deleteScript(pos: Int) = pluginList.value?.get(pos)?.apply {
-        delete()
-        refreshScriptList()
+    fun observe(owner: LifecycleOwner, observer: Observer<in List<ScriptHost>>) =
+        hosts.observe(owner, observer)
+
+    fun createScriptFromUri(fromUri: Uri) =
+        manager.createScriptFromUri(fromUri).also { refreshScriptList() }
+    fun refreshScriptList() = viewModelScope.launch {
+        hosts.postValue(manager.hosts)
     }
 
-    fun refreshScriptList() = viewModelScope.launch {
-        pluginList.postValue(scriptFileList)
-    }
+    fun editConfig(index: Int, editor: ScriptHost.ScriptConfig.() -> Unit) =
+        manager.editConfig(index, editor).also { refreshScriptList() }
+
+    fun deleteScript(pos: Int) = manager.delete(pos).also { refreshScriptList() }
 }
