@@ -38,6 +38,6 @@
         android:label="关于" />
     <fragment
         android:id="@+id/nav_setting"
-        android:name="io.github.mzdluo123.mirai.android.ui.SettingFragment"
+        android:name="io.github.mzdluo123.mirai.android.ui.setting.SettingFragment"
         android:label="设置" />
 </navigation>

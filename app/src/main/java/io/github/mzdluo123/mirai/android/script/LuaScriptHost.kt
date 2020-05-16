@@ -20,9 +20,10 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
         globals.get("Info").takeIf { it is LuaTable }?.let {
             var table = it as LuaTable
             name = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:name
-            author = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:author
-            version = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:version
-            description = table.get("name").takeUnless { it == LuaValue.NIL }?.toString()?:description
+            author = table.get("author").takeUnless { it == LuaValue.NIL }?.toString() ?: author
+            version = table.get("version").takeUnless { it == LuaValue.NIL }?.toString() ?: version
+            description = table.get("description").takeUnless { it == LuaValue.NIL }?.toString()
+                ?: description
         }
         return ScriptInfo(name, author, version, description, scriptFile.length())
     }

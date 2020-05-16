@@ -6,6 +6,7 @@ import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import net.mamoe.mirai.Bot
+import org.jetbrains.anko.toast
 import java.io.File
 
 class ScriptManager(
@@ -20,15 +21,15 @@ class ScriptManager(
     companion object {
         val instance: ScriptManager by lazy {
             val context: Context = BotApplication.context
-            val configDir = context.getExternalFilesDir("scripts")
-            val scriptDir = context.getExternalFilesDir("data")
+            val scriptDir = context.getExternalFilesDir("scripts")
+            val configDir = context.getExternalFilesDir("data")
             ScriptManager(context, scriptDir!!, configDir!!)
         }
     }
 
     init {
-        if (!configDir.exists()) configDir.mkdir()
-        if (!scriptDir.exists()) scriptDir.mkdir()
+        if (!scriptDir.exists()) scriptDir.mkdirs()
+        if (!configDir.exists()) configDir.mkdirs()
         loadScripts()
     }
 
@@ -38,38 +39,37 @@ class ScriptManager(
     }
 
     fun delete(index: Int) {
+        hosts[index].disable()
         hosts.removeAt(index)
     }
 
     private fun loadScripts() {
         scriptDir.listFiles()?.forEach { scriptFile ->
+            scriptFile.delete()
+            scriptFile.getConfigFile().delete()
+            /*
             hosts.addHost(
                 ScriptHostFactory.getScriptHost(
                     scriptFile,
                     scriptFile.getConfigFile(),
                     ScriptHostFactory.UNKNOWN
                 )
-            )
+            )*/
         }
     }
 
-    fun createScriptFromUri(fromUri: Uri) {
+    fun createScriptFromUri(fromUri: Uri, type: Int): Boolean {
         fromUri.getName(context).let { name ->
-            context.copyToFileDir(
+            val scriptFile = context.copyToFileDir(
                 fromUri,
                 name!!,
-                context.getExternalFilesDir("scripts")!!.absolutePath
+                scriptDir.absolutePath
             )
-            val scriptFile = File(scriptDir, name)
-            hosts.addHost(
-                ScriptHostFactory.getScriptHost(
-                    scriptFile,
-                    scriptFile.getConfigFile(),
-                    ScriptHostFactory.UNKNOWN
-                )
-            ).also { host ->
+
+            hosts.addHost(scriptFile, scriptFile.getConfigFile(), type)?.let { host ->
                 bots.forEach { bot -> host.installBot(bot) }
-            }
+                return true
+            } ?: return false
         }
 
     }
@@ -98,14 +98,22 @@ class ScriptManager(
         }
     }
 
-    private fun List<ScriptHost>.addHost(host: ScriptHost): ScriptHost {
+    private fun MutableList<ScriptHost>.addHost(
+        scriptFile: File,
+        configFile: File,
+        type: Int
+    ): ScriptHost? {
         try {
+            var host = ScriptHostFactory.getScriptHost(scriptFile, scriptFile.getConfigFile(), type)
+            host ?: throw Exception("未知的脚本类型！")
             host.load()
             host.enableIfPossible()
+            add(host)
+            return host
         } catch (e: Exception) {
-
+            context.toast(e.message.toString())
         }
-        return host
+        return null
     }
 
     private fun File.getConfigFile() = File(configDir, name)

@@ -5,12 +5,12 @@ import java.io.File
 import java.io.FileReader
 
 object ScriptHostFactory {
-    const val UNKNOWN = -1
-    const val LUA = 0
-    const val JAVASCRIPT = 1
-    const val PYTHON = 2
-    const val KOTLINSCRIPT = 3
-    val NAMES = arrayOf("Lua", "Js", "Python", "Kts")
+    const val UNKNOWN = 0
+    const val LUA = 1
+    const val JAVASCRIPT = 2
+    const val PYTHON = 3
+    const val KOTLINSCRIPT = 4
+    val NAMES = arrayOf("Unknown", "Lua", "JavaScript", "Python", "KotlinScript")
     fun getTypeFromSuffix(suffix: String) = when (suffix) {
         "lua" -> LUA
         "js" -> JAVASCRIPT
@@ -19,7 +19,7 @@ object ScriptHostFactory {
         else -> UNKNOWN
     }
 
-    fun getScriptHost(scriptFile: File, configFile: File, type: Int): ScriptHost {
+    fun getScriptHost(scriptFile: File, configFile: File, type: Int): ScriptHost? {
         var trueType: Int = type
         if (trueType == UNKNOWN) {
             if (configFile.exists()) {
@@ -31,8 +31,10 @@ object ScriptHostFactory {
             }
         }
         return when (type) {
-            LUA -> LuaScriptHost(scriptFile, configFile)
-            else -> throw Exception("Unknown script type!")
+            LUA -> LuaScriptHost(scriptFile, configFile).also {
+                it.config = ScriptHost.ScriptConfig(type, scriptFile.name, true, "")
+            }
+            else -> null
         }
     }
 

@@ -5,9 +5,8 @@ import android.net.Uri
 import java.io.File
 import java.io.IOException
 
-
 @Throws(IOException::class)
-fun Context.copyToFileDir(uri: Uri, name: String, path: String) {
+fun Context.copyToFileDir(uri: Uri, name: String, path: String): File {
     val plugin = File(path, name)
     plugin.createNewFile()
     val output = plugin.outputStream()
@@ -19,4 +18,5 @@ fun Context.copyToFileDir(uri: Uri, name: String, path: String) {
         }
     }
     output.close()
+    return plugin
 }
