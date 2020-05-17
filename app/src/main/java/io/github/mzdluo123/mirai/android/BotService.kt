@@ -241,7 +241,6 @@ class BotService : Service(), CommandOwner {
         override fun getBotInfo(): String {
             return MiraiAndroidStatus.recentStatus().format()
         }
-    }
 
         override fun openScript(index: Int) {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
@@ -274,4 +273,5 @@ class BotService : Service(), CommandOwner {
             return ScriptManager.instance.getHostInfoStrings()
         }
     }
+
 }
