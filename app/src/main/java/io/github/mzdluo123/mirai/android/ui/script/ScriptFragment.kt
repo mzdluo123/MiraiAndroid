@@ -9,23 +9,19 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.script.ScriptHost
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import kotlinx.android.synthetic.main.fragment_script.*
 import org.jetbrains.anko.*
 
-class ScriptFragment : Fragment() {
+class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFragmentListener {
     companion object {
         const val IMPORT_SCRIPT = 2
     }
@@ -34,7 +30,7 @@ class ScriptFragment : Fragment() {
     }
 
     private val adapter: ScriptListAdapter by lazy {
-        ScriptListAdapter(scriptViewModel)
+        ScriptListAdapter(this)
     }
 
     private val botServiceConnection = object : ServiceConnection {
@@ -62,7 +58,6 @@ class ScriptFragment : Fragment() {
         activity?.unbindService(botServiceConnection)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -72,8 +67,8 @@ class ScriptFragment : Fragment() {
         scriptViewModel.observe(viewLifecycleOwner, Observer {
             adapter.data = it.toMutableList()
             adapter.notifyDataSetChanged()
-            adapter.setEmptyView(TextView(context).apply { setText("当前无脚本") })
         })
+        adapter.setEmptyView(TextView(context).apply { setText("当前无脚本") })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -114,37 +109,47 @@ class ScriptFragment : Fragment() {
             }
         }
     }
+
+    override fun onDeleteScript(index: Int) {
+        context?.alert("删除脚本后无法恢复，是否确定？") {
+            yesButton {
+                scriptViewModel.deleteScript(index)
+            }
+            noButton { }
+        }?.show()
+    }
+
+    override fun onSaveScript(index: Int) {
+
+    }
+
+    override fun onReloadScript(index: Int) {
+        context?.alert("重新加载该脚本？") {
+            yesButton {
+                scriptViewModel.reloadScript(index)
+                context!!.toast("重载完毕")
+            }
+            noButton { }
+        }?.show()
+    }
+
+    override fun onOpenScript(index: Int) {
+        scriptViewModel.openScript(index)
+    }
+
+    override fun onEnableScript(index: Int) {
+        scriptViewModel.enableScript(index)
+        context!!.toast("已启用")
+    }
+
+    override fun onDisableScript(index: Int) {
+        scriptViewModel.disableScript(index)
+        context!!.toast("已禁用")
+    }
+
+    fun showScriptInfo(index: Int) {
+        ScriptInfoDialogFragment(index, scriptViewModel, this).show(parentFragmentManager, "script")
+    }
+
 }
 
-class ScriptListAdapter(var scriptViewModel: ScriptViewModel) :
-    BaseQuickAdapter<ScriptHost.ScriptInfo, BaseViewHolder>(R.layout.item_script) {
-    override fun convert(holder: BaseViewHolder, item: ScriptHost.ScriptInfo) {
-        with(holder){
-            setText(R.id.tv_script_alias, item.name)
-            setText(R.id.tv_script_author, item.author)
-            setText(R.id.tv_script_version, item.version)
-            holder.getView<ImageButton>(R.id.btn_delete).setOnClickListener {
-                context.alert("删除脚本后无法恢复，是否确定？") {
-                    yesButton {
-                        this@ScriptListAdapter.scriptViewModel.deleteScript(holder.layoutPosition)
-                    }
-                    noButton { }
-                }.show()
-            }
-            holder.getView<ImageButton>(R.id.btn_reload).setOnClickListener {
-                context.alert("重新加载该脚本？") {
-                    yesButton {
-                        this@ScriptListAdapter.scriptViewModel.reloadScript(holder.layoutPosition)
-                        context.toast("重载完毕")
-                    }
-                    noButton { }
-                }.show()
-            }
-            holder.getView<ImageButton>(R.id.btn_edit).setOnClickListener {
-                scriptViewModel.openScript(holder.layoutPosition)
-            }
-            holder.getView<ImageButton>(R.id.btn_setting).setOnClickListener {
-            }
-        }
-    }
-}

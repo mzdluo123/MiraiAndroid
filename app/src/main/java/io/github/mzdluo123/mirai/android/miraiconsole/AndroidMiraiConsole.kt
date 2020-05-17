@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.miraiconsole
 
 import android.app.PendingIntent
 import android.content.Context
@@ -8,15 +8,15 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.activity.MainActivity
-import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -35,7 +35,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         .getString("log_buffer_preference", "300")!!.toInt()
 
     val logStorage = LoopQueue<String>(logBuffer)
-    val loginSolver = AndroidLoginSolver(context)
+    val loginSolver =
+        AndroidLoginSolver(context)
 
     // 使用一个[60s/refreshPerMinute]的数组存放每4秒消息条数
     // 读取时增加最新一分钟，减去最老一分钟
@@ -182,81 +183,3 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         launch { manager.addBot(this@pushToScriptManager) }
     }
 }
-
-class AndroidLoginSolver(private val context: Context) : LoginSolver() {
-    lateinit var verificationResult: CompletableDeferred<String>
-    lateinit var captchaData: ByteArray
-    lateinit var url: String
-
-    companion object {
-        const val CAPTCHA_NOTIFICATION_ID = 2
-    }
-
-    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
-
-        verificationResult = CompletableDeferred()
-        captchaData = data
-        val notifyIntent = Intent(context, CaptchaActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val notifyPendingIntent = PendingIntent.getActivity(
-            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val builder =
-            NotificationCompat.Builder(context, BotApplication.CAPTCHA_NOTIFICATION)
-                .setContentIntent(notifyPendingIntent)
-                .setAutoCancel(false)
-                //禁止滑动删除
-                .setOngoing(true)
-                //右上角的时间显示
-                .setShowWhen(true)
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_info_black_24dp)
-                .setContentTitle("本次登录需要验证码")
-                .setContentText("点击这里输入验证码")
-        NotificationManagerCompat.from(context).apply {
-            notify(CAPTCHA_NOTIFICATION_ID, builder.build())
-        }
-        return verificationResult.await()
-    }
-
-    override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? {
-        verificationResult = CompletableDeferred()
-        this.url = url
-        sendVerifyNotification()
-        return verificationResult.await()
-    }
-
-    override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? {
-        verificationResult = CompletableDeferred()
-        this.url = url
-        sendVerifyNotification()
-        return verificationResult.await()
-    }
-
-    private fun sendVerifyNotification() {
-        val notifyIntent = Intent(context, UnsafeLoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val notifyPendingIntent = PendingIntent.getActivity(
-            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
-        val builder =
-            NotificationCompat.Builder(context, BotApplication.CAPTCHA_NOTIFICATION)
-                .setContentIntent(notifyPendingIntent)
-                .setAutoCancel(false)
-                //禁止滑动删除
-                .setOngoing(true)
-                //右上角的时间显示
-                .setShowWhen(true)
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_info_black_24dp)
-                .setContentTitle("本次登录需要进行登录验证")
-                .setContentText("点击这里开始验证")
-        NotificationManagerCompat.from(context).apply {
-            notify(CAPTCHA_NOTIFICATION_ID, builder.build())
-        }
-    }
-
-}
-

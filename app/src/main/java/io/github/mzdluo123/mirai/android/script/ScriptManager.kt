@@ -93,10 +93,25 @@ class ScriptManager(
         } ?: return false
     }
 
-    fun enable(index: Int) = hosts[index].enable()
+    fun enable(index: Int) {
+        Log.i("enable", index.toString())
+        if (hosts[index].config.enable) return
+        hosts[index].enable()
+        hosts[index].config.enable = true
+        hosts[index].info.enable = true
+        hosts[index].saveConfig()
+        bots.forEach { hosts[index].installBot(it) }
+    }
     fun enableAll() = hosts.forEach { host -> host.enable() }
 
-    fun disable(index : Int) = hosts[index].disable()
+    fun disable(index: Int) {
+        Log.i("disable", index.toString())
+        if (!hosts[index].config.enable) return
+        hosts[index].disable()
+        hosts[index].config.enable = false
+        hosts[index].info.enable = false
+        hosts[index].saveConfig()
+    }
     fun disableAll() = hosts.forEach {it.disable()}
 
     fun reload(index: Int) {

@@ -10,7 +10,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 
 @SuppressWarnings("unchecked")
 public class LoopQueue<E> implements Queue<E> {
@@ -95,7 +98,6 @@ public class LoopQueue<E> implements Queue<E> {
             result = a;
         else
             result = new Object[size()];
-
 
         for (int i = 0; i < size(); i++) {
             int pos = elementIndexOf(i);

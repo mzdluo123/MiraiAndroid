@@ -2,6 +2,7 @@ package io.github.mzdluo123.mirai.android.script
 
 import android.util.Log
 import com.ooooonly.luaMirai.lua.MiraiGlobals
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -31,7 +32,10 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
 
     override fun onFetchBot(bot: Bot) {
         Log.i("fetchBot", bot.id.toString())
-        globals.onLoad(bot)
+        if (!config.enable) return
+        bot.launch {
+            globals.onLoad(bot)
+        }
     }
 
     override fun onDisable() {

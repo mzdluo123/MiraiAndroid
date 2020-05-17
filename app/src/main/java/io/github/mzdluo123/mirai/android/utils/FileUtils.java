@@ -117,6 +117,6 @@ public final class FileUtils {
             length /= 1024;
             suffixIndex++;
         }
-        return String.format("%0.2f%s", remain + length, suffixs[suffixIndex]);
+        return String.format("%.2f%s", remain + length, suffixs[suffixIndex]);
     }
 }

@@ -5,14 +5,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cv_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:clickable="true"
-        app:cardElevation="0dp"
-        android:foreground="?android:attr/selectableItemBackgroundBorderless">
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -44,8 +46,8 @@
                 android:id="@+id/tv_script_version"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="版本"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -53,67 +55,14 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_script_alias" />
 
 
-            <ImageButton
-                android:id="@+id/btn_setting"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
+            <Switch
+                android:id="@+id/swt_enable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
-                android:background="#00FFFFFF"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="setting"
-                android:src="@drawable/ic_settings_black_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="w,1:1"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/btn_delete"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_delete_black_24dp"
-                android:background="#00FFFFFF"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="w,1:1"
-                app:layout_constraintRight_toLeftOf="@id/btn_setting"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="delete
-" />
-
-            <ImageButton
-                android:id="@+id/btn_edit"
-                android:background="#00FFFFFF"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_edit_black_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="w,1:1"
-                app:layout_constraintRight_toLeftOf="@id/btn_delete"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="edit" />
-
-            <ImageButton
-                android:id="@+id/btn_reload"
-                android:background="#00FFFFFF"
-                android:foreground="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:src="@drawable/ic_refresh_black_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="w,1:1"
-                app:layout_constraintRight_toLeftOf="@id/btn_edit"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="reload" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
+import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.github.mzdluo123.mirai.android.utils.register
@@ -90,7 +91,10 @@ class BotService : Service(), CommandOwner {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
-        androidMiraiConsole = AndroidMiraiConsole(baseContext)
+        androidMiraiConsole =
+            AndroidMiraiConsole(
+                baseContext
+            )
         powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
@@ -195,7 +199,6 @@ class BotService : Service(), CommandOwner {
             //防止
             // ClassCastException: java.lang.Object[] cannot be cast to java.lang.String[]
             // 不知道有没有更好的写法
-
             return androidMiraiConsole.logStorage.toArray(
                 arrayOfNulls<String>(
                     androidMiraiConsole.logStorage.size
@@ -226,11 +229,17 @@ class BotService : Service(), CommandOwner {
             androidMiraiConsole.logStorage.clear()
         }
 
+        override fun enableScript(index: Int) {
+            ScriptManager.instance.enable(index)
+        }
+
+        override fun disableScript(index: Int) {
+            ScriptManager.instance.disable(index)
+        }
+
         override fun getUrl(): String = androidMiraiConsole.loginSolver.url
 
-        override fun getScriptSize(): Int {
-            return ScriptManager.instance.hosts.size
-        }
+        override fun getScriptSize(): Int = ScriptManager.instance.hosts.size
 
         override fun getCaptcha(): ByteArray = androidMiraiConsole.loginSolver.captchaData
 
@@ -238,9 +247,7 @@ class BotService : Service(), CommandOwner {
             androidMiraiConsole.logStorage.add(log)
         }
 
-        override fun getBotInfo(): String {
-            return MiraiAndroidStatus.recentStatus().format()
-        }
+        override fun getBotInfo(): String = MiraiAndroidStatus.recentStatus().format()
 
         override fun openScript(index: Int) {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
@@ -269,9 +276,7 @@ class BotService : Service(), CommandOwner {
             ScriptManager.instance.delete(index)
         }
 
-        override fun getHostList(): Array<String> {
-            return ScriptManager.instance.getHostInfoStrings()
-        }
+        override fun getHostList(): Array<String> = ScriptManager.instance.getHostInfoStrings()
     }
 
 }

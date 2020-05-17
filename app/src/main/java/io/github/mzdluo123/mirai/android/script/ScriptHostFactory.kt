@@ -32,7 +32,7 @@ object ScriptHostFactory {
         }
         return when (trueType) {
             LUA -> LuaScriptHost(scriptFile, configFile).also {
-                it.config = ScriptHost.ScriptConfig(type, true, "")
+                it.config = ScriptHost.ScriptConfig(type, false, "")
             }
             else -> null
         }
