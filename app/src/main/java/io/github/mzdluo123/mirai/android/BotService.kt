@@ -238,6 +238,11 @@ class BotService : Service(), CommandOwner {
             androidMiraiConsole.logStorage.add(log)
         }
 
+        override fun getBotInfo(): String {
+            return MiraiAndroidStatus.recentStatus().format()
+        }
+    }
+
         override fun openScript(index: Int) {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
             val provideUri: Uri

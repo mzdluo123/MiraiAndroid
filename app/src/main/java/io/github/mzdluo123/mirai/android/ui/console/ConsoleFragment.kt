@@ -102,7 +102,12 @@ class ConsoleFragment : Fragment() {
             }
             R.id.action_report -> {
                 lifecycleScope.launch {
-                    val log = conn.botService.log.joinToString(separator = "\n")
+                    val log = buildString {
+                        append(conn.botService.botInfo)
+                        append("\n")
+                        append("========以下是控制台log=======\n")
+                        append(conn.botService.log.joinToString(separator = "\n"))
+                    }
                     val alertDialog = AlertDialog.Builder(activity)
                         .setTitle("正在上传日志")
                         .setMessage("请稍后")
@@ -110,8 +115,8 @@ class ConsoleFragment : Fragment() {
                         .create()
                     alertDialog.show()
                     val errorHandle = CoroutineExceptionHandler { coroutineContext, throwable ->
-                            alertDialog.dismiss()
-                            Toast.makeText(activity, "日志上传失败", Toast.LENGTH_SHORT).show()
+                        alertDialog.dismiss()
+                        Toast.makeText(activity, "日志上传失败", Toast.LENGTH_SHORT).show()
                     }
                     val url = async(errorHandle) { paste(log) }
                     val intent = Intent(Intent.ACTION_SEND)
@@ -180,7 +185,7 @@ class ConsoleFragment : Fragment() {
                     }
                     delay(200)
                 }
-            }catch (e:DeadObjectException){
+            } catch (e: DeadObjectException) {
                 return@launch
             }
         }

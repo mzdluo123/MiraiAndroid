@@ -71,8 +71,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         identity: Long,
         message: String
     ) {
-        logStorage.add("[${priority.name}] ${identityStr} $message")
-        Log.d(TAG, "[${priority.name}] ${identityStr} $message")
+        logStorage.add("[${priority.name}] $identityStr $message")
+        Log.d(TAG, "[${priority.name}] $identityStr $message")
     }
 
     override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {

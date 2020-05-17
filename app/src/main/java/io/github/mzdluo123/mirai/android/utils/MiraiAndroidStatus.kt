@@ -65,6 +65,5 @@ class MiraiAndroidStatus (
 
         append("日志缓存行数 ")
         append(logBuffer)
-        append("\n")
     }
 }

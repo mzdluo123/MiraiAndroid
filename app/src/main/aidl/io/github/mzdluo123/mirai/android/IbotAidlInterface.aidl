@@ -18,4 +18,5 @@ interface IbotAidlInterface {
     int getScriptSize();
     void openScript(int index);
     boolean createScript(String name,int type);
+    String getBotInfo();
 }
