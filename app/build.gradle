@@ -77,7 +77,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
     implementation 'net.lingala.zip4j:zip4j:2.5.2'
     implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
-    implementation'org.jetbrains.anko:anko-common:0.10.1'
+    implementation 'org.jetbrains.anko:anko-common:0.10.1'
     //implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     //implementation 'com.alibaba:fastjson:1.1.54.android'
     //implementation 'com.google.code.gson:gson:2.8.6'

@@ -2,11 +2,12 @@ package io.github.mzdluo123.mirai.android.script
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
+import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
-import org.jetbrains.anko.toast
 import java.io.File
 
 class ScriptManager(
@@ -25,6 +26,17 @@ class ScriptManager(
             val configDir = context.getExternalFilesDir("data")
             ScriptManager(context, scriptDir!!, configDir!!)
         }
+
+        fun unPackHostInfos(infoStrings: Array<String>): List<ScriptHost.ScriptInfo> =
+            List(infoStrings.size) {
+                Json.parse(ScriptHost.ScriptInfo.serializer(), infoStrings[it])
+            }
+
+        fun copyFileToScriptDir(context: Context, uri: Uri): File = context.copyToFileDir(
+            uri,
+            FileUtils.getFilePathByUri(context, uri)?.split("/")?.last()!!,
+            context.getExternalFilesDir("scripts")!!.absolutePath
+        )
     }
 
     init {
@@ -33,28 +45,29 @@ class ScriptManager(
         loadScripts()
     }
 
-    fun addBot(bot: Bot) = hosts.forEach { it.installBot(bot) }
+    fun addBot(bot: Bot) {
+        bots.add(bot)
+        hosts.forEach {
+            it.installBot(bot)
+        }
+    }
+
     fun editConfig(index: Int, editor: ScriptHost.ScriptConfig.() -> Unit) {
         hosts[index].config.editor()
     }
 
     fun delete(index: Int) {
         hosts[index].disable()
+        hosts[index].scriptFile.getConfigFile().delete()
+        hosts[index].scriptFile.delete()
         hosts.removeAt(index)
     }
 
     private fun loadScripts() {
         scriptDir.listFiles()?.forEach { scriptFile ->
-            scriptFile.delete()
-            scriptFile.getConfigFile().delete()
-            /*
-            hosts.addHost(
-                ScriptHostFactory.getScriptHost(
-                    scriptFile,
-                    scriptFile.getConfigFile(),
-                    ScriptHostFactory.UNKNOWN
-                )
-            )*/
+            //scriptFile.delete()
+            //scriptFile.getConfigFile().delete()
+            hosts.addHost(scriptFile, scriptFile.getConfigFile(), ScriptHostFactory.UNKNOWN)
         }
     }
 
@@ -71,7 +84,13 @@ class ScriptManager(
                 return true
             } ?: return false
         }
+    }
 
+    fun createScriptFromFile(scriptFile: File, type: Int): Boolean {
+        hosts.addHost(scriptFile, scriptFile.getConfigFile(), type)?.let { host ->
+            bots.forEach { bot -> host.installBot(bot) }
+            return true
+        } ?: return false
     }
 
     fun enable(index: Int) = hosts[index].enable()
@@ -98,6 +117,10 @@ class ScriptManager(
         }
     }
 
+    fun getHostInfoStrings(): Array<String> = List(hosts.size) {
+        hosts[it].getInfoString()
+    }.toTypedArray()
+
     private fun MutableList<ScriptHost>.addHost(
         scriptFile: File,
         configFile: File,
@@ -111,12 +134,12 @@ class ScriptManager(
             add(host)
             return host
         } catch (e: Exception) {
-            context.toast(e.message.toString())
+            Log.e("loadScriptError", e.message)
         }
         return null
     }
 
     private fun File.getConfigFile() = File(configDir, name)
-    private fun Uri.getName(context: Context) =
+    fun Uri.getName(context: Context) =
         FileUtils.getFilePathByUri(context, this)?.split("/")?.last()
 }

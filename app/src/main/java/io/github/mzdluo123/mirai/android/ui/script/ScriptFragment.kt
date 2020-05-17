@@ -1,12 +1,13 @@
 package io.github.mzdluo123.mirai.android.ui.script
 
 import android.app.Activity
-import android.content.ContentValues
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.IBinder
 import android.view.*
 import android.widget.ImageButton
 import android.widget.TextView
@@ -16,12 +17,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.script.ScriptHost
+import io.github.mzdluo123.mirai.android.script.ScriptManager
 import kotlinx.android.synthetic.main.fragment_script.*
 import org.jetbrains.anko.*
 
 class ScriptFragment : Fragment() {
+    companion object {
+        const val IMPORT_SCRIPT = 2
+    }
     private val scriptViewModel: ScriptViewModel by lazy {
         ViewModelProvider(this)[ScriptViewModel::class.java]
     }
@@ -30,9 +37,32 @@ class ScriptFragment : Fragment() {
         ScriptListAdapter(scriptViewModel)
     }
 
-    companion object {
-        const val IMPORT_SCRIPT = 2
+    private val botServiceConnection = object : ServiceConnection {
+        lateinit var helper: IbotAidlInterface
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+        }
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            helper = IbotAidlInterface.Stub.asInterface(service)
+            scriptViewModel.serviceHelper = helper
+            scriptViewModel.refreshScriptList()
+        }
     }
+
+    override fun onResume() {
+        super.onResume()
+        val bindIntent = Intent(activity, BotService::class.java)
+        activity?.bindService(bindIntent, botServiceConnection, Context.BIND_AUTO_CREATE)
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        activity?.unbindService(botServiceConnection)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -74,10 +104,11 @@ class ScriptFragment : Fragment() {
 
     private fun importScript(uri: Uri) {
         val typeList = listOf("自动识别后缀名", "Lua", "JavaScript", "Python", "KotlinScript")
-        context?.selector("请选择脚本的类型", typeList) { _, i ->
-            var result = scriptViewModel.createScriptFromUri(uri, i)
+        context?.selector("请选择脚本的类型", typeList) { _, type ->
+            val scriptFile = ScriptManager.copyFileToScriptDir(context!!, uri)
+            val result = scriptViewModel.createScriptFromFile(scriptFile, type)
             if (result) {
-                context?.toast("导入成功！")
+                context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
             } else {
                 context?.toast("导入失败，请检查脚本是否有误！")
             }
@@ -86,44 +117,31 @@ class ScriptFragment : Fragment() {
 }
 
 class ScriptListAdapter(var scriptViewModel: ScriptViewModel) :
-    BaseQuickAdapter<ScriptHost, BaseViewHolder>(R.layout.item_script) {
-    override fun convert(holder: BaseViewHolder, item: ScriptHost) {
+    BaseQuickAdapter<ScriptHost.ScriptInfo, BaseViewHolder>(R.layout.item_script) {
+    override fun convert(holder: BaseViewHolder, item: ScriptHost.ScriptInfo) {
         with(holder){
-            setText(R.id.tv_script_alias, item.config.alias)
-            setText(R.id.tv_script_author, item.info.author)
-            setText(R.id.tv_script_version, item.info.version)
+            setText(R.id.tv_script_alias, item.name)
+            setText(R.id.tv_script_author, item.author)
+            setText(R.id.tv_script_version, item.version)
             holder.getView<ImageButton>(R.id.btn_delete).setOnClickListener {
-                context.alert("确定删除？") {
+                context.alert("删除脚本后无法恢复，是否确定？") {
                     yesButton {
-                        this@ScriptListAdapter.scriptViewModel.deleteScript(position)
+                        this@ScriptListAdapter.scriptViewModel.deleteScript(holder.layoutPosition)
                     }
                     noButton { }
                 }.show()
             }
             holder.getView<ImageButton>(R.id.btn_reload).setOnClickListener {
-                scriptViewModel.reloadScript(holder.layoutPosition)
+                context.alert("重新加载该脚本？") {
+                    yesButton {
+                        this@ScriptListAdapter.scriptViewModel.reloadScript(holder.layoutPosition)
+                        context.toast("重载完毕")
+                    }
+                    noButton { }
+                }.show()
             }
             holder.getView<ImageButton>(R.id.btn_edit).setOnClickListener {
-                val scriptFile = scriptViewModel.getScriptFile(holder.layoutPosition)
-                val provideUri: Uri
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    var contentValues = ContentValues(1)
-                    contentValues.put(MediaStore.Images.Media.DATA, scriptFile.getAbsolutePath())
-                    provideUri = context.contentResolver.insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        contentValues
-                    )!!
-                } else {
-                    provideUri = Uri.fromFile(scriptFile);
-                }
-                context.startActivity(
-                    Intent("android.intent.action.VIEW").apply {
-                        addCategory("android.intent.category.DEFAULT")
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        putExtra(MediaStore.EXTRA_OUTPUT, provideUri)
-                        type = "text/plain"
-                        //setDataAndType(provideUri, )
-                    })
+                scriptViewModel.openScript(holder.layoutPosition)
             }
             holder.getView<ImageButton>(R.id.btn_setting).setOnClickListener {
             }

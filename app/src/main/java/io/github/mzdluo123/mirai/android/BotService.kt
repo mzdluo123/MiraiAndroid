@@ -4,10 +4,14 @@ package io.github.mzdluo123.mirai.android
 
 import android.annotation.SuppressLint
 import android.app.Service
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.provider.MediaStore
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
@@ -25,6 +29,7 @@ import net.mamoe.mirai.console.command.ContactCommandSender
 import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.SimpleLogger
+import java.io.File
 import kotlin.system.exitProcess
 
 
@@ -66,7 +71,6 @@ class BotService : Service(), CommandOwner {
             }
     }
 
-
     override fun onBind(intent: Intent): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -82,7 +86,6 @@ class BotService : Service(), CommandOwner {
         }
         return super.onStartCommand(intent, flags, startId)
     }
-
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
@@ -142,8 +145,12 @@ class BotService : Service(), CommandOwner {
         }
         register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, args ->
             sender.sendMessage(buildString {
-                append("已加载 ${ScriptManager.instance.hosts.size}个脚本\n")
-                ScriptManager.instance.hosts.joinTo(this, "\n") { it.scriptFile.name }
+                append("已加载${ScriptManager.instance.hosts.size}个脚本\n")
+                ScriptManager.instance.hosts.joinTo(
+                    this,
+                    "\n"
+                ) { "${it.info.name} ${it.info.version} by ${it.info.author}" }
+                append("\n已加载Bot数量：${ScriptManager.instance.botsSize}")
             })
             true
         }
@@ -173,6 +180,10 @@ class BotService : Service(), CommandOwner {
         exitProcess(0)
     }
 
+    private fun String.chunkedHexToBytes(): ByteArray =
+        this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
+            .toList().toByteArray()
+
     inner class BotBinder : IbotAidlInterface.Stub() {
         override fun runCmd(cmd: String?) {
             cmd?.let {
@@ -198,19 +209,64 @@ class BotService : Service(), CommandOwner {
             }
         }
 
+        override fun setScriptConfig(config: String?) {
+
+        }
+
+        override fun createScript(name: String?, type: Int): Boolean {
+            return ScriptManager.instance.createScriptFromFile(File(name), type)
+        }
+
+        override fun reloadScript(index: Int): Boolean {
+            ScriptManager.instance.reload(index)
+            return true
+        }
+
         override fun clearLog() {
             androidMiraiConsole.logStorage.clear()
         }
 
         override fun getUrl(): String = androidMiraiConsole.loginSolver.url
 
+        override fun getScriptSize(): Int {
+            return ScriptManager.instance.hosts.size
+        }
+
         override fun getCaptcha(): ByteArray = androidMiraiConsole.loginSolver.captchaData
 
         override fun sendLog(log: String?) {
             androidMiraiConsole.logStorage.add(log)
         }
-    }
 
-    private fun String.chunkedHexToBytes(): ByteArray = this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
-            .toList().toByteArray()
+        override fun openScript(index: Int) {
+            val scriptFile = ScriptManager.instance.hosts[index].scriptFile
+            val provideUri: Uri
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                var contentValues = ContentValues(1)
+                contentValues.put(MediaStore.Images.Media.DATA, scriptFile.getAbsolutePath())
+                provideUri = contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+                )!!
+            } else {
+                provideUri = Uri.fromFile(scriptFile);
+            }
+            startActivity(
+                Intent("android.intent.action.VIEW").apply {
+                    addCategory("android.intent.category.DEFAULT")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    putExtra(MediaStore.EXTRA_OUTPUT, provideUri)
+                    type = "text/plain"
+                    setDataAndType(provideUri, type)
+                })
+        }
+
+        override fun deleteScript(index: Int) {
+            ScriptManager.instance.delete(index)
+        }
+
+        override fun getHostList(): Array<String> {
+            return ScriptManager.instance.getHostInfoStrings()
+        }
+    }
 }

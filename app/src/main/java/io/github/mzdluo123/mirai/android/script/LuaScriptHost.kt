@@ -1,5 +1,6 @@
 package io.github.mzdluo123.mirai.android.script
 
+import android.util.Log
 import com.ooooonly.luaMirai.lua.MiraiGlobals
 import net.mamoe.mirai.Bot
 import org.luaj.vm2.LuaTable
@@ -29,12 +30,14 @@ class LuaScriptHost(scriptFile: File, configFile: File) : ScriptHost(scriptFile,
     }
 
     override fun onFetchBot(bot: Bot) {
+        Log.i("fetchBot", bot.id.toString())
         globals.onLoad(bot)
     }
 
     override fun onDisable() {
         globals.onFinish()
         globals.unSubsribeAll()
+        Log.i("uninstall", info.name)
     }
 
     override fun onEnable() {

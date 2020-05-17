@@ -10,21 +10,22 @@ import java.io.FileReader
 import java.io.FileWriter
 
 abstract class ScriptHost(val scriptFile: File, val configFile: File) {
-    //从配置文件读取
     @Serializable
     data class ScriptConfig(
         var type: Int,
-        var alias: String = "",
         var enable: Boolean = false,
         var data: String = ""
     )
-    //从脚本内读取
+
+    @Serializable
     data class ScriptInfo(
-        val name: String,
-        val author: String,
-        val version: String,
-        val description: String,
-        val fileLength: Long
+        var name: String = "",
+        var author: String = "",
+        var version: String = "",
+        var description: String = "",
+        var fileLength: Long,
+        var scriptType: Int = ScriptHostFactory.UNKNOWN,
+        var enable: Boolean = true
     )
 
     protected val logger: (String) -> Unit =
@@ -37,15 +38,19 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
         info = onCreate()
         if (configFile.exists()) {
             val reader = FileReader(configFile)
-            var text = reader.readText()
+            val text = reader.readText()
             reader.close()
             config = Json.parse(ScriptConfig.serializer(), text)
-        } else {
-            if (!info.name.isBlank()) config.alias = info.name
         }
+        info.scriptType = config.type
+        info.enable = config.enable
         saveConfig()
     }
 
+    @OptIn(UnstableDefault::class)
+    fun getInfoString(): String {
+        return Json.stringify(ScriptInfo.serializer(), info)
+    }
     fun disable() = onDisable()
     fun enable() = onEnable()
     fun enableIfPossible() {

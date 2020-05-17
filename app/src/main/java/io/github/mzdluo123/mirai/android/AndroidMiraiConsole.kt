@@ -30,7 +30,6 @@ import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
 
-
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private val logBuffer = BotApplication.getSettingPreference()
         .getString("log_buffer_preference", "300")!!.toInt()

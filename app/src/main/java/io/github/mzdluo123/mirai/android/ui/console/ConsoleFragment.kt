@@ -83,7 +83,6 @@ class ConsoleFragment : Fragment() {
         activity?.unbindService(conn)
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main, menu)
     }

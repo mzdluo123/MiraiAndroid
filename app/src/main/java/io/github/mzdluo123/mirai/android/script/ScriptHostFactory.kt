@@ -30,9 +30,9 @@ object ScriptHostFactory {
                 trueType = getTypeFromSuffix(scriptFile.getSuffix())
             }
         }
-        return when (type) {
+        return when (trueType) {
             LUA -> LuaScriptHost(scriptFile, configFile).also {
-                it.config = ScriptHost.ScriptConfig(type, scriptFile.name, true, "")
+                it.config = ScriptHost.ScriptConfig(type, true, "")
             }
             else -> null
         }
