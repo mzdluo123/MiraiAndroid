@@ -51,7 +51,6 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
         super.onResume()
         val bindIntent = Intent(activity, BotService::class.java)
         activity?.bindService(bindIntent, botServiceConnection, Context.BIND_AUTO_CREATE)
-
     }
 
     override fun onPause() {
@@ -163,4 +162,3 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
 }
-

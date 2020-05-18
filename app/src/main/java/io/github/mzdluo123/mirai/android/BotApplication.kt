@@ -33,11 +33,11 @@ class BotApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
-        val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
-        } else {
+        else
             myGetProcessName()
-        }
+
         // 防止服务进程多次初始化
         if (processName?.isEmpty() == false && processName == packageName) {
             // Register the channel with the system; you can't change the importance
@@ -75,7 +75,6 @@ class BotApplication : Application() {
         ACRA.init(this, CoreConfigurationBuilder(this).apply {
             setBuildConfigClass(BuildConfig::class.java)
                 .setReportFormat(StringFormat.JSON)
-            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
             setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
             getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
                 .setResText(R.string.acra_toast_text)

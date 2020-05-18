@@ -142,7 +142,7 @@ class ScriptManager(
         type: Int
     ): ScriptHost? {
         try {
-            Log.e("loading:", "${scriptFile.absolutePath}")
+            //Log.e("loading:", "${scriptFile.absolutePath}")
             val host = ScriptHostFactory.getScriptHost(scriptFile, scriptFile.getConfigFile(), type)
             host ?: throw Exception("未知的脚本类型！${scriptFile.absolutePath}")
             host.load()

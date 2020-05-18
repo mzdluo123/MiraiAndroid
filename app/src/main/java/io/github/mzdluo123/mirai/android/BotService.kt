@@ -4,7 +4,6 @@ package io.github.mzdluo123.mirai.android
 
 import android.annotation.SuppressLint
 import android.app.Service
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -14,6 +13,7 @@ import android.os.PowerManager
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
@@ -259,12 +259,11 @@ class BotService : Service(), CommandOwner {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
             val provideUri: Uri
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                var contentValues = ContentValues(1)
-                contentValues.put(MediaStore.Images.Media.DATA, scriptFile.getAbsolutePath())
-                provideUri = contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    contentValues
-                )!!
+                provideUri = FileProvider.getUriForFile(
+                    this@BotService,
+                    "io.github.mzdluo123.mirai.android.scriptprovider",
+                    scriptFile
+                )
             } else {
                 provideUri = Uri.fromFile(scriptFile);
             }
@@ -273,6 +272,7 @@ class BotService : Service(), CommandOwner {
                     addCategory("android.intent.category.DEFAULT")
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     putExtra(MediaStore.EXTRA_OUTPUT, provideUri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     type = "text/plain"
                     setDataAndType(provideUri, type)
                 })
