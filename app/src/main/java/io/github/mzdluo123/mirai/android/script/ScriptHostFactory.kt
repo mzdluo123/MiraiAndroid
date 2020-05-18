@@ -26,13 +26,14 @@ object ScriptHostFactory {
                 FileReader(configFile).apply {
                     trueType = Json.parse(ScriptHost.ScriptConfig.serializer(), readText()).type
                 }.close()
+                if (trueType == UNKNOWN) trueType = getTypeFromSuffix(scriptFile.getSuffix())
             } else {
                 trueType = getTypeFromSuffix(scriptFile.getSuffix())
             }
         }
         return when (trueType) {
             LUA -> LuaScriptHost(scriptFile, configFile).also {
-                it.config = ScriptHost.ScriptConfig(type, false, "")
+                it.config = ScriptHost.ScriptConfig(trueType, false, "")
             }
             else -> null
         }

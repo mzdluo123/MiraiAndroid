@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import kotlinx.android.synthetic.main.fragment_script.*
 import org.jetbrains.anko.*
@@ -98,15 +99,25 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     private fun importScript(uri: Uri) {
-        val typeList = listOf("自动识别后缀名", "Lua", "JavaScript", "Python", "KotlinScript")
-        context?.selector("请选择脚本的类型", typeList) { _, type ->
-            val scriptFile = ScriptManager.copyFileToScriptDir(context!!, uri)
-            val result = scriptViewModel.createScriptFromFile(scriptFile, type)
-            if (result) {
-                context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
-            } else {
-                context?.toast("导入失败，请检查脚本是否有误！")
-            }
+        uri.path ?: return
+        val scriptType = ScriptHostFactory.getTypeFromSuffix(uri.path!!.split(".").last())
+        if (scriptType != ScriptHostFactory.UNKNOWN) {
+            importScript(uri, scriptType)
+            return
+        }
+        val typeList = listOf("Lua", "JavaScript", "Python", "KotlinScript")
+        context?.selector("未知脚本的后缀名，请手动选择脚本类型", typeList) { _, type ->
+            importScript(uri, type + 1)
+        }
+    }
+
+    private fun importScript(uri: Uri, type: Int) {
+        val scriptFile = ScriptManager.copyFileToScriptDir(context!!, uri)
+        val result = scriptViewModel.createScriptFromFile(scriptFile, type)
+        if (result) {
+            context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
+        } else {
+            context?.toast("导入失败，请检查脚本是否有误！")
         }
     }
 
