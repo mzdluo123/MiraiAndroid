@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.script.ScriptManager
@@ -83,7 +84,8 @@ class BotService : Service(), CommandOwner {
                 }
             }
         }catch (e:Exception){
-            androidMiraiConsole.pushLog(0L, "发生错误 $e")
+            Log.e("onStartCommand", e.message)
+            androidMiraiConsole.pushLog(0L, "onStartCommand:发生错误 $e")
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -164,7 +166,11 @@ class BotService : Service(), CommandOwner {
     private fun startConsole(intent: Intent?) {
         if (isStart) return
         isStart = true
-        wakeLock.acquire()
+        try {
+            wakeLock.acquire()
+        } catch (e: Exception) {
+            Log.e("wakeLockError", e.message)
+        }
         MiraiAndroidStatus.startTime = System.currentTimeMillis()
         MiraiConsole.start(
             androidMiraiConsole,

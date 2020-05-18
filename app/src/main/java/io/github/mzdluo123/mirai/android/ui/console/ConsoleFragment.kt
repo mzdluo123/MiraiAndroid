@@ -19,7 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.utils.paste
+import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
@@ -55,6 +55,7 @@ class ConsoleFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
         commandSend_btn.setOnClickListener {
             submitCmd()
         }
@@ -100,38 +101,14 @@ class ConsoleFragment : Fragment() {
             R.id.action_setAutoLogin -> {
                 setAutoLogin()
             }
-            R.id.action_report -> {
-                lifecycleScope.launch {
-                    val log = buildString {
-                        append(conn.botService.botInfo)
-                        append("\n")
-                        append("========以下是控制台log=======\n")
-                        append(conn.botService.log.joinToString(separator = "\n"))
-                    }
-                    val alertDialog = AlertDialog.Builder(activity)
-                        .setTitle("正在上传日志")
-                        .setMessage("请稍后")
-                        .setCancelable(false)
-                        .create()
-                    alertDialog.show()
-                    val errorHandle = CoroutineExceptionHandler { coroutineContext, throwable ->
-                        alertDialog.dismiss()
-                        Toast.makeText(activity, "日志上传失败", Toast.LENGTH_SHORT).show()
-                    }
-                    val url = async(errorHandle) { paste(log) }
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.type = "text/plain"
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "MiraiAndroid日志分享")
-                    intent.putExtra(Intent.EXTRA_TEXT, url.await())
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    withContext(Dispatchers.Main) {
-                        alertDialog.dismiss()
-                        startActivity(Intent.createChooser(intent, "分享到"));
-                    }
-
-                }
-
-            }
+            R.id.action_report -> context?.shareText(
+                buildString {
+                    append(conn.botService.botInfo)
+                    append("\n")
+                    append("========以下是控制台log=======\n")
+                    append(conn.botService.log.joinToString(separator = "\n"))
+                }, lifecycleScope
+            )
         }
         return false
     }

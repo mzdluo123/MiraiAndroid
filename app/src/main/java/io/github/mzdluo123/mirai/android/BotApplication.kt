@@ -9,7 +9,11 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
 import androidx.annotation.RequiresApi
-
+import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
+import org.acra.ACRA
+import org.acra.config.CoreConfigurationBuilder
+import org.acra.config.ToastConfigurationBuilder
+import org.acra.data.StringFormat
 
 class BotApplication : Application() {
     companion object {
@@ -24,7 +28,6 @@ class BotApplication : Application() {
         }
 
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
@@ -63,6 +66,21 @@ class BotApplication : Application() {
             notificationManager.createNotificationChannel(captchaChannel)
             notificationManager.createNotificationChannel(offlineChannel)
         }
+    }
+
+
+    //崩溃事件注册
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        ACRA.init(this, CoreConfigurationBuilder(this).apply {
+            setBuildConfigClass(BuildConfig::class.java)
+                .setReportFormat(StringFormat.JSON)
+            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
+            setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
+            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
+                .setResText(R.string.acra_toast_text)
+                .setEnabled(true)
+        })
     }
 
     private fun myGetProcessName(): String? {

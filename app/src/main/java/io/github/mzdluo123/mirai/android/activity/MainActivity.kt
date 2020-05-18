@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -11,8 +12,14 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.yesButton
+import java.io.File
+import java.io.FileReader
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +55,29 @@ class MainActivity : AppCompatActivity() {
             })
             finish()
         }
+        checkCrash()
+        //throw Exception("测试异常")
+    }
+
+    private fun checkCrash() {
+        val crashDataFile = File(getExternalFilesDir("crash"), "crashdata")
+        if (!crashDataFile.exists()) return
+        var crashData: String
+        FileReader(crashDataFile).also {
+            crashData = it.readText()
+        }.close()
+        alert("检测到你上一次异常退出，是否上传崩溃日志？") {
+            yesButton {
+                shareText(crashData, lifecycleScope)
+            }
+            noButton { }
+        }.show()
+        crashDataFile.renameTo(
+            File(
+                getExternalFilesDir("crash"),
+                "crashdata${System.currentTimeMillis()}"
+            )
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean =

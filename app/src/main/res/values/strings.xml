@@ -13,7 +13,6 @@
 
     <string name="home_second">Home Second</string>
     <string name="service_description">MiraiAndroid用于运行Bot的服务</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="acra_toast_text">MiraiAndroid运行崩溃！</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
