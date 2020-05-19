@@ -67,7 +67,8 @@ class ScriptManager(
         scriptDir.listFiles()?.forEach { scriptFile ->
             //scriptFile.delete()
             //scriptFile.getConfigFile().delete()
-            hosts.addHost(scriptFile, scriptFile.getConfigFile(), ScriptHostFactory.UNKNOWN)
+            if (scriptFile.isFile)
+                hosts.addHost(scriptFile, scriptFile.getConfigFile(), ScriptHostFactory.UNKNOWN)
         }
     }
 

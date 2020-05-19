@@ -35,6 +35,9 @@ object ScriptHostFactory {
             LUA -> LuaScriptHost(scriptFile, configFile).also {
                 it.config = ScriptHost.ScriptConfig(trueType, false, "")
             }
+            JAVASCRIPT -> JavaScriptHost(scriptFile, configFile).also {
+                it.config = ScriptHost.ScriptConfig(trueType, false, "")
+            }
             else -> null
         }
     }
