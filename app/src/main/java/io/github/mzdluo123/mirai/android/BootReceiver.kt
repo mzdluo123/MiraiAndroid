@@ -3,11 +3,12 @@ package io.github.mzdluo123.mirai.android
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import kotlinx.serialization.ImplicitReflectionSerializer
 
 @ImplicitReflectionSerializer
 class BootReceiver : BroadcastReceiver() {
-//    companion object{
+    //    companion object{
 //        const val TAG = "BootReceiver"
 //    }
     private val ACTION = "android.intent.action.BOOT_COMPLETED"
@@ -18,8 +19,8 @@ class BootReceiver : BroadcastReceiver() {
         }
 
         if (intent.action == ACTION) {
-            val intent = Intent(context, BotService::class.java)
-            intent.putExtra(
+            val startIntent = Intent(context, BotService::class.java)
+            startIntent.putExtra(
                 "action",
                 BotService.START_SERVICE
             )
@@ -27,9 +28,13 @@ class BootReceiver : BroadcastReceiver() {
                 context.getSharedPreferences("account", Context.MODE_PRIVATE)
             val qq = account.getLong("qq", 0)
             val pwd = account.getString("pwd", null)
-            intent.putExtra("qq", qq)
-            intent.putExtra("pwd", pwd)
-            context.startForegroundService(intent)
+            startIntent.putExtra("qq", qq)
+            startIntent.putExtra("pwd", pwd)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(startIntent)
+            } else {
+                context.startService(startIntent)
+            }
         }
     }
 }

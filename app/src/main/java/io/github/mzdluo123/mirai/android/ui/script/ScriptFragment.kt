@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
@@ -114,7 +113,7 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     private fun importScript(uri: Uri, type: Int) {
-        val scriptFile = ScriptManager.copyFileToScriptDir(context!!, uri)
+        val scriptFile = ScriptManager.copyFileToScriptDir(requireContext(), uri)
         val result = scriptViewModel.createScriptFromFile(scriptFile, type)
         if (result) {
             context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
@@ -140,7 +139,7 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
         context?.alert("重新加载该脚本？") {
             yesButton {
                 scriptViewModel.reloadScript(index)
-                context!!.toast("重载完毕")
+                requireContext().toast("重载完毕")
             }
             noButton { }
         }?.show()
@@ -152,12 +151,12 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
 
     override fun onEnableScript(index: Int) {
         scriptViewModel.enableScript(index)
-        context!!.toast("已启用")
+        requireContext().toast("已启用")
     }
 
     override fun onDisableScript(index: Int) {
         scriptViewModel.disableScript(index)
-        context!!.toast("已禁用")
+        requireContext().toast("已禁用")
     }
 
     fun showScriptInfo(index: Int) {

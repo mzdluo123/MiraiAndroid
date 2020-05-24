@@ -146,8 +146,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private fun Bot.subscribeBotLifeEvent() {
         subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             // 防止一闪而过得掉线
-            delay(200)
-            if (this.bot.network.areYouOk()) return@subscribeAlways
+            // 但是它可能并不能在1.0版本正常工作。。。。。
+            delay(500)
+            if (this.bot.isActive) return@subscribeAlways
             pushLog(0L, "[INFO] 发送离线通知....")
             val builder =
                 NotificationCompat.Builder(

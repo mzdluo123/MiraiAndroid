@@ -145,11 +145,11 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun registerDefaultCommand() {
-        register(_description = "显示MiraiAndroid运行状态", _name = "android") { sender, args ->
+        register(_description = "显示MiraiAndroid运行状态", _name = "android") { sender, _ ->
             sender.sendMessage(MiraiAndroidStatus.recentStatus().format())
             true
         }
-        register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, args ->
+        register(_description = "查看已加载的脚本", _name = "script", _usage = "script") { sender, _ ->
             sender.sendMessage(buildString {
                 append("已加载${ScriptManager.instance.hosts.size}个脚本\n")
                 ScriptManager.instance.hosts.joinTo(
@@ -222,7 +222,7 @@ class BotService : Service(), CommandOwner {
 
         }
 
-        override fun createScript(name: String?, type: Int): Boolean {
+        override fun createScript(name: String, type: Int): Boolean {
             return ScriptManager.instance.createScriptFromFile(File(name), type)
         }
 
@@ -265,7 +265,7 @@ class BotService : Service(), CommandOwner {
                     scriptFile
                 )
             } else {
-                provideUri = Uri.fromFile(scriptFile);
+                provideUri = Uri.fromFile(scriptFile)
             }
             startActivity(
                 Intent("android.intent.action.VIEW").apply {
