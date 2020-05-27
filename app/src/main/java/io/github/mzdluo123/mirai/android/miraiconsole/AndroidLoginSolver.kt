@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
