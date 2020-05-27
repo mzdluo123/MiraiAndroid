@@ -133,7 +133,12 @@ class BotService : Service(), CommandOwner {
             }
         }
         GlobalScope.launch(handler) { bot.login() }
-
+        bot.subscribeMessages {
+            startsWith("/") { message ->
+                if (bot.checkManager(this.sender.id))
+                    CommandManager.runCommand(ContactCommandSender(bot,this.subject), message)
+            }
+        }
 
         GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         MiraiConsole.frontEnd.pushBot(bot)
