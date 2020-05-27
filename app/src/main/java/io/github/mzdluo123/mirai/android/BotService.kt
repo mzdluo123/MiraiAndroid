@@ -201,10 +201,7 @@ class BotService : Service(), CommandOwner {
             // ClassCastException: java.lang.Object[] cannot be cast to java.lang.String[]
             // 不知道有没有更好的写法
             return androidMiraiConsole.logStorage.toArray(
-                arrayOfNulls<String>(
-                    androidMiraiConsole.logStorage.size
-                )
-            )
+                arrayOfNulls(androidMiraiConsole.logStorage.size))
         }
 
         override fun submitVerificationResult(result: String?) {
