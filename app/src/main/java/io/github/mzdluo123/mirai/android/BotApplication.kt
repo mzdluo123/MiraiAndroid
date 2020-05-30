@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
-import androidx.annotation.RequiresApi
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
@@ -29,7 +28,7 @@ class BotApplication : Application() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCreate() {
         super.onCreate()
         context = this
@@ -40,31 +39,32 @@ class BotApplication : Application() {
 
         // 防止服务进程多次初始化
         if (processName?.isEmpty() == false && processName == packageName) {
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            // Create the NotificationChannel
-            val mChannel = NotificationChannel(
-                SERVICE_NOTIFICATION, "状态通知",
-                NotificationManager.IMPORTANCE_MIN
-            )
-            mChannel.description = "Mirai正在运行的通知"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // 只在8.0系统上注册通知通道，防止程序崩溃
+                val mChannel = NotificationChannel(
+                    SERVICE_NOTIFICATION, "状态通知",
+                    NotificationManager.IMPORTANCE_MIN
+                )
 
-            val captchaChannel = NotificationChannel(
-                CAPTCHA_NOTIFICATION, "验证码通知",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            captchaChannel.description = "登录需要输入验证码时的通知"
+                mChannel.description = "Mirai正在运行的通知"
 
-            val offlineChannel = NotificationChannel(
-                OFFLINE_NOTIFICATION, "离线通知",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            captchaChannel.description = "Mirai因各种原因离线的通知"
+                val captchaChannel = NotificationChannel(
+                    CAPTCHA_NOTIFICATION, "验证码通知",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                captchaChannel.description = "登录需要输入验证码时的通知"
 
-            notificationManager.createNotificationChannel(mChannel)
-            notificationManager.createNotificationChannel(captchaChannel)
-            notificationManager.createNotificationChannel(offlineChannel)
+                val offlineChannel = NotificationChannel(
+                    OFFLINE_NOTIFICATION, "离线通知",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+                captchaChannel.description = "Mirai因各种原因离线的通知"
+
+                notificationManager.createNotificationChannel(mChannel)
+                notificationManager.createNotificationChannel(captchaChannel)
+                notificationManager.createNotificationChannel(offlineChannel)
+            }
         }
     }
 
