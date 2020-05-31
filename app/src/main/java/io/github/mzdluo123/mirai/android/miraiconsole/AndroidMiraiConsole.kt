@@ -33,7 +33,8 @@ import net.mamoe.mirai.utils.SimpleLogger
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private val logBuffer = BotApplication.getSettingPreference()
         .getString("log_buffer_preference", "300")!!.toInt()
-
+    private val printToLogcat =
+        BotApplication.getSettingPreference().getBoolean("print_to_logcat_preference", false)
     val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver =
         AndroidLoginSolver(context)
@@ -46,7 +47,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private var refreshCurrentPos = 0
 
     companion object {
-        const val TAG = "MiraiAndroid"
+        const val TAG = "MA"
     }
 
     override fun createLoginSolver(): LoginSolver = loginSolver
@@ -63,7 +64,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     override fun pushLog(identity: Long, message: String) {
         logStorage.add(message)
-        Log.d(TAG, message)
+        if (printToLogcat) {
+            Log.i(TAG, message)
+        }
     }
 
     override fun pushLog(
@@ -73,7 +76,10 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         message: String
     ) {
         logStorage.add("[${priority.name}] $identityStr $message")
-        Log.d(TAG, "[${priority.name}] $identityStr $message")
+        if (printToLogcat){
+            Log.i(TAG, "[${priority.name}] $identityStr $message")
+        }
+
     }
 
     override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
