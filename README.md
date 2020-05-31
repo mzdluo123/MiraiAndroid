@@ -203,11 +203,12 @@ d8.bat --output 输出文件.jar 源文件
 重启即可使用插件，当然部分插件可能也会存在兼容性问题
 
 
-# Console插件兼容不完全列表
+# 兼容的Console插件列表
 
-以下插件由群友测试未发现问题，你可以到群内下载
+以下插件由群友测试未发现问题，你可以到群内下载，或是到[插件中心](https://github.com/mamoe/mirai-plugins)手动下载jvm版并导入
 
 * mirai-api-http
 * HsoSe
 * keywordReply
 * forward
+* CQHTTPMirai
