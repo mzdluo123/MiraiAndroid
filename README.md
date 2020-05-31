@@ -6,6 +6,13 @@
  * @LastEditors: sueRimn
  * @LastEditTime: 2020-05-09 12:22:15
  -->
+ 
+ <div align="center">
+   <img width="160" src="https://cdn.jsdelivr.net/gh/mzdluo123/blog_imgs/img/20200531205703.png" alt="logo"></br>
+
+   <img width="95" src="https://cdn.jsdelivr.net/gh/mzdluo123/blog_imgs/img/20200531205726.png" alt="title">
+</div>
+
 # MiraiAndroid
 
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android Pull Request & Master CI?style=flat-square">
@@ -206,6 +213,8 @@ d8.bat --output 输出文件.jar 源文件
 # 兼容的Console插件列表
 
 以下插件由群友测试未发现问题，你可以到群内下载，或是到[插件中心](https://github.com/mamoe/mirai-plugins)手动下载jvm版并导入
+
+对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
 
 * mirai-api-http
 * HsoSe
