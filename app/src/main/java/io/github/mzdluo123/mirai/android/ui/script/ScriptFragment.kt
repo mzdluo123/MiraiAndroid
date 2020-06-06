@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.mzdluo123.mirai.android.BotService
@@ -20,13 +21,18 @@ import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
+import io.github.mzdluo123.mirai.android.utils.askFileName
 import kotlinx.android.synthetic.main.fragment_script.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.*
 
 class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFragmentListener {
     companion object {
         const val IMPORT_SCRIPT = 2
     }
+
     private val scriptViewModel: ScriptViewModel by lazy {
         ViewModelProvider(this)[ScriptViewModel::class.java]
     }
@@ -75,7 +81,12 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         script_recycler.adapter = adapter
-        script_recycler.addItemDecoration(DividerItemDecoration(context,DividerItemDecoration.HORIZONTAL))
+        script_recycler.addItemDecoration(
+            DividerItemDecoration(
+                context,
+                DividerItemDecoration.HORIZONTAL
+            )
+        )
         script_recycler.layoutManager = LinearLayoutManager(activity)
     }
 
@@ -113,13 +124,19 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     private fun importScript(uri: Uri, type: Int) {
-        val scriptFile = ScriptManager.copyFileToScriptDir(requireContext(), uri)
-        val result = scriptViewModel.createScriptFromFile(scriptFile, type)
-        if (result) {
-            context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
-        } else {
-            context?.toast("导入失败，请检查脚本是否有误！")
+        viewLifecycleOwner.lifecycleScope.launch {
+            val name = withContext(Dispatchers.Main) {
+                requireActivity().askFileName()
+            } ?: return@launch
+            val scriptFile = ScriptManager.copyFileToScriptDir(requireContext(), uri,name)
+            val result = scriptViewModel.createScriptFromFile(scriptFile, type)
+            if (result) {
+                context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")
+            } else {
+                context?.toast("导入失败，请检查脚本是否有误！")
+            }
         }
+
     }
 
     override fun onDeleteScript(index: Int) {

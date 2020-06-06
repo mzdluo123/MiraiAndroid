@@ -20,7 +20,9 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer">
+        app:menu="@menu/activity_main_drawer"
+        app:itemTextColor="@color/color_drawer_item"
+        app:itemIconTint="@color/color_drawer_item">
 
         <Button
             android:id="@+id/btn_stopService"

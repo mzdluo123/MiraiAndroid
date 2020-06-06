@@ -37,8 +37,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
         findNavController(R.id.nav_host_fragment).let {
             setupActionBarWithNavController(it, appBarConfiguration)
             nav_view.setupWithNavController(it)

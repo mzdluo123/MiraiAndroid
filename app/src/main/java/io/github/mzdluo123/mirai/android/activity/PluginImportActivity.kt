@@ -2,7 +2,6 @@ package io.github.mzdluo123.mirai.android.activity
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.databinding.ActivityPluginImportBinding
 import io.github.mzdluo123.mirai.android.ui.plugin.PluginViewModel
-import io.github.mzdluo123.mirai.android.utils.FileUtils
+import io.github.mzdluo123.mirai.android.utils.askFileName
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.android.synthetic.main.activity_plugin_import.*
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -75,13 +74,15 @@ class PluginImportActivity : AppCompatActivity() {
             }
         }
 
-        val path = FileUtils.getFilePathByUri(this@PluginImportActivity, uri)
-        Log.e("PATH", path.toString())
-        val name = path?.split("/")?.last() ?: uri.lastPathSegment ?: return
+
+
         dialog.show()
         when (import_radioGroup.checkedRadioButtonId) {
             R.id.compile_radioButton -> {
                 lifecycleScope.launch(exceptionHandler) {
+                    val name = withContext(Dispatchers.Main) {
+                        askFileName()
+                    } ?: return@launch
                     withContext(Dispatchers.IO) {
                         copyToFileDir(
                             uri,
@@ -104,6 +105,9 @@ class PluginImportActivity : AppCompatActivity() {
             }
             R.id.copy_radioButton -> {
                 lifecycleScope.launch(exceptionHandler) {
+                    val name = withContext(Dispatchers.Main) {
+                        askFileName()
+                    } ?: return@launch
                     withContext(Dispatchers.IO) {
                         copyToFileDir(
                             uri,
@@ -123,19 +127,7 @@ class PluginImportActivity : AppCompatActivity() {
 
 
     private suspend fun loadPluginData() {
-        val realPath = FileUtils.getFilePathByUri(this, uri)
-        val realFileName = realPath?.split("/")?.last()
-        if (realFileName == null) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                Toast.makeText(
-                    this@PluginImportActivity,
-                    "无法加载插件",
-                    Toast.LENGTH_LONG
-                ).show()
-                finish()
-            }
-            return
-        }
+        val realFileName = "tmpfile.jar"
         baseContext.copyToFileDir(uri, realFileName, cacheDir.absolutePath)
         val cacheFile = File(cacheDir.absolutePath, realFileName)
         val zipFile = ZipFile(cacheFile)
@@ -146,7 +138,7 @@ class PluginImportActivity : AppCompatActivity() {
         FileReader(File(cacheDir.absolutePath, "plugin.yml")).use {
             with(yml.load<LinkedHashMap<String, Any>>(it)) {
                 plugInfo = PluginDescription(
-                    file = File(realPath),
+                    file = File(cacheDir.absolutePath, "tmpfile.jar"),
                     name = this.get("name") as String,
                     author = kotlin.runCatching {
                         this.get("author") as String

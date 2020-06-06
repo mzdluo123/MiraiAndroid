@@ -125,7 +125,7 @@ class ConsoleFragment : Fragment() {
     }
 
     private fun setAutoLogin() {
-        val alertView = View.inflate(activity, R.layout.alert_autologin, null)
+        val alertView = View.inflate(activity, R.layout.dialog_autologin, null)
         val pwdInput = alertView.findViewById<EditText>(R.id.password_input)
         val qqInput = alertView.findViewById<EditText>(R.id.qq_input)
         val accountStore = activity!!.getSharedPreferences("account", Context.MODE_PRIVATE)

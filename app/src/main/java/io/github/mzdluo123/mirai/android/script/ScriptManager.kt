@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.utils.FileUtils
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
@@ -19,6 +18,7 @@ class ScriptManager(
     private val bots = mutableListOf<Bot>()
     val botsSize: Int
         get() = bots.size
+
     companion object {
         val instance: ScriptManager by lazy {
             val context: Context = BotApplication.context
@@ -32,11 +32,13 @@ class ScriptManager(
                 Json.parse(ScriptHost.ScriptInfo.serializer(), infoStrings[it])
             }
 
-        fun copyFileToScriptDir(context: Context, uri: Uri): File = context.copyToFileDir(
-            uri,
-            FileUtils.getFilePathByUri(context, uri)?.split("/")?.last()!!,
-            context.getExternalFilesDir("scripts")!!.absolutePath
-        )
+        fun copyFileToScriptDir(context: Context, uri: Uri, name: String): File =
+            context.copyToFileDir(
+                uri,
+                name,
+                context.getExternalFilesDir("scripts")!!.absolutePath
+            )
+
     }
 
     init {
@@ -72,20 +74,20 @@ class ScriptManager(
         }
     }
 
-    fun createScriptFromUri(fromUri: Uri, type: Int): Boolean {
-        fromUri.getName(context).let { name ->
-            val scriptFile = context.copyToFileDir(
-                fromUri,
-                name!!,
-                scriptDir.absolutePath
-            )
-
-            hosts.addHost(scriptFile, scriptFile.getConfigFile(), type)?.let { host ->
-                bots.forEach { bot -> host.installBot(bot) }
-                return true
-            } ?: return false
-        }
-    }
+//    fun createScriptFromUri(fromUri: Uri, type: Int): Boolean {
+//        fromUri.getName(context).let { name ->
+//            val scriptFile = context.copyToFileDir(
+//                fromUri,
+//                name!!,
+//                scriptDir.absolutePath
+//            )
+//
+//            hosts.addHost(scriptFile, scriptFile.getConfigFile(), type)?.let { host ->
+//                bots.forEach { bot -> host.installBot(bot) }
+//                return true
+//            } ?: return false
+//        }
+//    }
 
     fun createScriptFromFile(scriptFile: File, type: Int): Boolean {
         hosts.addHost(scriptFile, scriptFile.getConfigFile(), type)?.let { host ->
@@ -103,6 +105,7 @@ class ScriptManager(
         hosts[index].saveConfig()
         bots.forEach { hosts[index].installBot(it) }
     }
+
     fun enableAll() = hosts.forEach { host -> host.enable() }
 
     fun disable(index: Int) {
@@ -113,7 +116,8 @@ class ScriptManager(
         hosts[index].info.enable = false
         hosts[index].saveConfig()
     }
-    fun disableAll() = hosts.forEach {it.disable()}
+
+    fun disableAll() = hosts.forEach { it.disable() }
 
     fun reload(index: Int) {
         hosts[index].disable()
@@ -157,6 +161,6 @@ class ScriptManager(
     }
 
     private fun File.getConfigFile() = File(configDir, name)
-    fun Uri.getName(context: Context) =
-        FileUtils.getFilePathByUri(context, this)?.split("/")?.last()
+//    fun Uri.getName(context: Context) =
+//      context.askFileName()
 }

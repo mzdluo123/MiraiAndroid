@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
-import io.github.mzdluo123.mirai.android.utils.FileUtils
+import io.github.mzdluo123.mirai.android.utils.formatFileLength
 
 class ScriptInfoDialogFragment(
     var scriptIndex: Int,
@@ -35,7 +35,7 @@ class ScriptInfoDialogFragment(
                     append("脚本类型：")
                     append(ScriptHostFactory.NAMES[info.scriptType])
                     append("\n大小：")
-                    append(FileUtils.formatFileLength(info.fileLength))
+                    append(formatFileLength(info.fileLength))
                     append("\n作者：")
                     append(info.author)
                     append("\n版本：")
