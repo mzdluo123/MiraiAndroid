@@ -42,12 +42,12 @@ class BotApplication : Application() {
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // 只在8.0系统上注册通知通道，防止程序崩溃
-                val mChannel = NotificationChannel(
+                val statusChannel = NotificationChannel(
                     SERVICE_NOTIFICATION, "状态通知",
                     NotificationManager.IMPORTANCE_MIN
                 )
 
-                mChannel.description = "Mirai正在运行的通知"
+                statusChannel.description = "Mirai正在运行的通知"
 
                 val captchaChannel = NotificationChannel(
                     CAPTCHA_NOTIFICATION, "验证码通知",
@@ -59,9 +59,9 @@ class BotApplication : Application() {
                     OFFLINE_NOTIFICATION, "离线通知",
                     NotificationManager.IMPORTANCE_HIGH
                 )
-                captchaChannel.description = "Mirai因各种原因离线的通知"
+                offlineChannel.description = "Mirai因各种原因离线的通知"
 
-                notificationManager.createNotificationChannel(mChannel)
+                notificationManager.createNotificationChannel(statusChannel)
                 notificationManager.createNotificationChannel(captchaChannel)
                 notificationManager.createNotificationChannel(offlineChannel)
             }
