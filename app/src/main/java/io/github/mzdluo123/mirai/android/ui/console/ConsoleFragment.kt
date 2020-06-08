@@ -1,18 +1,22 @@
 package io.github.mzdluo123.mirai.android.ui.console
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.DeadObjectException
-import android.os.IBinder
+import android.net.Uri
+import android.os.*
+import android.provider.Settings
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -109,8 +113,28 @@ class ConsoleFragment : Fragment() {
                     append(conn.botService.log.joinToString(separator = "\n"))
                 }, lifecycleScope
             )
+            R.id.action_battery->{
+                ignoreBatteryOptimization(requireActivity())
+            }
         }
         return false
+    }
+
+    @SuppressLint("BatteryLife")
+    private fun ignoreBatteryOptimization(activity: Activity) {
+            val powerManager =
+               getSystemService(requireContext(),PowerManager::class.java) as PowerManager?
+            val hasIgnored =
+                powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+            //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+            if (!hasIgnored) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:" + activity.packageName)
+                startActivity(intent)
+            }else{
+                Toast.makeText(context,"您已授权忽略电池优化",Toast.LENGTH_SHORT).show()
+            }
+
     }
 
     private fun submitCmd() {
@@ -128,7 +152,7 @@ class ConsoleFragment : Fragment() {
         val alertView = View.inflate(activity, R.layout.dialog_autologin, null)
         val pwdInput = alertView.findViewById<EditText>(R.id.password_input)
         val qqInput = alertView.findViewById<EditText>(R.id.qq_input)
-        val accountStore = activity!!.getSharedPreferences("account", Context.MODE_PRIVATE)
+        val accountStore = requireActivity().getSharedPreferences("account", Context.MODE_PRIVATE)
         val dialog = AlertDialog.Builder(activity)
             .setView(alertView)
             .setCancelable(true)
@@ -193,6 +217,7 @@ class ConsoleFragment : Fragment() {
             toString()
         }
     }
+
 }
 
 

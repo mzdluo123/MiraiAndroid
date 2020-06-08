@@ -8,4 +8,7 @@
     <item
         android:id="@+id/action_report"
         android:title="分享日志" />
+    <item
+        android:id="@+id/action_battery"
+        android:title="忽略电池优化" />
 </menu>
