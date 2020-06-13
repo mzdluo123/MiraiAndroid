@@ -16,8 +16,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 17
-        versionName "2.7"
+        versionCode 18
+        versionName "2.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
@@ -29,6 +29,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

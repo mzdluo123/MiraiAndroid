@@ -11,4 +11,7 @@
     <item
         android:id="@+id/action_battery"
         android:title="忽略电池优化" />
+    <item
+        android:id="@+id/action_fast_restart"
+        android:title="快速重启" />
 </menu>

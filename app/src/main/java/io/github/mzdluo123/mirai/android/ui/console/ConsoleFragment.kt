@@ -2,14 +2,17 @@ package io.github.mzdluo123.mirai.android.ui.console
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
-import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
-import android.os.*
+import android.os.Bundle
+import android.os.DeadObjectException
+import android.os.IBinder
+import android.os.PowerManager
 import android.provider.Settings
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -33,6 +36,8 @@ class ConsoleFragment : Fragment() {
 
     private lateinit var consoleViewModel: ConsoleViewModel
 
+    private lateinit var logRefreshJob: Job
+
     private val conn = object : ServiceConnection {
         lateinit var botService: IbotAidlInterface
 
@@ -43,6 +48,7 @@ class ConsoleFragment : Fragment() {
             startRefreshLoop()
         }
     }
+    private var serviceIsBound = false
 
 
     override fun onCreateView(
@@ -80,12 +86,17 @@ class ConsoleFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         val bindIntent = Intent(activity, BotService::class.java)
-        activity?.bindService(bindIntent, conn, Context.BIND_AUTO_CREATE)
+        requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT)
+        serviceIsBound = true
     }
 
     override fun onPause() {
         super.onPause()
-        activity?.unbindService(conn)
+        if (serviceIsBound) {
+            activity?.unbindService(conn)
+            serviceIsBound = false
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -113,8 +124,11 @@ class ConsoleFragment : Fragment() {
                     append(conn.botService.log.joinToString(separator = "\n"))
                 }, lifecycleScope
             )
-            R.id.action_battery->{
+            R.id.action_battery -> {
                 ignoreBatteryOptimization(requireActivity())
+            }
+            R.id.action_fast_restart -> {
+                restart()
             }
         }
         return false
@@ -122,18 +136,18 @@ class ConsoleFragment : Fragment() {
 
     @SuppressLint("BatteryLife")
     private fun ignoreBatteryOptimization(activity: Activity) {
-            val powerManager =
-               getSystemService(requireContext(),PowerManager::class.java) as PowerManager?
-            val hasIgnored =
-                powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
-            //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
-            if (!hasIgnored) {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                intent.data = Uri.parse("package:" + activity.packageName)
-                startActivity(intent)
-            }else{
-                Toast.makeText(context,"您已授权忽略电池优化",Toast.LENGTH_SHORT).show()
-            }
+        val powerManager =
+            getSystemService(requireContext(), PowerManager::class.java) as PowerManager?
+        val hasIgnored =
+            powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+        if (!hasIgnored) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:" + activity.packageName)
+            startActivity(intent)
+        } else {
+            Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+        }
 
     }
 
@@ -174,7 +188,7 @@ class ConsoleFragment : Fragment() {
     }
 
     private fun startRefreshLoop() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+        logRefreshJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
             try {
                 while (isActive) {
                     val text = conn.botService.log.joinToString(separator = "\n")
@@ -187,6 +201,7 @@ class ConsoleFragment : Fragment() {
                     delay(200)
                 }
             } catch (e: DeadObjectException) {
+                withContext(Dispatchers.Main) { log_text?.text = "无法连接到服务，可能是正在重启"}
                 return@launch
             }
         }
@@ -216,6 +231,32 @@ class ConsoleFragment : Fragment() {
             }
             toString()
         }
+    }
+
+    private fun restart() = viewLifecycleOwner.lifecycleScope.launch {
+        requireActivity().unbindService(conn)
+        serviceIsBound = false
+
+        requireActivity().startService(Intent(requireContext(), BotService::class.java).apply {
+            putExtra("action", BotService.STOP_SERVICE)
+        })
+
+        delay(100)
+        val bindIntent = Intent(activity, BotService::class.java)
+        do {
+            val account = requireActivity().getSharedPreferences("account", Context.MODE_PRIVATE)
+            requireActivity().startService(Intent(requireActivity(), BotService::class.java).apply {
+                putExtra("action", BotService.START_SERVICE)
+                putExtra("qq", account.getLong("qq", 0))
+                putExtra("pwd", account.getString("pwd", null))
+            })
+
+        }while (!requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT))
+
+
+        serviceIsBound = true
+        startRefreshLoop()
+
     }
 
 }

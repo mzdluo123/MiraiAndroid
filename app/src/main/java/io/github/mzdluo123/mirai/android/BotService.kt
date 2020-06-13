@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.Process
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -83,7 +84,7 @@ class BotService : Service(), CommandOwner {
                     STOP_SERVICE -> stopConsole()
                 }
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             Log.e("onStartCommand", e.message)
             androidMiraiConsole.pushLog(0L, "onStartCommand:发生错误 $e")
         }
@@ -136,7 +137,7 @@ class BotService : Service(), CommandOwner {
         bot.subscribeMessages {
             startsWith("/") { message ->
                 if (bot.checkManager(this.sender.id))
-                    CommandManager.runCommand(ContactCommandSender(bot,this.subject), message)
+                    CommandManager.runCommand(ContactCommandSender(bot, this.subject), message)
             }
         }
 
@@ -165,7 +166,8 @@ class BotService : Service(), CommandOwner {
     @SuppressLint("WakelockTimeout")
     private fun startConsole(intent: Intent?) {
         if (isStart) return
-        isStart = true
+        Log.e(TAG, "启动服务")
+
         try {
             wakeLock.acquire()
         } catch (e: Exception) {
@@ -176,14 +178,20 @@ class BotService : Service(), CommandOwner {
             androidMiraiConsole,
             path = getExternalFilesDir(null).toString()
         )
+        isStart = true
         createNotification()
         registerDefaultCommand()
+
         intent?.let { autoLogin(it) }
     }
 
     private fun stopConsole() {
+        if (!isStart) return
+        Log.e(TAG, "停止服务")
         ScriptManager.instance.disableAll()
-        wakeLock.release()
+        if (wakeLock.isHeld) {
+            wakeLock.release()
+        }
         MiraiConsole.stop()
         stopForeground(true)
         stopSelf()
@@ -206,7 +214,8 @@ class BotService : Service(), CommandOwner {
             // ClassCastException: java.lang.Object[] cannot be cast to java.lang.String[]
             // 不知道有没有更好的写法
             return androidMiraiConsole.logStorage.toArray(
-                arrayOfNulls(androidMiraiConsole.logStorage.size))
+                arrayOfNulls(androidMiraiConsole.logStorage.size)
+            )
         }
 
         override fun submitVerificationResult(result: String?) {

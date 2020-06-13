@@ -46,7 +46,7 @@ class CaptchaActivity : AppCompatActivity() {
         setContentView(R.layout.activity_captcha)
     }
 
-    @ImplicitReflectionSerializer
+
     override fun onStart() {
         super.onStart()
         val intent = Intent(baseContext, BotService::class.java)
