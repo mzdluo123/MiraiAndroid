@@ -21,7 +21,7 @@
 
 <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
 
-（实验性）在Android上运行Mirai-console
+在Android上运行Mirai-console，目前已完美实现jvm版mirai所有功能
 
 关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
 
@@ -29,7 +29,7 @@
 
 相比使用`Termux`或者是`Linux Deploy`等应用运行mirai的方案，该项目提供的方案具有更好的性能以及更少的资源占用，但可能存在兼容性问题
 
-最新的构建版本你可以到[这里](https://github.com/mzdluo123/MiraiAndroid/actions)找到，下载可能需要登录
+最新的构建版本你可以到[这里](https://github.com/mzdluo123/MiraiAndroid/actions)找到，下载可能需要登录；稍稳定的版本可用到release或qq群内下载
 
 更多信息请加QQ群`655057127`了解
 
@@ -209,15 +209,22 @@ d8.bat --output 输出文件.jar 源文件
 
 重启即可使用插件，当然部分插件可能也会存在兼容性问题
 
+# FAQ
+
+Q: 后台运行被系统杀死<br>
+A：请手动将应用添加到系统后台白名单
+
+Q：应用崩溃或后台报错<br>
+A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-core的问题请在菜单内找到分享日志并到群内或开启issue反馈，插件的问题请联系对应开发者；如果是应用崩溃，请重启并按照上面的方法提交日志给我们
 
 # 兼容的Console插件列表
 
 以下插件由群友测试未发现问题，你可以到群内下载，或是到[插件中心](https://github.com/mamoe/mirai-plugins)手动下载jvm版并导入
-
-对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
 
 * mirai-api-http
 * HsoSe
 * keywordReply
 * forward
 * CQHTTPMirai
+
+对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
