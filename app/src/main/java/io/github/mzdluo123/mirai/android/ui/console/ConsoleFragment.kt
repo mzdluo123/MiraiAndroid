@@ -2,7 +2,6 @@ package io.github.mzdluo123.mirai.android.ui.console
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
@@ -23,6 +22,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
@@ -201,8 +201,23 @@ class ConsoleFragment : Fragment() {
                     delay(200)
                 }
             } catch (e: DeadObjectException) {
-                withContext(Dispatchers.Main) { log_text?.text = "无法连接到服务，可能是正在重启"}
+                withContext(Dispatchers.Main) { log_text?.text = "无法连接到服务，可能是正在重启" }
+                reconnect()
                 return@launch
+            }
+        }
+
+    }
+
+    private fun reconnect() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            val bindIntent = Intent(activity, BotService::class.java)
+            while (isActive) {
+                if (requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT)) {
+                    serviceIsBound = true
+                    startRefreshLoop()
+                    return@launch
+                }
             }
         }
 
@@ -237,25 +252,10 @@ class ConsoleFragment : Fragment() {
         requireActivity().unbindService(conn)
         serviceIsBound = false
 
-        requireActivity().startService(Intent(requireContext(), BotService::class.java).apply {
-            putExtra("action", BotService.STOP_SERVICE)
-        })
-
+        BotApplication.context.stopBotService()
         delay(100)
-        val bindIntent = Intent(activity, BotService::class.java)
-        do {
-            val account = requireActivity().getSharedPreferences("account", Context.MODE_PRIVATE)
-            requireActivity().startService(Intent(requireActivity(), BotService::class.java).apply {
-                putExtra("action", BotService.START_SERVICE)
-                putExtra("qq", account.getLong("qq", 0))
-                putExtra("pwd", account.getString("pwd", null))
-            })
+        BotApplication.context.startBotService()
 
-        }while (!requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT))
-
-
-        serviceIsBound = true
-        startRefreshLoop()
 
     }
 

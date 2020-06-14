@@ -1,7 +1,10 @@
 package io.github.mzdluo123.mirai.android
 
+import android.app.Instrumentation
+import android.content.Intent
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.github.mzdluo123.mirai.android.activity.MainActivity
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,5 +24,20 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         val regex = "\\{.{8}-(.{4}-){3}.{12}\\}\\.mirai".toRegex()
         assertEquals("io.github.mzdluo123.mirai.android", appContext.packageName)
+    }
+
+    @Test
+    fun pushMsgTest(){
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+        appContext.startActivity(Intent(appContext,MainActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+        Thread.sleep(10000)
+
+        appContext.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
+            putExtra("type",1)
+            putExtra("msg","test msg")
+            putExtra("id",2314572588L)
+        })
+
+        Thread.sleep(100000)
     }
 }

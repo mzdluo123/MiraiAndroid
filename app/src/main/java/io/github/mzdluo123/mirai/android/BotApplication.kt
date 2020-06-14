@@ -5,10 +5,13 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
+import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.ToastConfigurationBuilder
@@ -90,5 +93,21 @@ class BotApplication : Application() {
             }
         }
         return null
+    }
+
+    internal fun startBotService() {
+        val account = getSharedPreferences("account", Context.MODE_PRIVATE)
+        this.startService(Intent(this, BotService::class.java).apply {
+            putExtra("action", BotService.START_SERVICE)
+            putExtra("qq", account.getLong("qq", 0))
+            putExtra("pwd", account.getString("pwd", null))
+        })
+    }
+
+    internal fun stopBotService() {
+        startService(Intent(this, BotService::class.java).apply {
+            putExtra("action", BotService.STOP_SERVICE)
+        })
+
     }
 }

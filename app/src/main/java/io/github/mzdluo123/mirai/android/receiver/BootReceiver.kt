@@ -1,9 +1,11 @@
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BotService
 import kotlinx.serialization.ImplicitReflectionSerializer
 
 @ImplicitReflectionSerializer
@@ -14,7 +16,8 @@ class BootReceiver : BroadcastReceiver() {
     private val ACTION = "android.intent.action.BOOT_COMPLETED"
     override fun onReceive(context: Context, intent: Intent) {
 //        Log.e(TAG,"收到广播")
-        if (!BotApplication.getSettingPreference().getBoolean("start_on_boot_preference", false)) {
+        if (!BotApplication.getSettingPreference()
+                .getBoolean("start_on_boot_preference", false)) {
             return
         }
 

@@ -75,9 +75,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         identity: Long,
         message: String
     ) {
-        logStorage.add("[${priority.name}] $identityStr $message")
+        logStorage.add("[${priority.name}] $message")
         if (printToLogcat){
-            Log.i(TAG, "[${priority.name}] $identityStr $message")
+            Log.i(TAG, "[${priority.name}] $message")
         }
 
     }

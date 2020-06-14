@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
         android:name=".BotApplication"
@@ -19,12 +19,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+<!--        <receiver-->
+<!--            android:name=".receiver.PushMsgReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="io.github.mzdluo123.mirai.android.PushMsg"/>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
         <activity
             android:name=".activity.UnsafeLoginActivity"
             android:excludeFromRecents="true"
             android:label="请完成登录验证"
             android:launchMode="singleTask" />
-
         <activity android:name=".activity.PluginImportActivity">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
@@ -61,7 +69,7 @@
             android:taskAffinity="" />
 
         <receiver
-            android:name=".BootReceiver"
+            android:name=".receiver.BootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -82,7 +90,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/path_script" />
         </provider>
-
     </application>
 
 </manifest>
