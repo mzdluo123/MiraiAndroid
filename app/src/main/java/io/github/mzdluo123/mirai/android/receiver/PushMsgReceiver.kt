@@ -11,6 +11,7 @@ class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() 
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+        // 为了兼容垃圾autojs，所以统一string发然后转类型
         val type = intent.getStringExtra("type")?.toInt() ?: return
         val id = intent.getStringExtra("id")?.toLong() ?: return
         val msg = intent.getStringExtra("msg") ?: return

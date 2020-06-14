@@ -33,9 +33,9 @@ class ExampleInstrumentedTest {
         Thread.sleep(10000)
 
         appContext.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
-            putExtra("type",1)
+            putExtra("type","1")
             putExtra("msg","test msg")
-            putExtra("id",2314572588L)
+            putExtra("id","2314572588")
         })
 
         Thread.sleep(100000)

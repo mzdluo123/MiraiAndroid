@@ -228,3 +228,30 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 * CQHTTPMirai
 
 对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
+
+# 消息推送(2.9新增)
+
+你可以发送广播来快速向指定群或联系人推送信息，以下是示例，所有Extra的类型都是string(为了某些奇怪的情况)
+
+```kotlin
+context.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
+    putExtra("type","1为发送至联系人 0为发送至群")
+    putExtra("msg","test msg")
+    putExtra("id","qq或群号")
+})
+
+```
+
+以下是auto.js的示例
+
+```js
+app.sendBroadcast({
+    action: "io.github.mzdluo123.mirai.android.PushMsg",
+    extras: {
+        type: "1为发送至联系人 0为发送至群",
+        msg: "test",
+        id: "qq或群号"
+        }
+    })
+
+```
