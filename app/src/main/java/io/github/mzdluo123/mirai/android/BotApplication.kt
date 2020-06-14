@@ -79,9 +79,10 @@ class BotApplication : Application() {
             setBuildConfigClass(BuildConfig::class.java)
                 .setReportFormat(StringFormat.JSON)
             setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
-            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
-                .setResText(R.string.acra_toast_text)
-                .setEnabled(true)
+//            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
+//                .setResText(R.string.acra_toast_text)
+//                .setEnabled(true)
+            //不知道为什么开启的时候总是显示这个，先暂时禁用
         })
     }
 
