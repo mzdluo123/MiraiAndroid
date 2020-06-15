@@ -46,6 +46,7 @@ class BotService : Service(), CommandOwner {
     private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
+    private val allowPushMsg = BotApplication.getSettingPreference().getBoolean("allow_push_msg_preference",false)
 
 // 多进程调试辅助
 //  init {
@@ -171,7 +172,6 @@ class BotService : Service(), CommandOwner {
     private fun startConsole(intent: Intent?) {
         if (isStart) return
         Log.e(TAG, "启动服务")
-        registerReceiver()
         try {
             wakeLock.acquire()
         } catch (e: Exception) {
@@ -183,6 +183,7 @@ class BotService : Service(), CommandOwner {
             consoleVersion = BuildConfig.COREVERSION,
             path = getExternalFilesDir(null).toString()
         )
+        registerReceiver()
         isStart = true
         createNotification()
         registerDefaultCommand()
@@ -192,7 +193,9 @@ class BotService : Service(), CommandOwner {
     private fun stopConsole() {
         if (!isStart) return
         Log.e(TAG, "停止服务")
-        unregisterReceiver(msgReceiver)
+        if (allowPushMsg){
+            unregisterReceiver(msgReceiver)
+        }
         ScriptManager.instance.disableAll()
         if (wakeLock.isHeld) {
             wakeLock.release()
@@ -204,18 +207,21 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun registerReceiver() {
-        val filter = IntentFilter().apply {
-            addAction("io.github.mzdluo123.mirai.android.PushMsg")
-            priority = 999
+        if (allowPushMsg){
+            MiraiConsole.frontEnd.pushLog(0L,"[MA] 正在启动消息推送广播监听器")
+            val filter = IntentFilter().apply {
+                addAction("io.github.mzdluo123.mirai.android.PushMsg")
+                priority = 999
+            }
+            registerReceiver(msgReceiver, filter)
         }
-        registerReceiver(msgReceiver, filter)
     }
 
 
 
     internal fun sendFriendMsg(id: Long, msg: String?) {
         bot?.launch {
-            consoleFrontEnd.logStorage.add("[MA] 成功处理一个好友消息推送请求: $msg->$id")
+            MiraiConsole.frontEnd.pushLog(0L,"[MA] 成功处理一个好友消息推送请求: $msg->$id")
             this@BotService.bot!!.getFriend(id).sendMessage(msg!!)
         }
     }
@@ -223,7 +229,7 @@ class BotService : Service(), CommandOwner {
 
     internal fun sendGroupMsg(id: Long, msg: String?) {
         bot?.launch {
-            consoleFrontEnd.logStorage.add("[MA] 成功处理一个群消息推送请求: $msg->$id")
+            MiraiConsole.frontEnd.pushLog(0L,"[MA] 成功处理一个群消息推送请求: $msg->$id")
             this@BotService.bot!!.getGroup(id).sendMessage(msg!!)
         }
     }

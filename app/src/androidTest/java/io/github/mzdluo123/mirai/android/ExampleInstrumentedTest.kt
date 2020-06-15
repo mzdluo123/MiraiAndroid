@@ -38,6 +38,6 @@ class ExampleInstrumentedTest {
             putExtra("id","2314572588")
         })
 
-        Thread.sleep(100000)
+        Thread.sleep(1000)
     }
 }

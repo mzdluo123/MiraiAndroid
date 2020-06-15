@@ -28,5 +28,15 @@
             android:key="print_to_logcat_preference"
             android:title="打印日志到logcat"
             android:summary="你可以使用 TAG: MA 级别:INFO 来看到log"/>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="allow_push_msg_preference"
+            android:summary="使用方法请看项目GitHub"
+            android:title="允许使用广播推送消息" />
+        <EditTextPreference
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:enabled="false"
+            android:title="所有的设置重启后才会生效！" />
     </PreferenceCategory>
 </PreferenceScreen>
