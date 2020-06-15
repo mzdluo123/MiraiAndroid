@@ -244,12 +244,9 @@ ma://sendFriendMsg?msg=消息&id=账号&at=要at的人
 ```
 
 ```kotlin
-context.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
-    putExtra("type","1为发送至联系人 2为发送至群")
-    putExtra("msg","test msg")
-    putExtra("id","qq或群号")
-})
-
+sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
+        data = Uri.parse("ma://sendGroupMsg?msg=HelloWorld&id=655057127")
+    })
 ```
 
 以下是auto.js的示例
