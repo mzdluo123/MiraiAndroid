@@ -237,7 +237,7 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 
 ```kotlin
 context.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
-    putExtra("type","1为发送至联系人 0为发送至群")
+    putExtra("type","1为发送至联系人 2为发送至群")
     putExtra("msg","test msg")
     putExtra("id","qq或群号")
 })
@@ -250,7 +250,7 @@ context.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply 
 app.sendBroadcast({
     action: "io.github.mzdluo123.mirai.android.PushMsg",
     extras: {
-        type: "1为发送至联系人 0为发送至群",
+        type: "1为发送至联系人 2为发送至群",
         msg: "test",
         id: "qq或群号"
         }
