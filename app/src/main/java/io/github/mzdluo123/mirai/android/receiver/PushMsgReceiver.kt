@@ -3,6 +3,7 @@ package io.github.mzdluo123.mirai.android.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import io.github.mzdluo123.mirai.android.BotService
 
 class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() {
@@ -11,13 +12,22 @@ class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() 
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        // 为了兼容垃圾autojs，所以统一string发然后转类型
-        val type = intent.getStringExtra("type")?.toInt() ?: return
-        val id = intent.getStringExtra("id")?.toLong() ?: return
-        val msg = intent.getStringExtra("msg") ?: return
-        when (type) {
-            1 -> botService.sendFriendMsg(id, msg)
-            2 -> botService.sendGroupMsg(id, msg)
+        try {
+            val data = intent.data ?: return
+            if (data.scheme != "ma") {
+                return
+            }
+            val id = data.getQueryParameter("id")?.toLong() ?: return
+            val msg = data.getQueryParameter("msg") ?: return
+            when (data.host) {
+                "sendGroupMsg" -> botService.sendGroupMsg(id, msg)
+                "sendFriendMsg" -> botService.sendFriendMsg(id, msg)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(TAG, e.toString())
         }
+
     }
 }

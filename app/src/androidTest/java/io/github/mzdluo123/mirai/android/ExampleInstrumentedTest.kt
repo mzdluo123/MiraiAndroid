@@ -2,6 +2,7 @@ package io.github.mzdluo123.mirai.android
 
 import android.app.Instrumentation
 import android.content.Intent
+import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.mzdluo123.mirai.android.activity.MainActivity
@@ -33,9 +34,7 @@ class ExampleInstrumentedTest {
         Thread.sleep(10000)
 
         appContext.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
-            putExtra("type","1")
-            putExtra("msg","test msg")
-            putExtra("id","2314572588")
+            data = Uri.parse("ma://sendGroupMsg?msg=HelloWorld&id=655057127")
         })
 
         Thread.sleep(1000)

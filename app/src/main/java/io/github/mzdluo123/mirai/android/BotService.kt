@@ -212,6 +212,7 @@ class BotService : Service(), CommandOwner {
             val filter = IntentFilter().apply {
                 addAction("io.github.mzdluo123.mirai.android.PushMsg")
                 priority = 999
+                addDataScheme("ma")
             }
             registerReceiver(msgReceiver, filter)
         }

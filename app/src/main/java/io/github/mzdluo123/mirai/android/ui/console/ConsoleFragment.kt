@@ -218,6 +218,7 @@ class ConsoleFragment : Fragment() {
                     startRefreshLoop()
                     return@launch
                 }
+                delay(100)
             }
         }
 
@@ -253,7 +254,7 @@ class ConsoleFragment : Fragment() {
         serviceIsBound = false
 
         BotApplication.context.stopBotService()
-        delay(100)
+        delay(200)
         BotApplication.context.startBotService()
 
 
