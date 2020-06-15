@@ -240,6 +240,7 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 ```
 ma://sendGroupMsg?msg=消息&id=群号
 ma://sendFriendMsg?msg=消息&id=账号
+ma://sendFriendMsg?msg=消息&id=账号&at=要at的人
 ```
 
 ```kotlin
@@ -258,5 +259,11 @@ app.sendBroadcast({
     action: "io.github.mzdluo123.mirai.android.PushMsg",
     data: "ma://sendGroupMsg?msg=来自autojs的消息&id=655057127"
 })
+```
 
+以下是tasker的示例
+
+```yaml
+    ma (2)
+    	A1: 发送意图 [ 操作:io.github.mzdluo123.mirai.android.PushMsg 类别:None Mime类型: 数据:ma://sendGroupMsg?msg=来自tasker的消息&id=655057127 额外: 额外: 额外: 包: 类: 目标:Broadcast Receiver ] 
 ```

@@ -32,6 +32,7 @@ import net.mamoe.mirai.console.command.ConsoleCommandSender.sendMessage
 import net.mamoe.mirai.console.command.ContactCommandSender
 import net.mamoe.mirai.console.utils.checkManager
 import net.mamoe.mirai.event.subscribeMessages
+import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
 import kotlin.system.exitProcess
@@ -46,7 +47,8 @@ class BotService : Service(), CommandOwner {
     private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
-    private val allowPushMsg = BotApplication.getSettingPreference().getBoolean("allow_push_msg_preference",false)
+    private val allowPushMsg =
+        BotApplication.getSettingPreference().getBoolean("allow_push_msg_preference", false)
 
 // 多进程调试辅助
 //  init {
@@ -193,7 +195,7 @@ class BotService : Service(), CommandOwner {
     private fun stopConsole() {
         if (!isStart) return
         Log.e(TAG, "停止服务")
-        if (allowPushMsg){
+        if (allowPushMsg) {
             unregisterReceiver(msgReceiver)
         }
         ScriptManager.instance.disableAll()
@@ -207,8 +209,8 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun registerReceiver() {
-        if (allowPushMsg){
-            MiraiConsole.frontEnd.pushLog(0L,"[MA] 正在启动消息推送广播监听器")
+        if (allowPushMsg) {
+            MiraiConsole.frontEnd.pushLog(0L, "[MA] 正在启动消息推送广播监听器")
             val filter = IntentFilter().apply {
                 addAction("io.github.mzdluo123.mirai.android.PushMsg")
                 priority = 999
@@ -219,10 +221,9 @@ class BotService : Service(), CommandOwner {
     }
 
 
-
     internal fun sendFriendMsg(id: Long, msg: String?) {
         bot?.launch {
-            MiraiConsole.frontEnd.pushLog(0L,"[MA] 成功处理一个好友消息推送请求: $msg->$id")
+            MiraiConsole.frontEnd.pushLog(0L, "[MA] 成功处理一个好友消息推送请求: $msg->$id")
             this@BotService.bot!!.getFriend(id).sendMessage(msg!!)
         }
     }
@@ -230,12 +231,21 @@ class BotService : Service(), CommandOwner {
 
     internal fun sendGroupMsg(id: Long, msg: String?) {
         bot?.launch {
-            MiraiConsole.frontEnd.pushLog(0L,"[MA] 成功处理一个群消息推送请求: $msg->$id")
+            MiraiConsole.frontEnd.pushLog(0L, "[MA] 成功处理一个群消息推送请求: $msg->$id")
             this@BotService.bot!!.getGroup(id).sendMessage(msg!!)
         }
     }
 
+    internal fun sendGroupMsgWithAT(id: Long, msg: String?, user: Long) {
+        bot?.launch {
+            MiraiConsole.frontEnd.pushLog(0L, "[MA] 成功处理一个群消息推送请求: $msg->$id")
+            val group = this@BotService.bot!!.getGroup(id)
+            group.sendMessage(At(group[user]) + msg!!)
+        }
+    }
 
+
+    @ExperimentalUnsignedTypes
     private fun String.chunkedHexToBytes(): ByteArray =
         this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()

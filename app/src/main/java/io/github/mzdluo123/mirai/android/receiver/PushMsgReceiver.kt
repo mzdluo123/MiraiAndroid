@@ -8,7 +8,7 @@ import io.github.mzdluo123.mirai.android.BotService
 
 class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() {
     companion object {
-        val TAG = PushMsgReceiver.javaClass.name
+        val TAG = PushMsgReceiver::class.java.name
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -20,7 +20,13 @@ class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() 
             val id = data.getQueryParameter("id")?.toLong() ?: return
             val msg = data.getQueryParameter("msg") ?: return
             when (data.host) {
-                "sendGroupMsg" -> botService.sendGroupMsg(id, msg)
+                "sendGroupMsg" -> {
+                    val at = data.getQueryParameter("at")?.toLong()
+                    if (at != null) {
+                        botService.sendGroupMsgWithAT(id, msg, at)
+                    }
+                    botService.sendGroupMsg(id, msg)
+                }
                 "sendFriendMsg" -> botService.sendFriendMsg(id, msg)
             }
 

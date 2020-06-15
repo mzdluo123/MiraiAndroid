@@ -1,16 +1,13 @@
 package io.github.mzdluo123.mirai.android
 
-import android.app.Instrumentation
 import android.content.Intent
 import android.net.Uri
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import io.github.mzdluo123.mirai.android.activity.MainActivity
-
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -34,9 +31,13 @@ class ExampleInstrumentedTest {
         Thread.sleep(10000)
 
         appContext.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
+            data = Uri.parse("ma://sendGroupMsg?msg=HelloWorld&id=655057127&at=2314572588")
+        })
+        Thread.sleep(1000)
+        appContext.sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
             data = Uri.parse("ma://sendGroupMsg?msg=HelloWorld&id=655057127")
         })
-
         Thread.sleep(1000)
+
     }
 }
