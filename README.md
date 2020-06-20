@@ -25,8 +25,6 @@
 
 关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
 
-**仅Android 6及以上可用**
-
 相比使用`Termux`或者是`Linux Deploy`等应用运行mirai的方案，该项目提供的方案具有更好的性能以及更少的资源占用，但可能存在兼容性问题
 
 最新的构建版本你可以到[这里](https://github.com/mzdluo123/MiraiAndroid/actions)找到，下载可能需要登录；稍稳定的版本可用到release或qq群内下载
@@ -230,6 +228,25 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 * CQHTTPMirai
 
 对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
+
+# 关于支持的Android版本
+
+我们尚不清楚MiraiAndroid究竟能在哪些Android版本上正常工作，需要大家进行测试
+
+我们已经测试无问题的Android版本：
+
+* Android 10
+* Android 8.1（无法在Android端编译部分插件）
+
+其他版本还未进行测试，以下是测试要求：
+
+* 程序不闪退，不报错，不出现无响应，通知显示正常，能正常完成登录
+* 能够在Android端编译jvm插件（可选）
+* 能够使用编译好的jvm插件发送消息，发送图片，处理事件和正确读写配置
+* 能够正常运行两个脚本引擎的demo
+
+从下一个release版本开始项目的minsdk版本将调整至21（Android 5.1），测试结果可以通过issue和交流群告诉我们，谢谢！（反馈时记得带上日志和Android版本，抓取日志可以在控制台右上角菜单内找到）
+
 
 # 消息推送(2.9新增)
 
