@@ -1,5 +1,6 @@
 package io.github.mzdluo123.mirai.android.activity
 
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -7,18 +8,17 @@ import android.content.ServiceConnection
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.IBinder
-import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import kotlinx.android.synthetic.main.activity_captcha.*
-import kotlinx.android.synthetic.main.activity_unsafe_login.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.ImplicitReflectionSerializer
 
+@ExperimentalUnsignedTypes
 class CaptchaActivity : AppCompatActivity() {
     private val conn = object : ServiceConnection {
         lateinit var botService: IbotAidlInterface
@@ -53,6 +53,10 @@ class CaptchaActivity : AppCompatActivity() {
         bindService(intent, conn, Context.BIND_AUTO_CREATE)
         captchaConfirm_btn.setOnClickListener {
             conn.sendCaptcha(captcha_input.text.toString())
+            // 删除通知
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(AndroidLoginSolver.CAPTCHA_NOTIFICATION_ID)
             finish()
         }
     }

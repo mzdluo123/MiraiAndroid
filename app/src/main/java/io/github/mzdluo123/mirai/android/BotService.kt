@@ -38,6 +38,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 
+@ExperimentalUnsignedTypes
 class BotService : Service(), CommandOwner {
     lateinit var consoleFrontEnd: AndroidMiraiConsole
         private set
@@ -91,7 +92,7 @@ class BotService : Service(), CommandOwner {
                 }
             }
         } catch (e: Exception) {
-            Log.e("onStartCommand", e.message)
+            Log.e("onStartCommand", e.message ?: "null")
             consoleFrontEnd.pushLog(0L, "onStartCommand:发生错误 $e")
         }
         return super.onStartCommand(intent, flags, startId)
@@ -177,7 +178,7 @@ class BotService : Service(), CommandOwner {
         try {
             wakeLock.acquire()
         } catch (e: Exception) {
-            Log.e("wakeLockError", e.message)
+            Log.e("wakeLockError", e.message ?: "null")
         }
         MiraiAndroidStatus.startTime = System.currentTimeMillis()
         MiraiConsole.start(
@@ -313,14 +314,14 @@ class BotService : Service(), CommandOwner {
         override fun openScript(index: Int) {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
             val provideUri: Uri
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                provideUri = FileProvider.getUriForFile(
+            provideUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                FileProvider.getUriForFile(
                     this@BotService,
                     "io.github.mzdluo123.mirai.android.scriptprovider",
                     scriptFile
                 )
             } else {
-                provideUri = Uri.fromFile(scriptFile)
+                Uri.fromFile(scriptFile)
             }
             startActivity(
                 Intent("android.intent.action.VIEW").apply {

@@ -6,7 +6,6 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
@@ -46,7 +45,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 .setOngoing(true)
                 //右上角的时间显示
                 .setShowWhen(true)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_info_black_24dp)
                 .setContentTitle("本次登录需要验证码")
                 .setContentText("点击这里输入验证码")
@@ -90,7 +89,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 .setOngoing(true)
                 //右上角的时间显示
                 .setShowWhen(true)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_info_black_24dp)
                 .setContentTitle("本次登录需要进行登录验证")
                 .setContentText("点击这里开始验证")
