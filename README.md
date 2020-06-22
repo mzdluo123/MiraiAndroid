@@ -21,7 +21,7 @@
 
 <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
 
-在Android上运行Mirai-console，目前已完美实现jvm版mirai所有功能
+mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口
 
 关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
 
