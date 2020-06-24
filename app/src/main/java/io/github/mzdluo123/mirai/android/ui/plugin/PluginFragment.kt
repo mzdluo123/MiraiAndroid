@@ -2,6 +2,7 @@ package io.github.mzdluo123.mirai.android.ui.plugin
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.PopupMenu
@@ -39,7 +40,9 @@ class PluginFragment : Fragment() {
 
         adapter.setOnItemClickListener { _, view, position ->
             val menu = PopupMenu(activity, view)
-            menu.gravity = Gravity.END
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                menu.gravity = Gravity.END
+            }
             menu.menuInflater.inflate(R.menu.plugin_manage, menu.menu)
             menu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
