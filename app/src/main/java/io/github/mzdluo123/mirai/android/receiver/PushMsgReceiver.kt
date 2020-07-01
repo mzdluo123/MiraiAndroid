@@ -24,6 +24,7 @@ class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() 
                     val at = data.getQueryParameter("at")?.toLong()
                     if (at != null) {
                         botService.sendGroupMsgWithAT(id, msg, at)
+                        return
                     }
                     botService.sendGroupMsg(id, msg)
                 }
