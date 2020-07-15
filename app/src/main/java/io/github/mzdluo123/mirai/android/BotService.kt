@@ -38,6 +38,7 @@ import java.io.File
 import kotlin.system.exitProcess
 
 
+
 @ExperimentalUnsignedTypes
 class BotService : Service(), CommandOwner {
     lateinit var consoleFrontEnd: AndroidMiraiConsole
@@ -303,6 +304,13 @@ class BotService : Service(), CommandOwner {
         override fun getScriptSize(): Int = ScriptManager.instance.hosts.size
 
         override fun getCaptcha(): ByteArray = consoleFrontEnd.loginSolver.captchaData
+        override fun getLogonId(): Long {
+            return try {
+                Bot.botInstances.first().id
+            } catch (e: NoSuchElementException) {
+                0
+            }
+        }
 
 
         override fun sendLog(log: String?) {

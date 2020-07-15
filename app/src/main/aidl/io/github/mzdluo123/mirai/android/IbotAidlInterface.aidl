@@ -11,6 +11,7 @@ interface IbotAidlInterface {
     byte[] getCaptcha();
     String getUrl();
     void submitVerificationResult(String result);
+    long getLogonId();
 
     //Script
     String[] getHostList();

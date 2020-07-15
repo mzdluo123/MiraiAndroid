@@ -8,10 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
-import android.os.Bundle
-import android.os.DeadObjectException
-import android.os.IBinder
-import android.os.PowerManager
+import android.os.*
 import android.provider.Settings
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -22,6 +19,9 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -88,6 +88,7 @@ class ConsoleFragment : Fragment() {
         val bindIntent = Intent(activity, BotService::class.java)
         requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT)
         serviceIsBound = true
+        startLoadAvatar()
     }
 
     override fun onPause() {
@@ -137,16 +138,21 @@ class ConsoleFragment : Fragment() {
     @SuppressLint("BatteryLife")
     private fun ignoreBatteryOptimization(activity: Activity) {
         val powerManager =
-            getSystemService(requireContext(), PowerManager::class.java) as PowerManager?
-        val hasIgnored =
-            powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+            getSystemService(requireContext(), PowerManager::class.java)
         //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
-        if (!hasIgnored) {
-            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-            intent.data = Uri.parse("package:" + activity.packageName)
-            startActivity(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+            if (!hasIgnored) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:" + activity.packageName)
+                startActivity(intent)
+            } else {
+                Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+            }
+
         } else {
-            Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "只有新版Android才需要这个操作哦", Toast.LENGTH_SHORT).show()
+
         }
 
     }
@@ -206,7 +212,31 @@ class ConsoleFragment : Fragment() {
                 return@launch
             }
         }
+    }
 
+    private fun startLoadAvatar() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                try {
+                    val id = conn.botService.logonId
+                    if (id != 0L) {
+                        Glide.with(requireActivity()).load("http://q1.qlogo.cn/g?b=qq&nk=$id&s=640")
+                            .apply(
+                                RequestOptions().error(R.mipmap.ic_new_launcher_round)
+                                    .transform(RoundedCorners(40))
+                            )
+                            .into(requireActivity().findViewById(R.id.head_imageVIew))
+                        return@launch
+                    }
+
+                } catch (e: UninitializedPropertyAccessException) {
+                    // pass
+                } catch (e: DeadObjectException) {
+                    //pass
+                }
+                delay(1000)
+            }
+        }
     }
 
     private fun reconnect() {
@@ -220,6 +250,7 @@ class ConsoleFragment : Fragment() {
                 }
                 delay(100)
             }
+            startLoadAvatar()
         }
 
     }
