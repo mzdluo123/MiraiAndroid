@@ -11,7 +11,9 @@
    <img width="160" src="https://cdn.jsdelivr.net/gh/mzdluo123/blog_imgs/img/20200531205703.png" alt="logo"></br>
 
    <img width="95" src="https://cdn.jsdelivr.net/gh/mzdluo123/blog_imgs/img/20200531205726.png" alt="title">
+
 </div>
+
 
 # MiraiAndroid
 
@@ -30,6 +32,8 @@ mirai-console的Android前端程序，可作为qq机器人使用，支持多种�
 最新的构建版本你可以到[这里](https://github.com/mzdluo123/MiraiAndroid/actions)找到，下载可能需要登录；稍稳定的版本可用到release或qq群内下载
 
 更多信息请加QQ群`655057127`了解
+
+图标以及形象由画师<a href = "https://github.com/DazeCake">DazeCake</a>绘制
 
 # 已实现的功能
 
