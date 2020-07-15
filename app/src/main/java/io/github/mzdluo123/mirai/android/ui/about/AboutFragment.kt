@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.fragment_about.*
 
 class AboutFragment : Fragment() {
     private lateinit var aboutBinding: FragmentAboutBinding
+    private var click = 0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -26,7 +27,10 @@ class AboutFragment : Fragment() {
             container,
             false
         )
-        aboutBinding.appVersion = context!!.packageManager.getPackageInfo(context!!.packageName,0).versionName
+        aboutBinding.appVersion = requireContext().packageManager.getPackageInfo(
+            requireContext().packageName,
+            0
+        ).versionName
         aboutBinding.coreVersion = BuildConfig.COREVERSION
         return aboutBinding.root
     }
@@ -38,6 +42,13 @@ class AboutFragment : Fragment() {
         }
         github2_bth.setOnClickListener {
             openUrl("https://github.com/mzdluo123/MiraiAndroid")
+        }
+        imageView2.setOnClickListener {
+            if (click < 4) {
+                click++
+                return@setOnClickListener
+            }
+            imageView2.setImageResource(R.drawable.avatar)
         }
     }
 
