@@ -6,15 +6,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
-import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
+import io.ktor.client.HttpClient
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
-import org.acra.config.ToastConfigurationBuilder
 import org.acra.data.StringFormat
 
 class BotApplication : Application() {
@@ -28,7 +26,7 @@ class BotApplication : Application() {
         internal fun getSettingPreference(): SharedPreferences {
             return context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         }
-
+        val httpClient = lazy { HttpClient() }
     }
 
 
