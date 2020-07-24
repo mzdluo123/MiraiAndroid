@@ -1,26 +1,20 @@
 package io.github.mzdluo123.mirai.android.ui.script
 
 import android.app.Activity
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.github.mzdluo123.mirai.android.BotService
-import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
+import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.askFileName
 import kotlinx.android.synthetic.main.fragment_script.*
 import kotlinx.coroutines.Dispatchers
@@ -33,49 +27,31 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
         const val IMPORT_SCRIPT = 2
     }
 
-    private val scriptViewModel: ScriptViewModel by lazy {
-        ViewModelProvider(this)[ScriptViewModel::class.java]
-    }
+    private lateinit var scriptViewModel: ScriptViewModel
 
     private val adapter: ScriptListAdapter by lazy {
         ScriptListAdapter(this)
     }
 
-    private val botServiceConnection = object : ServiceConnection {
-        lateinit var helper: IbotAidlInterface
+    private lateinit var botServiceConnection: ServiceConnector
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        botServiceConnection = ServiceConnector(requireContext())
+        lifecycle.addObserver(botServiceConnection)
 
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            helper = IbotAidlInterface.Stub.asInterface(service)
-            scriptViewModel.serviceHelper = helper
-            scriptViewModel.refreshScriptList()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val bindIntent = Intent(activity, BotService::class.java)
-        activity?.bindService(bindIntent, botServiceConnection, Context.BIND_AUTO_CREATE)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        activity?.unbindService(botServiceConnection)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_script, container, false).also {
-        setHasOptionsMenu(true)
-        scriptViewModel.observe(viewLifecycleOwner, Observer {
-            adapter.data = it.toMutableList()
-            adapter.notifyDataSetChanged()
-        })
-        adapter.setEmptyView(TextView(context).apply { setText("当前无脚本") })
+    ): View? {
+        return inflater.inflate(R.layout.fragment_script, container, false).also {
+            setHasOptionsMenu(true)
+
+            adapter.setEmptyView(TextView(context).apply { setText("当前无脚本") })
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -88,6 +64,21 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
             )
         )
         script_recycler.layoutManager = LinearLayoutManager(activity)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        botServiceConnection.connectStatus.observe(this, Observer {
+            if (it) {
+                scriptViewModel = ScriptViewModel(botServiceConnection.botService)
+
+                scriptViewModel.observe(viewLifecycleOwner, Observer {
+                    adapter.data = it.toMutableList()
+                    adapter.notifyDataSetChanged()
+                })
+                scriptViewModel.refreshScriptList()
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -128,7 +119,7 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
             val name = withContext(Dispatchers.Main) {
                 requireActivity().askFileName()
             } ?: return@launch
-            val scriptFile = ScriptManager.copyFileToScriptDir(requireContext(), uri,name)
+            val scriptFile = ScriptManager.copyFileToScriptDir(requireContext(), uri, name)
             val result = scriptViewModel.createScriptFromFile(scriptFile, type)
             if (result) {
                 context?.toast("导入成功，当前脚本数量：${scriptViewModel.hostSize}")

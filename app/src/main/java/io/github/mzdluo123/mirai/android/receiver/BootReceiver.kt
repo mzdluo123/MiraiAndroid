@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.service.BotService
 import kotlinx.serialization.ImplicitReflectionSerializer
 
 @ImplicitReflectionSerializer

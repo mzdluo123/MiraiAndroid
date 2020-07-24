@@ -3,13 +3,15 @@ package io.github.mzdluo123.mirai.android.ui.console
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.DeadObjectException
+import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -17,15 +19,15 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BotService
-import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
@@ -33,29 +35,23 @@ import java.security.MessageDigest
 
 
 class ConsoleFragment : Fragment() {
+    companion object {
+        const val TAG = "ConsoleFragment"
+    }
 
     private lateinit var consoleViewModel: ConsoleViewModel
 
-    private lateinit var logRefreshJob: Job
+    private var logRefreshJob: Job? = null
 
-    private val conn = object : ServiceConnection {
-        lateinit var botService: IbotAidlInterface
-
-        override fun onServiceDisconnected(name: ComponentName?) {}
-
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            botService = IbotAidlInterface.Stub.asInterface(service)
-            startRefreshLoop()
-        }
-    }
-    private var serviceIsBound = false
-
+    private lateinit var conn: ServiceConnector
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        conn = ServiceConnector(requireContext())
+        lifecycle.addObserver(conn)
         consoleViewModel =
             ViewModelProvider(this).get(ConsoleViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
@@ -81,23 +77,31 @@ class ConsoleFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
+        conn.connectStatus.observe(this, Observer {
+            Log.d(TAG, "service status $it")
+            if (logRefreshJob != null && logRefreshJob!!.isActive) {
+                return@Observer
+            }
+            if (it) {
+                startRefreshLoop()
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
-        val bindIntent = Intent(activity, BotService::class.java)
-        requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT)
-        serviceIsBound = true
         startLoadAvatar()
+        if (logRefreshJob != null && logRefreshJob!!.isActive) {
+            logRefreshJob!!.cancel()
+        }
+        startRefreshLoop()
     }
 
     override fun onPause() {
         super.onPause()
-        if (serviceIsBound) {
-            activity?.unbindService(conn)
-            serviceIsBound = false
+        if (logRefreshJob != null && logRefreshJob!!.isActive) {
+            logRefreshJob!!.cancel()
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -194,23 +198,25 @@ class ConsoleFragment : Fragment() {
     }
 
     private fun startRefreshLoop() {
+        if (!conn.connectStatus.value!!) {
+            return
+        }
         logRefreshJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+            log_text?.clearComposingText()
             try {
+                withContext(Dispatchers.Main) { Log.d(TAG, "start loop") }
                 while (isActive) {
                     val text = conn.botService.log.joinToString(separator = "\n")
-                    if (isActive) {
-                        withContext(Dispatchers.Main) {
-                            log_text?.text = text
+                    withContext(Dispatchers.Main) {
+                        log_text?.text = text
 //                            main_scroll.scrollTo(0, log_text.bottom)
-                        }
                     }
                     delay(200)
                 }
             } catch (e: DeadObjectException) {
-                withContext(Dispatchers.Main) { log_text?.text = "无法连接到服务，可能是正在重启" }
-                reconnect()
-                return@launch
+                // ignore
             }
+            withContext(Dispatchers.Main) { log_text?.append("\n无法连接到服务，可能是正在重启") }
         }
     }
 
@@ -220,7 +226,8 @@ class ConsoleFragment : Fragment() {
                 try {
                     val id = conn.botService.logonId
                     if (id != 0L) {
-                        Glide.with(requireActivity()).load("http://q1.qlogo.cn/g?b=qq&nk=$id&s=640")
+                        Glide.with(requireActivity())
+                            .load("http://q1.qlogo.cn/g?b=qq&nk=$id&s=640")
                             .apply(
                                 RequestOptions().error(R.mipmap.ic_new_launcher_round)
                                     .transform(RoundedCorners(40))
@@ -239,21 +246,6 @@ class ConsoleFragment : Fragment() {
         }
     }
 
-    private fun reconnect() {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            val bindIntent = Intent(activity, BotService::class.java)
-            while (isActive) {
-                if (requireActivity().bindService(bindIntent, conn, Context.BIND_ABOVE_CLIENT)) {
-                    serviceIsBound = true
-                    startRefreshLoop()
-                    return@launch
-                }
-                delay(100)
-            }
-            startLoadAvatar()
-        }
-
-    }
 
     private fun md5(str: String): String {
         val digest = MessageDigest.getInstance("MD5")
@@ -281,14 +273,11 @@ class ConsoleFragment : Fragment() {
     }
 
     private fun restart() = viewLifecycleOwner.lifecycleScope.launch {
-        requireActivity().unbindService(conn)
-        serviceIsBound = false
-
+        conn.disconnect()
         BotApplication.context.stopBotService()
         delay(200)
         BotApplication.context.startBotService()
-
-
+        conn.connect()
     }
 
 }

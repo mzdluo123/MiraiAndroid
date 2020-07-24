@@ -9,10 +9,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BotService
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.script.ScriptManager
+import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient

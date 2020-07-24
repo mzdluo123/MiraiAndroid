@@ -44,7 +44,7 @@
         </activity>
 
         <service
-            android:name=".BotService"
+            android:name=".service.BotService"
             android:description="@string/service_description"
             android:enabled="true"
             android:exported="false"

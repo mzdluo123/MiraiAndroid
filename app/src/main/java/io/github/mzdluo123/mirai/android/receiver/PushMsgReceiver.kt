@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import io.github.mzdluo123.mirai.android.BotService
+import io.github.mzdluo123.mirai.android.service.BotService
 
 class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() {
     companion object {

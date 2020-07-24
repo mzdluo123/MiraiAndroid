@@ -1,6 +1,6 @@
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.service
 
 import android.annotation.SuppressLint
 import android.app.Service
@@ -15,6 +15,10 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BuildConfig
+import io.github.mzdluo123.mirai.android.IbotAidlInterface
+import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
@@ -50,7 +54,8 @@ class BotService : Service(), CommandOwner {
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
     private val allowPushMsg =
-        BotApplication.getSettingPreference().getBoolean("allow_push_msg_preference", false)
+        BotApplication.getSettingPreference()
+            .getBoolean("allow_push_msg_preference", false)
 
 // 多进程调试辅助
 //  init {
@@ -67,7 +72,10 @@ class BotService : Service(), CommandOwner {
 
     private fun createNotification() {
         //使用兼容版本
-        NotificationCompat.Builder(this, BotApplication.SERVICE_NOTIFICATION)
+        NotificationCompat.Builder(
+            this,
+            BotApplication.SERVICE_NOTIFICATION
+        )
             .setSmallIcon(R.drawable.ic_extension_black_24dp)//设置状态栏的通知图标
             .setAutoCancel(false) //禁止用户点击删除按钮删除
             .setOngoing(true) //禁止滑动删除
@@ -86,7 +94,10 @@ class BotService : Service(), CommandOwner {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
-            intent?.getIntExtra("action", START_SERVICE).let { action ->
+            intent?.getIntExtra(
+                "action",
+                START_SERVICE
+            ).let { action ->
                 when (action) {
                     START_SERVICE -> startConsole(intent)
                     STOP_SERVICE -> stopConsole()

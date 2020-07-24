@@ -8,9 +8,9 @@ import io.github.mzdluo123.mirai.android.script.ScriptManager
 import kotlinx.coroutines.launch
 import java.io.File
 
-class ScriptViewModel() : ViewModel() {
+class ScriptViewModel(private val serviceHelper: IbotAidlInterface) : ViewModel() {
     val hosts = MutableLiveData<List<ScriptHost.ScriptInfo>>()
-    lateinit var serviceHelper: IbotAidlInterface
+
     val hostSize: Int
         get() = serviceHelper.scriptSize
 

@@ -10,7 +10,10 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
+import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.HttpClient
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.data.StringFormat
@@ -26,7 +29,9 @@ class BotApplication : Application() {
         internal fun getSettingPreference(): SharedPreferences {
             return context.getSharedPreferences("setting", Context.MODE_PRIVATE)
         }
+
         val httpClient = lazy { HttpClient() }
+        val json = lazy { Json(JsonConfiguration.Default) }
     }
 
 
