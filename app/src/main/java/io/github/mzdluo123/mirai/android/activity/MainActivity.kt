@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         btn_stopService.setOnClickListener {
             BotApplication.context.stopBotService()
+            BotApplication.context.dismissAllNotification()
             finish()
         }
         checkCrash()

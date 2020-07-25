@@ -9,10 +9,14 @@ import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import kotlinx.android.synthetic.main.activity_unsafe_login.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @ExperimentalUnsignedTypes
 class UnsafeLoginActivity : AppCompatActivity() {
@@ -25,6 +29,13 @@ class UnsafeLoginActivity : AppCompatActivity() {
         lifecycle.addObserver(conn)
         setContentView(R.layout.activity_unsafe_login)
         initWebView()
+        refresh_unsafe_web.setOnRefreshListener {
+            unsafe_login_web.reload()
+            lifecycleScope.launch {
+                delay(1000)
+                refresh_unsafe_web.isRefreshing = false
+            }
+        }
         //  Toast.makeText(this, "请在完成验证后点击右上角继续登录", Toast.LENGTH_LONG).show()
     }
 
@@ -60,6 +71,11 @@ class UnsafeLoginActivity : AppCompatActivity() {
             javaScriptEnabled = true
             domStorageEnabled = true
         }
+        conn.connectStatus.observe(this, Observer {
+            if (it) {
+                unsafe_login_web.loadUrl(conn.botService.url)
+            }
+        })
     }
 
     private fun authFinish() {

@@ -17,9 +17,7 @@ import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.utils.MiraiConsoleUI
 import net.mamoe.mirai.event.Listener
@@ -46,6 +44,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         .getString("status_refresh_count", "15")!!.toInt() // 4s
     private val msgSpeeds = IntArray(refreshPerMinute)
     private var refreshCurrentPos = 0
+
+    private var sendOfflineMsgJob: Job? = null
 
     companion object {
         const val TAG = "MA"
@@ -77,7 +77,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         message: String
     ) {
         logStorage.add("[${priority.name}] $message")
-        if (printToLogcat){
+        if (printToLogcat) {
             Log.i(TAG, "[${priority.name}] $message")
         }
 
@@ -152,35 +152,56 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     private fun Bot.subscribeBotLifeEvent() {
         subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
-            // 防止一闪而过的掉线
-            delay(500)
-            if (this.bot.isOnline) return@subscribeAlways
-            pushLog(0L, "[INFO] 发送离线通知....")
-            val builder =
-                NotificationCompat.Builder(
-                    BotApplication.context,
-                    BotApplication.OFFLINE_NOTIFICATION
-                )
-                    .setAutoCancel(false)
-                    .setOngoing(false)
-                    .setShowWhen(true)
-                    .setSmallIcon(R.drawable.ic_info_black_24dp)
-                    .setContentTitle("Mirai离线")
-            when (this) {
-                is BotOfflineEvent.Dropped -> builder.setContentText("请检查网络环境")
-                is BotOfflineEvent.Force -> {
-                    //设置长消息的style
-                    builder.setStyle(NotificationCompat.BigTextStyle())
-                    builder.setContentText(this.message)
+            if (this is BotOfflineEvent.Force) {
+                val builder =
+                    NotificationCompat.Builder(
+                        BotApplication.context,
+                        BotApplication.OFFLINE_NOTIFICATION
+                    )
+                        .setAutoCancel(false)
+                        .setOngoing(false)
+                        .setShowWhen(true)
+                        .setSmallIcon(R.drawable.ic_info_black_24dp)
+                        .setContentTitle("Mirai离线")
+
+                builder.setStyle(NotificationCompat.BigTextStyle())
+                builder.setContentText(this.message)
+
+                NotificationManagerCompat.from(BotApplication.context).apply {
+                    notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
                 }
-                else -> return@subscribeAlways
+                return@subscribeAlways
             }
-            NotificationManagerCompat.from(BotApplication.context).apply {
-                notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+            if (this is BotOfflineEvent.Dropped) {
+                sendOfflineMsgJob = GlobalScope.launch {
+                    delay(2000)
+                    if (!isActive) {
+                        return@launch
+                    }
+                    val builder =
+                        NotificationCompat.Builder(
+                            BotApplication.context,
+                            BotApplication.OFFLINE_NOTIFICATION
+                        )
+                            .setAutoCancel(false)
+                            .setOngoing(false)
+                            .setShowWhen(true)
+                            .setSmallIcon(R.drawable.ic_info_black_24dp)
+                            .setContentTitle("Mirai离线")
+                    builder.setContentText("请检查网络环境")
+                    NotificationManagerCompat.from(BotApplication.context).apply {
+                        notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+                    }
+                }
             }
+
+            pushLog(0L, "[INFO] 发送离线通知....")
         }
         subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
             pushLog(0L, "[INFO] 发送上线通知....")
+            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
+                sendOfflineMsgJob!!.cancel()
+            }
             NotificationManagerCompat.from(BotApplication.context)
                 .cancel(BotService.OFFLINE_NOTIFICATION_ID)
         }
