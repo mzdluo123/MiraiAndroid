@@ -1,4 +1,4 @@
-name: Android Pull Request & Master CI
+name: Android ConnectCheck
 
 on:
   pull_request:
@@ -19,7 +19,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          script: ./gradlew connectedCheck
+          script: bash ./gradlew connectedCheck
 
 # jobs:
 # #   test:
