@@ -19,7 +19,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          script: bash adb shell "setprop persist.sys.language zh-cn" && ./gradlew connectedCheck
+          emulator-options: -prop persist.sys.language=zh -prop persist.sys.country=CN 
+          script: bash ./gradlew connectedCheck
 
 # jobs:
 # #   test:
