@@ -28,7 +28,9 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         botService = IbotAidlInterface.Stub.asInterface(service)
         connectStatus.value = true
-        IdleResources.botServiceLoading.decrement()
+        if (!IdleResources.botServiceLoading.isIdleNow) {
+            IdleResources.botServiceLoading.decrement()
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)

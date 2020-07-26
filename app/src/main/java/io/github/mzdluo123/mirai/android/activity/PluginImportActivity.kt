@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android.console
+package io.github.mzdluo123.mirai.android.activity
 
 import android.net.Uri
 import android.os.Bundle

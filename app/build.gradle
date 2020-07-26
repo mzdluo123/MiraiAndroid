@@ -21,6 +21,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
+        buildConfigField("boolean", "INTEST", "false")
     }
     buildFeatures {
         dataBinding = true
@@ -36,6 +37,7 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("boolean", "INTEST", "true")
         }
     }
 

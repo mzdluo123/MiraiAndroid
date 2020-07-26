@@ -7,7 +7,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import io.github.mzdluo123.mirai.android.console.MainActivity
+import io.github.mzdluo123.mirai.android.activity.MainActivity
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.junit.Rule
@@ -16,11 +16,12 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class NavTest {
+class NavTest : TestWithIdleResources() {
 
     @Rule
     @JvmField
     var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
+
 
     @Test
     fun navTest() {

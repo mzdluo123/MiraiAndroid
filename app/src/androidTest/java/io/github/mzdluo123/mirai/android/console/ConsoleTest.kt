@@ -2,42 +2,34 @@ package io.github.mzdluo123.mirai.android.console
 
 
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import io.github.mzdluo123.mirai.android.IdleResources
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.TestWithIdleResources
+import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.childAtPosition
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsInstanceOf
-import org.junit.*
+import org.junit.FixMethodOrder
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.JVM)
-class ConsoleTest {
+class ConsoleTest : TestWithIdleResources() {
 
     @Rule
     @JvmField
     var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
-
-    @Before
-    fun before() {
-        IdlingRegistry.getInstance().register(IdleResources.botServiceLoading)
-    }
-
-    @After
-    fun after() {
-        IdlingRegistry.getInstance().unregister(IdleResources.botServiceLoading)
-    }
 
 
     @Test

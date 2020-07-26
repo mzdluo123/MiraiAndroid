@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android.console
+package io.github.mzdluo123.mirai.android.activity
 
 import android.content.Intent
 import android.net.Uri
@@ -73,8 +73,12 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
         }
 
-        lifecycleScope.launch(exceptionHandler) {
-            checkUpdate()
+        if (BuildConfig.INTEST) {
+            toast("跳过更新检查")
+        } else {
+            lifecycleScope.launch(exceptionHandler) {
+                checkUpdate()
+            }
         }
         //throw Exception("测试异常")
     }
