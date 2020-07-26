@@ -19,7 +19,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          emulator-options: -prop persist.sys.language=zh -prop persist.sys.country=CN 
+          emulator-options: -prop persist.sys.language=zh -prop persist.sys.country=CN -prop ro.product.locale.language=zh -prop ro.product.locale.region=CN
           script: bash ./gradlew connectedCheck
 
 # jobs:
