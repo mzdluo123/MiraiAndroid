@@ -64,17 +64,22 @@ class MainActivity : AppCompatActivity() {
         BotApplication.context.startBotService()
         btn_stopService.setOnClickListener {
             BotApplication.context.stopBotService()
+            BotApplication.context.dismissAllNotification()
             finish()
         }
         checkCrash()
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             toast("检查更新失败")
-            Log.e(TAG, throwable.message)
             throwable.printStackTrace()
+            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
         }
 
-        lifecycleScope.launch(exceptionHandler) {
-            checkUpdate()
+        if (BuildConfig.INTEST) {
+            toast("跳过更新检查")
+        } else {
+            lifecycleScope.launch(exceptionHandler) {
+                checkUpdate()
+            }
         }
         //throw Exception("测试异常")
     }

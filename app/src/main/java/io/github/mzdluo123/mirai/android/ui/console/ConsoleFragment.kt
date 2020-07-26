@@ -133,6 +133,7 @@ class ConsoleFragment : Fragment() {
                 ignoreBatteryOptimization(requireActivity())
             }
             R.id.action_fast_restart -> {
+                BotApplication.context.dismissAllNotification()
                 restart()
             }
         }

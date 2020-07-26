@@ -9,7 +9,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
+import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
+import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.HttpClient
 import kotlinx.serialization.json.Json
@@ -32,6 +34,7 @@ class BotApplication : Application() {
 
         val httpClient = lazy { HttpClient() }
         val json = lazy { Json(JsonConfiguration.Default) }
+
     }
 
 
@@ -112,6 +115,14 @@ class BotApplication : Application() {
         startService(Intent(this, BotService::class.java).apply {
             putExtra("action", BotService.STOP_SERVICE)
         })
-
     }
+
+    internal fun dismissAllNotification() {
+        NotificationManagerCompat.from(this).apply {
+            cancel(BotService.OFFLINE_NOTIFICATION_ID)
+            cancel(AndroidLoginSolver.CAPTCHA_NOTIFICATION_ID)
+
+        }
+    }
+
 }

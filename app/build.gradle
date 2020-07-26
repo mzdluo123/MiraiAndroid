@@ -21,6 +21,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
+        buildConfigField("boolean", "INTEST", "false")
     }
     buildFeatures {
         dataBinding = true
@@ -36,6 +37,7 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("boolean", "INTEST", "true")
         }
     }
 
@@ -66,6 +68,9 @@ android {
 
 
 
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -138,9 +143,15 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
 
     //test
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
 
 //  https://mvnrepository.com/artifact/net.mamoe/mirai-console
