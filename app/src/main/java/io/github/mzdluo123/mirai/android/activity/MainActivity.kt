@@ -5,14 +5,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.library.BuildConfig
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
@@ -48,19 +49,19 @@ class MainActivity : AppCompatActivity() {
             ), drawer_layout
         )
     }
+    private val navController:NavController by lazy{
+        findNavController(R.id.nav_host_fragment)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.AppTheme_NoActionBar)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        nav_view.setupWithNavController(navController)
 
-        findNavController(R.id.nav_host_fragment).let {
-            setupActionBarWithNavController(it, appBarConfiguration)
-            nav_view.setupWithNavController(it)
-        }
         BotApplication.context.startBotService()
-
         btn_stopService.setOnClickListener {
             BotApplication.context.stopBotService()
             finish()
@@ -78,33 +79,12 @@ class MainActivity : AppCompatActivity() {
         //throw Exception("测试异常")
     }
 
-    private fun checkCrash() {
-        val crashDataFile = File(getExternalFilesDir("crash"), "crashdata")
-        if (!crashDataFile.exists()) return
-        var crashData: String
-        FileReader(crashDataFile).also {
-            crashData = it.readText()
-        }.close()
-        alert("检测到你上一次异常退出，是否上传崩溃日志？") {
-            yesButton {
-                shareText(crashData, lifecycleScope)
-            }
-            noButton { }
-        }.show()
-        crashDataFile.renameTo(
-            File(
-                getExternalFilesDir("crash"),
-                "crashdata${System.currentTimeMillis()}"
-            )
-        )
-    }
 
     override fun onSupportNavigateUp(): Boolean =
-        findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
 
     private suspend fun checkUpdate() {
-
         val rep = withContext(Dispatchers.IO) {
             val client = OkHttpClient.Builder().dns(SafeDns()).build()
             val res = client.newCall(
@@ -135,4 +115,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun checkCrash() {
+        val crashDataFile = File(getExternalFilesDir("crash"), "crashdata")
+        if (!crashDataFile.exists()) return
+        var crashData: String
+        FileReader(crashDataFile).also {
+            crashData = it.readText()
+        }.close()
+        alert("检测到你上一次异常退出，是否上传崩溃日志？") {
+            yesButton {
+                shareText(crashData, lifecycleScope)
+            }
+            noButton { }
+        }.show()
+        crashDataFile.renameTo(
+            File(
+                getExternalFilesDir("crash"),
+                "crashdata${System.currentTimeMillis()}"
+            )
+        )
+    }
+
 }
