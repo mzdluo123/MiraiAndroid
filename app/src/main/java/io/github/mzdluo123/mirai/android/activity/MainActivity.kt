@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
         }
 
-        if (BuildConfig.INTEST) {
+        if (BuildConfig.DEBUG) {
             toast("跳过更新检查")
         } else {
             lifecycleScope.launch(exceptionHandler) {
