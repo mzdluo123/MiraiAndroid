@@ -64,34 +64,66 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.1.0'
+    
+    //androidx-core-ktx
+    implementation 'androidx.core:core-ktx:1.3.0'
+
+    //androidx-appcompat
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    //androidx-legacy
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    //androidx-constraintlayout
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    //androidx-navigation
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'androidx.navigation:navigation-ui:2.2.2'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
 
-    implementation "net.mamoe:mirai-core-qqandroid:$CORE_VERSION"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.4'
+    //androidx-lifecycle
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    //androidx-preference
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
+
+    //kotlinx-coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.7"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.4'
+
+    //zip
     implementation 'net.lingala.zip4j:zip4j:2.5.2'
+
+    //BaseRecyclerViewAdapterHelper
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
+
+    //mirai-core
+    implementation "net.mamoe:mirai-core-qqandroid:$CORE_VERSION"
+
+    //mirai-lua
     implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
+
+    //anko
     implementation 'org.jetbrains.anko:anko-common:0.10.1'
+
+    //acra
     implementation "ch.acra:acra-core:5.1.3"
     implementation "ch.acra:acra-toast:5.1.3"
+
+    //glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+
+    //yaml
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.26'
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
-    kapt 'com.github.bumptech.glide:compiler:4.11.0'
+    //test
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
