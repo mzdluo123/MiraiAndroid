@@ -10,7 +10,7 @@
         android:name="io.github.mzdluo123.mirai.android.ui.console.ConsoleFragment"
         android:label="控制台"
         tools:layout="@layout/fragment_home"/>
-    <fragment
+    <!--fragment
         android:id="@+id/nav_home_second"
         android:name="io.github.mzdluo123.mirai.android.ui.console.HomeSecondFragment"
         android:label="@string/home_second"
@@ -19,7 +19,7 @@
         <argument
             android:name="myArg"
             app:argType="string" />
-    </fragment>
+    </fragment-->
 
     <fragment
         android:id="@+id/nav_plugins"
@@ -31,11 +31,23 @@
         android:id="@+id/nav_scripts"
         android:name="io.github.mzdluo123.mirai.android.ui.script.ScriptFragment"
         android:label="脚本管理"
-        tools:layout="@layout/fragment_script" />
+        tools:layout="@layout/fragment_script">
+        <action
+            android:id="@+id/action_nav_scripts_to_nav_scripts_center"
+            app:destination="@id/nav_scripts_center" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_scripts_center"
+        android:name="io.github.mzdluo123.mirai.android.ui.script.ScriptCenterFragment"
+        android:label="脚本中心"
+        tools:layout="@layout/fragment_script_center" />
+
     <fragment
         android:id="@+id/nav_about"
         android:name="io.github.mzdluo123.mirai.android.ui.about.AboutFragment"
         android:label="关于" />
+
     <fragment
         android:id="@+id/nav_setting"
         android:name="io.github.mzdluo123.mirai.android.ui.setting.SettingFragment"

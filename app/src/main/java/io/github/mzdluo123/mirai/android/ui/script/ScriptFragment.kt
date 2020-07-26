@@ -5,10 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.github.mzdluo123.mirai.android.R
@@ -39,20 +40,21 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
         super.onCreate(savedInstanceState)
         botServiceConnection = ServiceConnector(requireContext())
         lifecycle.addObserver(botServiceConnection)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_script, container, false).also {
-            setHasOptionsMenu(true)
-
-            adapter.setEmptyView(TextView(context).apply { setText("当前无脚本") })
-        }
+    ): View? = inflater.inflate(R.layout.fragment_script, container, false).also {
+        setHasOptionsMenu(true)
+        adapter.setEmptyView(inflater.inflate(R.layout.fragment_script_empty, null).apply {
+            findViewById<Button>(R.id.btn_script_center).setOnClickListener {
+                findNavController().navigate(R.id.action_nav_scripts_to_nav_scripts_center)
+            }
+        })
     }
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -82,16 +84,23 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.plugin_add, menu)
+        inflater.inflate(R.menu.menu_script, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) return false
-        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "*/*"
-        }, IMPORT_SCRIPT)
-        return true
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        android.R.id.home -> false
+        R.id.action_add_script -> {
+            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "*/*"
+            }, IMPORT_SCRIPT)
+            true
+        }
+        R.id.action_script_center -> {
+            findNavController().navigate(R.id.action_nav_scripts_to_nav_scripts_center)
+            true
+        }
+        else -> true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
