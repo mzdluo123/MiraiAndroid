@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.library.BuildConfig
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -14,6 +13,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText

@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android
+package io.github.mzdluo123.mirai.android.activity
 
 
 import androidx.test.espresso.Espresso.onView
@@ -7,7 +7,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import io.github.mzdluo123.mirai.android.activity.MainActivity
+import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.TestWithIdleResources
+import io.github.mzdluo123.mirai.android.childAtPosition
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.junit.Rule
@@ -22,12 +24,11 @@ class NavTest : TestWithIdleResources() {
     @JvmField
     var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
 
-
     @Test
     fun navTest() {
         val appCompatImageButton = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -62,7 +63,7 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton2 = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -95,9 +96,24 @@ class NavTest : TestWithIdleResources() {
         )
         navigationMenuItemView2.perform(click())
 
+        val actionMenuItemView = onView(
+            allOf(
+                withId(R.id.action_script_center), withContentDescription("脚本中心"),
+                childAtPosition(
+                    childAtPosition(
+                        withId(R.id.toolbar),
+                        2
+                    ),
+                    0
+                ),
+                isDisplayed()
+            )
+        )
+        actionMenuItemView.perform(click())
+
         val appCompatImageButton3 = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Navigate up"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -112,6 +128,24 @@ class NavTest : TestWithIdleResources() {
             )
         )
         appCompatImageButton3.perform(click())
+
+        val appCompatImageButton4 = onView(
+            allOf(
+                withContentDescription("Open navigation drawer"),
+                childAtPosition(
+                    allOf(
+                        withId(R.id.toolbar),
+                        childAtPosition(
+                            withClassName(`is`("com.google.android.material.appbar.AppBarLayout")),
+                            0
+                        )
+                    ),
+                    1
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatImageButton4.perform(click())
 
         val navigationMenuItemView3 = onView(
             allOf(
@@ -130,9 +164,9 @@ class NavTest : TestWithIdleResources() {
         )
         navigationMenuItemView3.perform(click())
 
-        val appCompatImageButton4 = onView(
+        val appCompatImageButton5 = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -146,7 +180,7 @@ class NavTest : TestWithIdleResources() {
                 isDisplayed()
             )
         )
-        appCompatImageButton4.perform(click())
+        appCompatImageButton5.perform(click())
 
         val navigationMenuItemView4 = onView(
             allOf(
@@ -165,9 +199,9 @@ class NavTest : TestWithIdleResources() {
         )
         navigationMenuItemView4.perform(click())
 
-        val appCompatImageButton5 = onView(
+        val appCompatImageButton6 = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -181,7 +215,7 @@ class NavTest : TestWithIdleResources() {
                 isDisplayed()
             )
         )
-        appCompatImageButton5.perform(click())
+        appCompatImageButton6.perform(click())
 
         val navigationMenuItemView5 = onView(
             allOf(
@@ -200,9 +234,9 @@ class NavTest : TestWithIdleResources() {
         )
         navigationMenuItemView5.perform(click())
 
-        val appCompatImageButton6 = onView(
+        val appCompatImageButton7 = onView(
             allOf(
-                withContentDescription("打开抽屉式导航栏"),
+                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -216,7 +250,7 @@ class NavTest : TestWithIdleResources() {
                 isDisplayed()
             )
         )
-        appCompatImageButton6.perform(click())
+        appCompatImageButton7.perform(click())
 
         val appCompatButton = onView(
             allOf(

@@ -42,10 +42,9 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 .setContentIntent(notifyPendingIntent)
                 .setAutoCancel(false)
                 //禁止滑动删除
-                .setOngoing(true)
+                .setOngoing(false)
                 //右上角的时间显示
                 .setShowWhen(true)
-                .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_info_black_24dp)
                 .setContentTitle("本次登录需要验证码")
                 .setContentText("点击这里输入验证码")
@@ -86,10 +85,9 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
                 .setContentIntent(notifyPendingIntent)
                 .setAutoCancel(false)
                 //禁止滑动删除
-                .setOngoing(true)
+                .setOngoing(false)
                 //右上角的时间显示
                 .setShowWhen(true)
-                .setAutoCancel(false)
                 .setSmallIcon(R.drawable.ic_info_black_24dp)
                 .setContentTitle("本次登录需要进行登录验证")
                 .setContentText("点击这里开始验证")

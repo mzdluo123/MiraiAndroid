@@ -36,7 +36,7 @@ class ConsoleTest : TestWithIdleResources() {
     fun fastLoginAndFastRestartTest() {
         val overflowMenuButton = onView(
             allOf(
-                withContentDescription("更多选项"),
+                withContentDescription("More options"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),
@@ -110,7 +110,7 @@ class ConsoleTest : TestWithIdleResources() {
 
         val overflowMenuButton2 = onView(
             allOf(
-                withContentDescription("更多选项"),
+                withContentDescription("More options"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),
