@@ -59,6 +59,10 @@ android {
         exclude 'META-INF/ASL2.0'
         exclude("META-INF/*.kotlin_module")
     }
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -99,8 +103,14 @@ dependencies {
 // https://mvnrepository.com/artifact/com.moandjiezana.toml/toml4j
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
 }

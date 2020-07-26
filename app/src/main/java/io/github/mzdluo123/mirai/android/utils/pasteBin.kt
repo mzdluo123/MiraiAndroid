@@ -5,16 +5,19 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 suspend fun paste(text: String): String {
-    val res = BotApplication.httpClient.value.post<HttpResponse>("https://paste.ubuntu.com/") {
-        body = MultiPartFormDataContent(formData {
-            append("poster", "MiraiAndroid")
-            append("syntax", "text")
-            append("expiration", "")
-            append("content", text)
-        })
+    return withContext(Dispatchers.IO) {
+        val res = BotApplication.httpClient.value.post<HttpResponse>("https://paste.ubuntu.com/") {
+            body = MultiPartFormDataContent(formData {
+                append("poster", "MiraiAndroid")
+                append("syntax", "text")
+                append("expiration", "")
+                append("content", text)
+            })
+        }
+        return@withContext "https://paste.ubuntu.com" + res.headers["Location"].toString()
     }
-
-    return "https://paste.ubuntu.com" + res.headers["Location"].toString()
 }

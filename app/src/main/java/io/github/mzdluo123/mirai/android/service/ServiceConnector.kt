@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
+import io.github.mzdluo123.mirai.android.IdleResources
 
 
 class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObserver {
@@ -27,7 +28,7 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         botService = IbotAidlInterface.Stub.asInterface(service)
         connectStatus.value = true
-
+        IdleResources.botServiceLoading.decrement()
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -38,6 +39,9 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
                 this,
                 Context.BIND_ABOVE_CLIENT
             )
+            if (IdleResources.botServiceLoading.isIdleNow) {
+                IdleResources.botServiceLoading.increment()
+            }
         }
     }
 

@@ -7,8 +7,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
-import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
+import io.github.mzdluo123.mirai.android.console.CaptchaActivity
+import io.github.mzdluo123.mirai.android.console.UnsafeLoginActivity
 import kotlinx.coroutines.CompletableDeferred
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole

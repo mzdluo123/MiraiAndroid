@@ -34,6 +34,7 @@ class BotApplication : Application() {
 
         val httpClient = lazy { HttpClient() }
         val json = lazy { Json(JsonConfiguration.Default) }
+
     }
 
 

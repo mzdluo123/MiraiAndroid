@@ -1,4 +1,4 @@
-package io.github.mzdluo123.mirai.android.activity
+package io.github.mzdluo123.mirai.android.console
 
 import android.content.Intent
 import android.net.Uri
@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity() {
         checkCrash()
         val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
             toast("检查更新失败")
-            Log.e(TAG, throwable.message)
             throwable.printStackTrace()
+            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
         }
 
         lifecycleScope.launch(exceptionHandler) {
