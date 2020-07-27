@@ -38,7 +38,6 @@ class ConsoleIntentTest : TestWithIdleResources() {
 
         val overflowMenuButton = onView(
             allOf(
-                withContentDescription("More options"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),

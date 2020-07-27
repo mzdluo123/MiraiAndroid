@@ -28,7 +28,6 @@ class NavTest : TestWithIdleResources() {
     fun navTest() {
         val appCompatImageButton = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -63,7 +62,6 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton2 = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -98,7 +96,7 @@ class NavTest : TestWithIdleResources() {
 
         val actionMenuItemView = onView(
             allOf(
-                withId(R.id.action_script_center), withContentDescription("脚本中心"),
+                withId(R.id.action_script_center),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),
@@ -111,9 +109,9 @@ class NavTest : TestWithIdleResources() {
         )
         actionMenuItemView.perform(click())
 
+        Thread.sleep(100)
         val appCompatImageButton3 = onView(
             allOf(
-                withContentDescription("Navigate up"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -131,7 +129,6 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton4 = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -166,7 +163,6 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton5 = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -201,7 +197,6 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton6 = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),
@@ -236,7 +231,6 @@ class NavTest : TestWithIdleResources() {
 
         val appCompatImageButton7 = onView(
             allOf(
-                withContentDescription("Open navigation drawer"),
                 childAtPosition(
                     allOf(
                         withId(R.id.toolbar),

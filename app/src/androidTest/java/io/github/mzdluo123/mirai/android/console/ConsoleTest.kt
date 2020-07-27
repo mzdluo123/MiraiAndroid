@@ -36,7 +36,6 @@ class ConsoleTest : TestWithIdleResources() {
     fun fastLoginAndFastRestartTest() {
         val overflowMenuButton = onView(
             allOf(
-                withContentDescription("More options"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),
@@ -110,7 +109,6 @@ class ConsoleTest : TestWithIdleResources() {
 
         val overflowMenuButton2 = onView(
             allOf(
-                withContentDescription("More options"),
                 childAtPosition(
                     childAtPosition(
                         withId(R.id.toolbar),
@@ -159,31 +157,12 @@ class ConsoleTest : TestWithIdleResources() {
         val appCompatEditText = onView(
             allOf(
                 withId(R.id.command_input),
-                childAtPosition(
-                    childAtPosition(
-                        withId(R.id.nav_host_fragment),
-                        0
-                    ),
-                    1
-                ),
                 isDisplayed()
             )
         )
         appCompatEditText.perform(replaceText("help"), closeSoftKeyboard())
 
-        val appCompatImageButton = onView(
-            allOf(
-                withId(R.id.commandSend_btn),
-                childAtPosition(
-                    childAtPosition(
-                        withId(R.id.nav_host_fragment),
-                        0
-                    ),
-                    2
-                ),
-                isDisplayed()
-            )
-        )
+        val appCompatImageButton = onView(withId(R.id.commandSend_btn))
         appCompatImageButton.perform(click())
 
         val textView = onView(
