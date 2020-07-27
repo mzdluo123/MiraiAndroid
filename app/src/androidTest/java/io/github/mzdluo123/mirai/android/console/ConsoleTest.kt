@@ -13,7 +13,6 @@ import io.github.mzdluo123.mirai.android.TestWithIdleResources
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.childAtPosition
 import org.hamcrest.CoreMatchers
-import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsInstanceOf
 import org.junit.FixMethodOrder
@@ -95,14 +94,8 @@ class ConsoleTest : TestWithIdleResources() {
 
         val appCompatButton = onView(
             allOf(
-                withId(android.R.id.button1), withText("设置自动登录"),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.ScrollView")),
-                        0
-                    ),
-                    3
-                )
+                withId(android.R.id.button1), withText("设置自动登录")
+
             )
         )
         appCompatButton.perform(scrollTo(), click())
