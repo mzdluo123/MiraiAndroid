@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
+import kotlinx.serialization.UnstableDefault
 import java.text.SimpleDateFormat
 
 class MiraiAndroidStatus (
@@ -17,19 +18,22 @@ class MiraiAndroidStatus (
     var startTime:String,
     var logBuffer:Int
 ) {
-    companion object{
-        var startTime:Long = 0
-        fun recentStatus(context:Context =BotApplication.context ):MiraiAndroidStatus = MiraiAndroidStatus(
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName,
-            BuildConfig.COREVERSION,
-            BuildConfig.LUAMIRAI_VERSION,
-            Build.VERSION.RELEASE,
-            Build.VERSION.SDK_INT,
-            DeviceStatus.getSystemAvaialbeMemorySize(context.applicationContext),
-            DeviceStatus.getCurrentNetType(context.applicationContext),
-            SimpleDateFormat.getDateTimeInstance().format(startTime),
-            BotApplication.getSettingPreference().getString("log_buffer_preference", "300")!!.toInt()
-        )
+    @ExperimentalUnsignedTypes
+    @UnstableDefault
+    companion object {
+        var startTime: Long = 0
+        fun recentStatus(context: Context = BotApplication.context): MiraiAndroidStatus =
+            MiraiAndroidStatus(
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName,
+                BuildConfig.COREVERSION,
+                BuildConfig.LUAMIRAI_VERSION,
+                Build.VERSION.RELEASE,
+                Build.VERSION.SDK_INT,
+                DeviceStatus.getSystemAvaialbeMemorySize(context.applicationContext),
+                DeviceStatus.getCurrentNetType(context.applicationContext),
+                SimpleDateFormat.getDateTimeInstance().format(startTime),
+                BotApplication.getSettingPreference().getString("log_buffer_preference", "300")!!.toInt()
+            )
     }
 
     fun format():String = buildString{

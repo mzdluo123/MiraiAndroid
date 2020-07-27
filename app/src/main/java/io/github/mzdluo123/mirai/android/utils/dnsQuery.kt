@@ -3,10 +3,13 @@ package io.github.mzdluo123.mirai.android.utils
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.content
 import okhttp3.Dns
 import java.net.InetAddress
 
+@ExperimentalUnsignedTypes
+@UnstableDefault
 class SafeDns : Dns {
     override fun lookup(hostname: String): List<InetAddress> {
         return runBlocking {

@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.UnstableDefault
 import net.lingala.zip4j.ZipFile
 import net.mamoe.mirai.console.plugins.PluginDescription
 import org.yaml.snakeyaml.Yaml
@@ -25,9 +26,12 @@ import java.io.File
 import java.io.FileReader
 
 
+@ExperimentalUnsignedTypes
+@UnstableDefault
 class PluginImportActivity : AppCompatActivity() {
 
     private lateinit var uri: Uri
+
     private lateinit var pluginViewModel: PluginViewModel
     private lateinit var dialog: AlertDialog
     private lateinit var activityPluginImportBinding: ActivityPluginImportBinding
@@ -37,7 +41,6 @@ class PluginImportActivity : AppCompatActivity() {
 //        uri = Uri.parse(intent.getStringExtra("uri"))
         try {
             uri = intent.data ?: return
-
             pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
             activityPluginImportBinding =
                 DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)

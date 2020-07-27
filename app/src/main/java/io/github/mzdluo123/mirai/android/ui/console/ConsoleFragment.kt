@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.shareText
@@ -34,6 +35,7 @@ import kotlinx.coroutines.*
 import java.security.MessageDigest
 
 
+@ExperimentalUnsignedTypes
 class ConsoleFragment : Fragment() {
     companion object {
         const val TAG = "ConsoleFragment"
@@ -133,7 +135,7 @@ class ConsoleFragment : Fragment() {
                 ignoreBatteryOptimization(requireActivity())
             }
             R.id.action_fast_restart -> {
-                BotApplication.context.dismissAllNotification()
+                NotificationFactory.dismissAllNotification()
                 restart()
             }
         }

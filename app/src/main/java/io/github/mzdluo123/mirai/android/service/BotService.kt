@@ -13,12 +13,11 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.provider.MediaStore
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
-import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
@@ -40,7 +39,6 @@ import net.mamoe.mirai.message.data.At
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.File
 import kotlin.system.exitProcess
-
 
 
 @ExperimentalUnsignedTypes
@@ -71,23 +69,9 @@ class BotService : Service(), CommandOwner {
     }
 
     private fun createNotification() {
-        //使用兼容版本
-        NotificationCompat.Builder(
-            this,
-            BotApplication.SERVICE_NOTIFICATION
-        )
-            .setSmallIcon(R.drawable.ic_extension_black_24dp)//设置状态栏的通知图标
-            .setAutoCancel(false) //禁止用户点击删除按钮删除
-            .setOngoing(true) //禁止滑动删除
-            .setShowWhen(true) //右上角的时间显示
-            .setOnlyAlertOnce(true)
-            .setStyle(NotificationCompat.BigTextStyle())
-            .setContentTitle("MiraiAndroid未登录") //创建通知
-            .setContentText("请完成登录并将软件添加到系统后台运行白名单确保能及时处理消息")
-            .build()
-            .let {
-                startForeground(NOTIFICATION_ID, it) //设置为前台服务
-            }
+        NotificationFactory.statusNotification().let {
+            startForeground(NOTIFICATION_ID, it) //设置为前台服务
+        }
     }
 
     override fun onBind(intent: Intent): IBinder = binder

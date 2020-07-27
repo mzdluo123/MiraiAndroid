@@ -2,29 +2,27 @@ package io.github.mzdluo123.mirai.android
 
 import android.app.ActivityManager
 import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
-import androidx.core.app.NotificationManagerCompat
+import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
-import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.HttpClient
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.data.StringFormat
 
+@ExperimentalUnsignedTypes
 class BotApplication : Application() {
+    @UnstableDefault
     companion object {
-        const val SERVICE_NOTIFICATION = "service"
-        const val CAPTCHA_NOTIFICATION = "captcha"
-        const val OFFLINE_NOTIFICATION = "offline"
+
         lateinit var context: BotApplication
             private set
 
@@ -48,32 +46,7 @@ class BotApplication : Application() {
 
         // 防止服务进程多次初始化
         if (processName?.isEmpty() == false && processName == packageName) {
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                // 只在8.0系统上注册通知通道，防止程序崩溃
-                val statusChannel = NotificationChannel(
-                    SERVICE_NOTIFICATION, "状态通知",
-                    NotificationManager.IMPORTANCE_MIN
-                )
-
-                statusChannel.description = "Mirai正在运行的通知"
-
-                val captchaChannel = NotificationChannel(
-                    CAPTCHA_NOTIFICATION, "验证码通知",
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-                captchaChannel.description = "登录需要输入验证码时的通知"
-
-                val offlineChannel = NotificationChannel(
-                    OFFLINE_NOTIFICATION, "离线通知",
-                    NotificationManager.IMPORTANCE_HIGH
-                )
-                offlineChannel.description = "Mirai因各种原因离线的通知"
-
-                notificationManager.createNotificationChannel(statusChannel)
-                notificationManager.createNotificationChannel(captchaChannel)
-                notificationManager.createNotificationChannel(offlineChannel)
-            }
+            initNotification()
         }
     }
 
@@ -117,12 +90,5 @@ class BotApplication : Application() {
         })
     }
 
-    internal fun dismissAllNotification() {
-        NotificationManagerCompat.from(this).apply {
-            cancel(BotService.OFFLINE_NOTIFICATION_ID)
-            cancel(AndroidLoginSolver.CAPTCHA_NOTIFICATION_ID)
-
-        }
-    }
 
 }

@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
+import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
@@ -23,6 +24,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.content
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -33,6 +35,8 @@ import org.jetbrains.anko.yesButton
 import java.io.File
 import java.io.FileReader
 
+@UnstableDefault
+@ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
     companion object {
         const val TAG = "MainActivity"
@@ -64,11 +68,11 @@ class MainActivity : AppCompatActivity() {
         BotApplication.context.startBotService()
         btn_stopService.setOnClickListener {
             BotApplication.context.stopBotService()
-            BotApplication.context.dismissAllNotification()
+            NotificationFactory.dismissAllNotification()
             finish()
         }
         checkCrash()
-        val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             toast("检查更新失败")
             throwable.printStackTrace()
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
@@ -120,6 +124,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun checkCrash() {
         val crashDataFile = File(getExternalFilesDir("crash"), "crashdata")
         if (!crashDataFile.exists()) return

@@ -1,16 +1,12 @@
 package io.github.mzdluo123.mirai.android.miraiconsole
 
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.activity.MainActivity
+import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
@@ -93,15 +89,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
         subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
         launch {
             val avatar = downloadAvatar()  // 获取通知展示用的头像
-            //点击进入主页
-            val notifyIntent = Intent(BotApplication.context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            val notifyPendingIntent = PendingIntent.getActivity(
-                BotApplication.context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-            )
             var msgSpeed = 0
-            val startTime = System.currentTimeMillis()
             while (isActive) {
                 /*
                 * 总速度+=最新速度 [0] [1] ... [14]
@@ -115,24 +103,11 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
                 }
                 msgSpeed -= msgSpeeds[refreshCurrentPos]
                 msgSpeeds[refreshCurrentPos] = 0
-                val notification = NotificationCompat.Builder(
-                    BotApplication.context,
-                    BotApplication.SERVICE_NOTIFICATION
-                )
-                    //设置状态栏的通知图标
-                    .setSmallIcon(R.drawable.ic_extension_black_24dp)
-                    //禁止用户点击删除按钮删除
-                    .setAutoCancel(false)
-                    //禁止滑动删除
-                    .setOngoing(true)
-                    //右上角的时间显示
-                    .setShowWhen(true).setWhen(startTime)
-                    .setOnlyAlertOnce(true)
-                    .setLargeIcon(avatar).setContentIntent(notifyPendingIntent)
-                    .setContentTitle("MiraiAndroid正在运行")
-                    .setContentText("消息速度 ${msgSpeed}/min").build()
                 NotificationManagerCompat.from(BotApplication.context).apply {
-                    notify(BotService.NOTIFICATION_ID, notification)
+                    notify(
+                        BotService.NOTIFICATION_ID,
+                        NotificationFactory.statusNotification("消息速度 ${msgSpeed}/min", avatar)
+                    )
                 }
                 delay(60L / refreshPerMinute * 1000)
             }
@@ -153,22 +128,11 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
     private fun Bot.subscribeBotLifeEvent() {
         subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
             if (this is BotOfflineEvent.Force) {
-                val builder =
-                    NotificationCompat.Builder(
-                        BotApplication.context,
-                        BotApplication.OFFLINE_NOTIFICATION
-                    )
-                        .setAutoCancel(false)
-                        .setOngoing(false)
-                        .setShowWhen(true)
-                        .setSmallIcon(R.drawable.ic_info_black_24dp)
-                        .setContentTitle("Mirai离线")
-
-                builder.setStyle(NotificationCompat.BigTextStyle())
-                builder.setContentText(this.message)
-
                 NotificationManagerCompat.from(BotApplication.context).apply {
-                    notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+                    notify(
+                        BotService.OFFLINE_NOTIFICATION_ID,
+                        NotificationFactory.offlineNotification(message, true)
+                    )
                 }
                 return@subscribeAlways
             }
@@ -178,19 +142,11 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
                     if (!isActive) {
                         return@launch
                     }
-                    val builder =
-                        NotificationCompat.Builder(
-                            BotApplication.context,
-                            BotApplication.OFFLINE_NOTIFICATION
-                        )
-                            .setAutoCancel(false)
-                            .setOngoing(false)
-                            .setShowWhen(true)
-                            .setSmallIcon(R.drawable.ic_info_black_24dp)
-                            .setContentTitle("Mirai离线")
-                    builder.setContentText("请检查网络环境")
                     NotificationManagerCompat.from(BotApplication.context).apply {
-                        notify(BotService.OFFLINE_NOTIFICATION_ID, builder.build())
+                        notify(
+                            BotService.OFFLINE_NOTIFICATION_ID,
+                            NotificationFactory.offlineNotification("请检查网络设置")
+                        )
                     }
                 }
             }
