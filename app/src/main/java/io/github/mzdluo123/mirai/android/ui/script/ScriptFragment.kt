@@ -73,7 +73,6 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
         botServiceConnection.connectStatus.observe(this, Observer {
             if (it) {
                 scriptViewModel = ScriptViewModel(botServiceConnection.botService)
-
                 scriptViewModel.observe(viewLifecycleOwner, Observer {
                     adapter.data = it.toMutableList()
                     adapter.notifyDataSetChanged()
