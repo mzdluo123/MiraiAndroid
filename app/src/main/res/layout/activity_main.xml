@@ -24,17 +24,40 @@
         app:itemTextColor="@color/color_drawer_item"
         app:itemIconTint="@color/color_drawer_item">
 
-        <Button
-            android:id="@+id/btn_stopService"
-            style="@style/Widget.AppCompat.ButtonBar.AlertDialog"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_gravity="bottom"
             android:layout_marginStart="8dp"
-            android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_exit_to_app_black_24dp"
-            android:text="退出应用"
-            android:textSize="14sp" />
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp">
+
+            <Button
+                android:id="@+id/btn_exit"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_exit_to_app_black_24dp"
+                android:text="退出应用"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_reboot"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_restore_24"
+                android:text="快速重启"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
     </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

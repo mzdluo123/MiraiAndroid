@@ -26,7 +26,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.shareText
@@ -113,13 +112,6 @@ class ConsoleFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         when (item.itemId) {
-//            R.id.action_exit -> {
-//                val intent = Intent(activity, BotService::class.java)
-//                intent.putExtra("action", BotService.STOP_SERVICE)
-////                conn.botService.clearLog()
-//                activity?.startService(intent)
-//                activity?.finish()
-//            }
             R.id.action_setAutoLogin -> {
                 setAutoLogin()
             }
@@ -134,10 +126,11 @@ class ConsoleFragment : Fragment() {
             R.id.action_battery -> {
                 ignoreBatteryOptimization(requireActivity())
             }
+            /*
             R.id.action_fast_restart -> {
                 NotificationFactory.dismissAllNotification()
                 restart()
-            }
+            }*/
         }
         return false
     }

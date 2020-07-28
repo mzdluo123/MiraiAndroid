@@ -20,10 +20,7 @@ import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.content
 import okhttp3.OkHttpClient
@@ -37,7 +34,7 @@ import java.io.FileReader
 
 @UnstableDefault
 @ExperimentalUnsignedTypes
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     companion object {
         const val TAG = "MainActivity"
     }
@@ -66,11 +63,22 @@ class MainActivity : AppCompatActivity() {
         nav_view.setupWithNavController(navController)
 
         BotApplication.context.startBotService()
-        btn_stopService.setOnClickListener {
+        btn_exit.setOnClickListener {
             BotApplication.context.stopBotService()
             NotificationFactory.dismissAllNotification()
             finish()
         }
+        btn_reboot.setOnClickListener {
+            NotificationFactory.dismissAllNotification()
+            launch {
+                navController.popBackStack()
+                BotApplication.context.stopBotService()
+                delay(200)
+                BotApplication.context.startBotService()
+                navController.setGraph(R.navigation.mobile_navigation)
+            }
+        }
+
         checkCrash()
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             toast("检查更新失败")

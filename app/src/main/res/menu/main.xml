@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_setAutoLogin"
         android:title="设置自动登录" />
@@ -11,7 +10,7 @@
     <item
         android:id="@+id/action_battery"
         android:title="忽略电池优化" />
-    <item
+    <!--item
         android:id="@+id/action_fast_restart"
-        android:title="快速重启" />
+        android:title="快速重启" /-->
 </menu>
