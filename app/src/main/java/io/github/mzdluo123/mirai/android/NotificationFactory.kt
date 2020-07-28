@@ -88,7 +88,7 @@ object NotificationFactory {
             .setOnlyAlertOnce(true)
             .setStyle(NotificationCompat.BigTextStyle())
             .setContentIntent(launchMainActivity)
-            .setContentTitle("MiraiAndroid未登录") //创建通知
+            .setContentTitle("MiraiAndroid") //创建通知
             .setContentText(content)
             .setLargeIcon(avatar)
             .build()

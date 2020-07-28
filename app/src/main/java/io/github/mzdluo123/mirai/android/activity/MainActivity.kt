@@ -71,11 +71,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         btn_reboot.setOnClickListener {
             NotificationFactory.dismissAllNotification()
             launch {
-                navController.popBackStack()
                 BotApplication.context.stopBotService()
                 delay(200)
                 BotApplication.context.startBotService()
-                navController.setGraph(R.navigation.mobile_navigation)
+                navController.popBackStack()
+                navController.navigate(R.id.nav_console)  // 重新启动console fragment，使其能够链接到服务
+                drawer_layout.closeDrawers()
             }
         }
 
