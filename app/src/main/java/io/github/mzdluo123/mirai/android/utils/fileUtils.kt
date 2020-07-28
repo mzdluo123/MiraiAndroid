@@ -8,7 +8,6 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import io.github.mzdluo123.mirai.android.R
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 
@@ -47,11 +46,11 @@ suspend fun Context.askFileName(): String? {
         val editText = view.findViewById<EditText>(R.id.filename_input)
         val dialog = AlertDialog.Builder(this@askFileName)
             .setView(view)
-            .setPositiveButton("确定", DialogInterface.OnClickListener { dialog, which ->
+            .setPositiveButton("确定", DialogInterface.OnClickListener { _, _ ->
                 name.complete(editText.text.toString())
             })
             .setNegativeButton(
-                "取消", DialogInterface.OnClickListener { dialog, which ->
+                "取消", DialogInterface.OnClickListener { _, _ ->
                     name.complete(null)
                 })
             .setCancelable(false)
