@@ -13,6 +13,7 @@ import io.github.mzdluo123.mirai.android.TestWithIdleResources
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.childAtPosition
 import org.hamcrest.CoreMatchers
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.core.IsInstanceOf
 import org.junit.FixMethodOrder
@@ -100,36 +101,26 @@ class ConsoleTest : TestWithIdleResources() {
         )
         appCompatButton.perform(scrollTo(), click())
 
-        val overflowMenuButton2 = onView(
+        val appCompatImageButton7 = onView(
             allOf(
                 childAtPosition(
-                    childAtPosition(
+                    allOf(
                         withId(R.id.toolbar),
-                        2
+                        childAtPosition(
+                            withClassName(Matchers.`is`("com.google.android.material.appbar.AppBarLayout")),
+                            0
+                        )
                     ),
-                    0
+                    1
                 ),
                 isDisplayed()
             )
         )
-        overflowMenuButton2.perform(click())
+        appCompatImageButton7.perform(click())
 
-        val appCompatTextView2 = onView(
-            allOf(
-                withId(R.id.title), withText("快速重启"),
-                childAtPosition(
-                    childAtPosition(
-                        withId(R.id.content),
-                        0
-                    ),
-                    0
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatTextView2.perform(click())
+        onView(withText("快速重启")).perform(click())
 
-        onView(withId(R.id.log_text))
+        onView(withId(R.id.log_text)).check(ViewAssertions.matches(isDisplayed()))
         Thread.sleep(2000)  //花两秒钟给控制台加载log
 
         onView(withId(R.id.log_text)).check(
