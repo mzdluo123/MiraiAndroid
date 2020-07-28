@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ooooonly.giteeman.GiteeFile
+import io.github.mzdluo123.mirai.android.IdleResources
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
@@ -44,15 +45,18 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
                     yesButton {
 
                         val progressDialog =
-                            context?.indeterminateProgressDialog("正在导入").also { it?.show() }
+                            context?.indeterminateProgressDialog("正在导入").also {
+                                IdleResources.loadingData.increment()
+                                it?.show()
+                            }
 
                         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
                             progressDialog?.dismiss()
+                            IdleResources.loadingData.decrement()
                             context?.toast("导入失败！\n$throwable")
                         }
                         launch(exceptionHandler) {
                             alertDialog?.dismiss()
-
                             withContext(Dispatchers.IO) {
                                 val filePath =
                                     requireContext().getExternalFilesDir("scripts")!!.absolutePath + "/" + selectedFile.fileName
@@ -66,6 +70,7 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
                                 if (!result) throw Exception()
                             }
                             progressDialog?.dismiss()
+                            IdleResources.loadingData.decrement()
                             context?.toast("导入成功！")
                         }
 
@@ -100,6 +105,7 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
                     adapter.data = it.toMutableList()
                     adapter.notifyDataSetChanged()
                 })
+                IdleResources.loadingData.increment()
                 scriptViewModel.showFiles(
                     GiteeFile(
                         "ooooonly",

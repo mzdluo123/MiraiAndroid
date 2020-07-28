@@ -6,7 +6,7 @@ object IdleResources {
 
     // Android单元测试所需要的东西
 
-    val logUploadDialogIdleResources by lazy { CountingIdlingResource("logUploadDialogIdleResources") }
+    val loadingData by lazy { CountingIdlingResource("logUploadDialogIdleResources") }
 
     val botServiceLoading by lazy { CountingIdlingResource("botServiceLoading") }
 }

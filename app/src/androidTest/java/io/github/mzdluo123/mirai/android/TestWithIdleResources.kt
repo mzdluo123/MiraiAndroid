@@ -16,13 +16,13 @@ open class TestWithIdleResources {
 
     @Before
     fun before() {
-        IdlingRegistry.getInstance().register(IdleResources.logUploadDialogIdleResources)
+        IdlingRegistry.getInstance().register(IdleResources.loadingData)
         IdlingRegistry.getInstance().register(IdleResources.botServiceLoading)
     }
 
     @After
     fun after() {
-        IdlingRegistry.getInstance().unregister(IdleResources.logUploadDialogIdleResources)
+        IdlingRegistry.getInstance().unregister(IdleResources.loadingData)
         IdlingRegistry.getInstance().register(IdleResources.botServiceLoading)
     }
 }

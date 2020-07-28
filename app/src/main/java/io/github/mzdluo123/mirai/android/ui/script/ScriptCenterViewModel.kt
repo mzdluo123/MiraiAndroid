@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ooooonly.giteeman.GiteeFile
+import io.github.mzdluo123.mirai.android.IdleResources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,6 +20,7 @@ class ScriptCenterViewModel() : ViewModel() {
                 Dispatchers.IO
             ) {
                 fileList.postValue(parent.listFiles())
+                IdleResources.loadingData.decrement()
             }
         }
     }
