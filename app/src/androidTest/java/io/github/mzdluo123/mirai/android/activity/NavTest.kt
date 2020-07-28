@@ -246,23 +246,5 @@ class NavTest : TestWithIdleResources() {
         )
         appCompatImageButton7.perform(click())
 
-        val appCompatButton = onView(
-            allOf(
-                withId(R.id.btn_stopService), withText("退出应用"),
-                childAtPosition(
-                    allOf(
-                        withId(R.id.nav_view),
-                        childAtPosition(
-                            withId(R.id.drawer_layout),
-                            1
-                        )
-                    ),
-                    1
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton.perform(click())
     }
-
 }

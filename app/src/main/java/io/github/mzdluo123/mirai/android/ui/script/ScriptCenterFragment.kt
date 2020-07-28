@@ -102,8 +102,8 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
                                 if (!result) throw Exception()
                             }
                             progressDialog?.dismiss()
-                            IdleResources.loadingData.decrement()
                             context?.toast("导入成功！")
+                            IdleResources.loadingData.decrement()
                         }
 
                     }
