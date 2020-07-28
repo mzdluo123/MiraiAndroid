@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
-                android:drawableLeft="@drawable/ic_exit_to_app_black_24dp"
+                android:drawableLeft="@drawable/ic_exit_to_app_24dp"
                 android:text="退出应用"
                 android:textSize="14sp" />
 
