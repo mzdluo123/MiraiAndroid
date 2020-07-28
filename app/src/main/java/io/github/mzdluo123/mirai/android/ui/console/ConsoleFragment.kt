@@ -106,7 +106,7 @@ class ConsoleFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main, menu)
+        inflater.inflate(R.menu.menu_console, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
