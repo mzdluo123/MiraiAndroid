@@ -123,10 +123,11 @@ class ConsoleFragment : Fragment() {
                     append(conn.botService.log.joinToString(separator = "\n"))
                 }, lifecycleScope
             )
+            /*
             R.id.action_battery -> {
                 ignoreBatteryOptimization(requireActivity())
             }
-            /*
+
             R.id.action_fast_restart -> {
                 NotificationFactory.dismissAllNotification()
                 restart()
@@ -149,7 +150,6 @@ class ConsoleFragment : Fragment() {
             } else {
                 Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
             }
-
         } else {
             Toast.makeText(requireContext(), "只有新版Android才需要这个操作哦", Toast.LENGTH_SHORT).show()
 

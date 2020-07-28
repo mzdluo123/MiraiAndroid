@@ -7,9 +7,9 @@
     <item
         android:id="@+id/action_report"
         android:title="分享日志" />
-    <item
+    <!--item
         android:id="@+id/action_battery"
-        android:title="忽略电池优化" />
+        android:title="忽略电池优化" /-->
     <!--item
         android:id="@+id/action_fast_restart"
         android:title="快速重启" /-->
