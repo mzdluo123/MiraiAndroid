@@ -2,9 +2,11 @@ package io.github.mzdluo123.mirai.android.utils
 
 import android.content.Context
 import android.os.Build
+import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
 import kotlinx.serialization.UnstableDefault
+import splitties.experimental.ExperimentalSplittiesApi
 import java.text.SimpleDateFormat
 
 class MiraiAndroidStatus (
@@ -18,6 +20,7 @@ class MiraiAndroidStatus (
     var startTime:String,
     var logBuffer:Int
 ) {
+    @ExperimentalSplittiesApi
     @ExperimentalUnsignedTypes
     @UnstableDefault
     companion object {
@@ -32,7 +35,7 @@ class MiraiAndroidStatus (
                 DeviceStatus.getSystemAvaialbeMemorySize(context.applicationContext),
                 DeviceStatus.getCurrentNetType(context.applicationContext),
                 SimpleDateFormat.getDateTimeInstance().format(startTime),
-                BotApplication.getSettingPreference().getString("log_buffer_preference", "300")!!.toInt()
+                AppSettings.logBuffer
             )
     }
 

@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Process
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
@@ -16,6 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
+import org.acra.config.ToastConfigurationBuilder
 import org.acra.data.StringFormat
 
 @ExperimentalUnsignedTypes
@@ -25,10 +25,6 @@ class BotApplication : Application() {
 
         lateinit var context: BotApplication
             private set
-
-        internal fun getSettingPreference(): SharedPreferences {
-            return context.getSharedPreferences("setting", Context.MODE_PRIVATE)
-        }
 
         val httpClient = lazy { HttpClient() }
         val json = lazy { Json(JsonConfiguration.Default) }
@@ -58,9 +54,9 @@ class BotApplication : Application() {
             setBuildConfigClass(BuildConfig::class.java)
                 .setReportFormat(StringFormat.JSON)
             setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
-//            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
-//                .setResText(R.string.acra_toast_text)
-//                .setEnabled(true)
+            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
+                .setResText(R.string.acra_toast_text)
+                .setEnabled(true)
             //不知道为什么开启的时候总是显示这个，先暂时禁用
         })
     }
