@@ -5,12 +5,17 @@ import android.content.Intent
 import androidx.lifecycle.LifecycleCoroutineScope
 import io.github.mzdluo123.mirai.android.IdleResources
 import kotlinx.coroutines.*
-import org.jetbrains.anko.indeterminateProgressDialog
-import org.jetbrains.anko.toast
+import splitties.alertdialog.appcompat.alertDialog
+import splitties.alertdialog.appcompat.message
+import splitties.alertdialog.appcompat.title
+import splitties.toast.toast
+
 
 fun Context.shareText(text: String, scope: LifecycleCoroutineScope) {
     scope.launch {
-        val waitingDialog = indeterminateProgressDialog("请稍候", "正在上传") {
+        val waitingDialog = alertDialog {
+            message = "正在上传"
+            title = "请稍后"
             //setCancelable(false)
         }
         waitingDialog.show()

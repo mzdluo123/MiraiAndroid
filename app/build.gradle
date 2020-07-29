@@ -122,8 +122,9 @@ dependencies {
     //}
     //implementation 'com.ooooonly:giteeman:0.1.1'
 
-    //anko
-    implementation 'org.jetbrains.anko:anko-common:0.10.1'
+    //splitties
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-base:3.0.0-alpha06")
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-appcompat:3.0.0-alpha06")
 
     //acra
     implementation "ch.acra:acra-core:5.1.3"

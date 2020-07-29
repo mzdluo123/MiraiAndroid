@@ -25,10 +25,11 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.content
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.noButton
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.yesButton
+import splitties.alertdialog.appcompat.alertDialog
+import splitties.alertdialog.appcompat.cancelButton
+import splitties.alertdialog.appcompat.message
+import splitties.alertdialog.appcompat.okButton
+import splitties.toast.toast
 import java.io.File
 import java.io.FileReader
 
@@ -125,8 +126,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 return
             }
             withContext(Dispatchers.Main) {
-                alert(title = "发现新版本 $version", message = body) {
-                    positiveButton("立即更新") {
+                alertDialog(title = "发现新版本 $version", message = body) {
+                    setPositiveButton("立即更新") { _, _ ->
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl)))
                     }
                 }.show()
@@ -141,11 +142,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         FileReader(crashDataFile).also {
             crashData = it.readText()
         }.close()
-        alert("检测到你上一次异常退出，是否上传崩溃日志？") {
-            yesButton {
+        alertDialog {
+            message = "检测到你上一次异常退出，是否上传崩溃日志？"
+            okButton {
                 shareText(crashData, lifecycleScope)
             }
-            noButton { }
+            cancelButton { }
         }.show()
         crashDataFile.renameTo(
             File(
