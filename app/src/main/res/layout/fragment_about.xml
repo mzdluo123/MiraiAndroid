@@ -44,12 +44,12 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:text="关于Mirai"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/version_text" />
+                app:layout_constraintTop_toBottomOf="@+id/btn_join_group" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -94,7 +94,7 @@
                 android:id="@+id/textView8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:text="关于MiraiAndroid"
                 android:textAlignment="center"
                 android:textSize="24sp"
@@ -148,6 +148,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView3"
                 tools:text="版本号" />
+
+            <Button
+                android:id="@+id/btn_join_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="加入交流群"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/version_text" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

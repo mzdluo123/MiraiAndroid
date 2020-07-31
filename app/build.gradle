@@ -16,8 +16,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 27
-        versionName "2.10.0"
+        versionCode 28
+        versionName "2.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
