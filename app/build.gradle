@@ -16,8 +16,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 27
-        versionName "2.10.0"
+        versionCode 28
+        versionName "2.10.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "LUAMIRAI_VERSION", "\"$LUAMIRAI_VERSION\"")
@@ -90,9 +90,9 @@ dependencies {
 
     //androidx-navigation
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
-    implementation 'androidx.navigation:navigation-ui:2.2.2'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.2.2'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.2.2'
+    implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.0'
 
     //androidx-lifecycle
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
@@ -125,8 +125,9 @@ dependencies {
     //}
     //implementation 'com.ooooonly:giteeman:0.1.1'
 
-    //anko
-    implementation 'org.jetbrains.anko:anko-common:0.10.1'
+    //splitties
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-base:3.0.0-alpha06")
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-appcompat:3.0.0-alpha06")
 
     //acra
     implementation "ch.acra:acra-core:5.1.3"

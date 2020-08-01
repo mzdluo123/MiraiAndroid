@@ -1,36 +1,27 @@
 package io.github.mzdluo123.mirai.android.ui.console
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.DeadObjectException
-import android.os.PowerManager
-import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.*
+import splitties.toast.toast
 import java.security.MessageDigest
 
 
@@ -40,11 +31,11 @@ class ConsoleFragment : Fragment() {
         const val TAG = "ConsoleFragment"
     }
 
-    private lateinit var consoleViewModel: ConsoleViewModel
-
     private var logRefreshJob: Job? = null
 
     private lateinit var conn: ServiceConnector
+
+    private var autoScroll = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,8 +44,6 @@ class ConsoleFragment : Fragment() {
     ): View? {
         conn = ServiceConnector(requireContext())
         lifecycle.addObserver(conn)
-        consoleViewModel =
-            ViewModelProvider(this).get(ConsoleViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         setHasOptionsMenu(true)
         return root
@@ -68,8 +57,16 @@ class ConsoleFragment : Fragment() {
         }
         shortcutBottom_btn.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                delay(100)
-                main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+                if (autoScroll) {
+                    autoScroll = false
+                    toast("自动滚动禁用")
+                    shortcutBottom_btn.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp)
+                } else {
+                    autoScroll = true
+                    toast("自动滚动启用")
+                    shortcutBottom_btn.setImageResource(R.drawable.ic_baseline_keyboard_arrow_up_24)
+                }
+
             }
         }
         command_input.setOnEditorActionListener { _, actionId, _ ->
@@ -136,26 +133,25 @@ class ConsoleFragment : Fragment() {
         return false
     }
 
-    @SuppressLint("BatteryLife")
-    private fun ignoreBatteryOptimization(activity: Activity) {
-        val powerManager =
-            getSystemService(requireContext(), PowerManager::class.java)
-        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
-            if (!hasIgnored) {
-                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                intent.data = Uri.parse("package:" + activity.packageName)
-                startActivity(intent)
-            } else {
-                Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(requireContext(), "只有新版Android才需要这个操作哦", Toast.LENGTH_SHORT).show()
-
-        }
-
-    }
+//    @SuppressLint("BatteryLife")
+//    private fun ignoreBatteryOptimization(activity: Activity) {
+//        val powerManager =
+//            getSystemService(requireContext(), PowerManager::class.java)
+//        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+//            if (!hasIgnored) {
+//                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+//                intent.data = Uri.parse("package:" + activity.packageName)
+//                startActivity(intent)
+//            } else {
+//                Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+//            }
+//        } else {
+//            Toast.makeText(requireContext(), "只有新版Android才需要这个操作哦", Toast.LENGTH_SHORT).show()
+//
+//        }
+//    }
 
     private fun submitCmd() {
         var command = command_input.text.toString()
@@ -205,7 +201,9 @@ class ConsoleFragment : Fragment() {
                     val text = conn.botService.log.joinToString(separator = "\n")
                     withContext(Dispatchers.Main) {
                         log_text?.text = text
-//                            main_scroll.scrollTo(0, log_text.bottom)
+                        if (autoScroll) {
+                            main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+                        }
                     }
                     delay(200)
                 }
@@ -268,13 +266,13 @@ class ConsoleFragment : Fragment() {
         }
     }
 
-    private fun restart() = viewLifecycleOwner.lifecycleScope.launch {
-        conn.disconnect()
-        BotApplication.context.stopBotService()
-        delay(200)
-        BotApplication.context.startBotService()
-        conn.connect()
-    }
+//    private fun restart() = viewLifecycleOwner.lifecycleScope.launch {
+//        conn.disconnect()
+//        BotApplication.context.stopBotService()
+//        delay(200)
+//        BotApplication.context.startBotService()
+//        conn.connect()
+//    }
 
 }
 

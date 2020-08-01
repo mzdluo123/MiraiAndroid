@@ -1,6 +1,5 @@
 package io.github.mzdluo123.mirai.android.ui.script
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,7 +14,8 @@ import io.github.mzdluo123.mirai.android.script.ScriptHostFactory
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import kotlinx.android.synthetic.main.fragment_script_center.*
 import kotlinx.coroutines.*
-import org.jetbrains.anko.*
+import splitties.alertdialog.appcompat.*
+import splitties.toast.toast
 
 @ExperimentalStdlibApi
 class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
@@ -45,23 +45,23 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         android.R.id.home -> false
         R.id.action_upload_script -> {
-            context?.alert(
-                """
+            context?.alertDialog {
+                message = """
                 你需要
                 1.注册gitee账号
                 2.向脚本仓库地址“https://gitee.com/ooooonly/lua-mirai-project/tree/master/ScriptCenter”提交你的“Pull Request”
                 3.等待审核即可上架
-            """.trimIndent(), "如何上传脚本"
-            ) {
-                positiveButton("前往仓库地址") {
-                    context?.startActivity(
+            """.trimIndent()
+                title = "如何上传脚本"
+                setPositiveButton("前往仓库地址") { _, _ ->
+                    context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
                             Uri.parse("https://gitee.com/ooooonly/lua-mirai-project/tree/master/ScriptCenter")
                         )
                     )
                 }
-                negativeButton("取消") {}
+                setNegativeButton("取消") { _, _ -> }
             }?.show()
             true
         }
@@ -72,23 +72,25 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
         super.onActivityCreated(savedInstanceState)
         adapter = ScriptCenterListAdapter { selectedFile ->
             if (selectedFile.isFile) {
-                var alertDialog: AlertDialog? = null
-                alertDialog = context?.alert("是否导入${selectedFile.fileName}？") {
-                    yesButton {
+                var alert: androidx.appcompat.app.AlertDialog? = null
+                alert = context?.alertDialog {
+                    message = "是否导入${selectedFile.fileName}？"
+                    okButton {
 
                         val progressDialog =
-                            context?.indeterminateProgressDialog("正在导入").also {
+                            context.alertDialog {
+                                message = "正在导入"
                                 IdleResources.loadingData.increment()
-                                it?.show()
                             }
+                        progressDialog.show()
 
                         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                            progressDialog?.dismiss()
+                            progressDialog.dismiss()
                             IdleResources.loadingData.decrement()
-                            context?.toast("导入失败！\n$throwable")
+                            context.toast("导入失败！\n$throwable")
                         }
                         launch(exceptionHandler) {
-                            alertDialog?.dismiss()
+
                             withContext(Dispatchers.IO) {
                                 val filePath =
                                     requireContext().getExternalFilesDir("scripts")!!.absolutePath + "/" + selectedFile.fileName
@@ -102,15 +104,15 @@ class ScriptCenterFragment : Fragment(), CoroutineScope by MainScope() {
                                 if (!result) throw Exception()
                             }
                             progressDialog?.dismiss()
-                            context?.toast("导入成功！")
+                            context.toast("导入成功！")
                             IdleResources.loadingData.decrement()
                         }
 
                     }
-                    noButton { }
-                }?.build()
+                    cancelButton {}
+                }
 
-                alertDialog?.show()
+                alert?.show()
             } else {
                 scriptViewModel.showFiles(selectedFile)
             }

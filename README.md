@@ -17,7 +17,7 @@
 
 # MiraiAndroid
 
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android Pull Request & Master CI?style=flat-square">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android Build?style=flat-square">
 
 <img alt="GitHub issues" src="https://img.shields.io/github/issues/mzdluo123/MiraiAndroid?style=flat-square">
 
@@ -25,13 +25,13 @@
 
 mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口
 
-关于mirai项目的一切请点击[这里](https://github.com/mamoe/mirai)
+关于mirai项目以及mirai-console的一切请点击[这里](https://github.com/mamoe/mirai)
 
 相比使用`Termux`或者是`Linux Deploy`等应用运行mirai的方案，该项目提供的方案具有更好的性能以及更少的资源占用，但可能存在兼容性问题
 
 最新的构建版本你可以到release或QQ群内找到
 
-更多信息请加QQ群`655057127`了解
+MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内相关规定或是有其他不当行为你可能会被无理由移出本群
 
 图标以及形象由画师<a href = "https://github.com/DazeCake">DazeCake</a>绘制
 

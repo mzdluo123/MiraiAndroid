@@ -21,7 +21,8 @@ import kotlinx.android.synthetic.main.fragment_script.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.*
+import splitties.alertdialog.appcompat.*
+import splitties.toast.toast
 
 class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFragmentListener {
     companion object {
@@ -116,9 +117,11 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
             importScript(uri, scriptType)
             return
         }
-        val typeList = listOf("Lua", "JavaScript", "Python", "KotlinScript")
-        context?.selector("未知脚本的后缀名，请手动选择脚本类型", typeList) { _, type ->
-            importScript(uri, type + 1)
+        context?.alertDialog {
+            title = "未知脚本的后缀名，请手动选择脚本类型"
+            setItems(arrayOf("Lua", "JavaScript", "Python", "KotlinScript")) { _, type ->
+                importScript(uri, type + 1)
+            }
         }
     }
 
@@ -139,11 +142,12 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     override fun onDeleteScript(index: Int) {
-        context?.alert("删除脚本后无法恢复，是否确定？") {
-            yesButton {
+        context?.alertDialog {
+            message = "删除脚本后无法恢复，是否确定？"
+            okButton {
                 scriptViewModel.deleteScript(index)
             }
-            noButton { }
+            cancelButton { }
         }?.show()
     }
 
@@ -152,12 +156,13 @@ class ScriptFragment : Fragment(), ScriptInfoDialogFragment.ScriptInfoDialogFrag
     }
 
     override fun onReloadScript(index: Int) {
-        context?.alert("重新加载该脚本？") {
-            yesButton {
+        context?.alertDialog {
+            message = "重新加载该脚本？"
+            okButton {
                 scriptViewModel.reloadScript(index)
                 requireContext().toast("重载完毕")
             }
-            noButton { }
+            cancelButton { }
         }?.show()
     }
 

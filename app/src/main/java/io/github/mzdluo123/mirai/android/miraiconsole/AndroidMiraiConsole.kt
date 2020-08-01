@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
@@ -23,21 +24,20 @@ import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.SimpleLogger
+import splitties.experimental.ExperimentalSplittiesApi
 
+@ExperimentalSplittiesApi
 @ExperimentalUnsignedTypes
 class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
-    private val logBuffer = BotApplication.getSettingPreference()
-        .getString("log_buffer_preference", "300")!!.toInt()
-    private val printToLogcat =
-        BotApplication.getSettingPreference().getBoolean("print_to_logcat_preference", false)
+    private val logBuffer = AppSettings.logBuffer
+    private val printToLogcat = AppSettings.printToLogcat
     val logStorage = LoopQueue<String>(logBuffer)
     val loginSolver =
         AndroidLoginSolver(context)
 
     // 使用一个[60s/refreshPerMinute]的数组存放每4秒消息条数
     // 读取时增加最新一分钟，减去最老一分钟
-    private val refreshPerMinute = BotApplication.getSettingPreference()
-        .getString("status_refresh_count", "15")!!.toInt() // 4s
+    private val refreshPerMinute = AppSettings.refreshPerMinute
     private val msgSpeeds = IntArray(refreshPerMinute)
     private var refreshCurrentPos = 0
 

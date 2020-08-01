@@ -14,7 +14,7 @@ import android.os.PowerManager
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.FileProvider
-import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.NotificationFactory
@@ -51,9 +51,7 @@ class BotService : Service(), CommandOwner {
     private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
-    private val allowPushMsg =
-        BotApplication.getSettingPreference()
-            .getBoolean("allow_push_msg_preference", false)
+    private val allowPushMsg = AppSettings.allowPushMsg
 
 // 多进程调试辅助
 //  init {

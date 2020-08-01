@@ -10,6 +10,7 @@
         android:id="@+id/main_scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
+
         app:layout_constraintBottom_toTopOf="@+id/command_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +56,7 @@
         android:id="@+id/shortcutBottom_btn"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+        android:src="@drawable/ic_baseline_keyboard_arrow_up_24"
         android:tint="@color/colorBtnImg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
