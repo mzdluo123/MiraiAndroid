@@ -39,19 +39,19 @@ class PluginImportActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_plugin_import)
 //        uri = Uri.parse(intent.getStringExtra("uri"))
-        try {
-            uri = intent.data ?: return
-            pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
-            activityPluginImportBinding =
-                DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)
-            lifecycleScope.launch(Dispatchers.IO) { loadPluginData() }
-            activityPluginImportBinding.importBtn.setOnClickListener {
-                startImport()
-            }
-        } catch (e: Exception) {
+
+        val errorHandel = CoroutineExceptionHandler { _, _ ->
             Toast.makeText(this, "无法打开这个文件，请检查这是不是一个合法的插件jar文件", Toast.LENGTH_SHORT).show()
             finish()
-            return
+
+        }
+        uri = intent.data ?: return
+        pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
+        activityPluginImportBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)
+        lifecycleScope.launch(errorHandel) { loadPluginData() }
+        activityPluginImportBinding.importBtn.setOnClickListener {
+            startImport()
         }
 
     }
@@ -129,7 +129,7 @@ class PluginImportActivity : AppCompatActivity() {
     }
 
 
-    private suspend fun loadPluginData() {
+    private suspend fun loadPluginData() = withContext(Dispatchers.IO) {
         val realFileName = "tmpfile.jar"
         baseContext.copyToFileDir(uri, realFileName, cacheDir.absolutePath)
         val cacheFile = File(cacheDir.absolutePath, realFileName)
