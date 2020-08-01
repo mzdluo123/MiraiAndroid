@@ -36,24 +36,26 @@
 
             <Button
                 android:id="@+id/btn_exit"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_exit_to_app_24dp"
                 android:text="退出应用"
+                android:textColor="@color/color_drawer_item"
                 android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btn_reboot"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_restore_24"
                 android:text="快速重启"
+                android:textColor="@color/color_drawer_item"
                 android:textSize="14sp" />
 
         </LinearLayout>
