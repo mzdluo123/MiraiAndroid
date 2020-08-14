@@ -23,6 +23,8 @@
 
 <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
 
+<h2>因mirai协议支持库已archive，本项目后续只提供ui方面的更新，不提供任何功能方面的更新</h2>
+
 mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口
 
 关于mirai项目以及mirai-console的一切请点击[这里](https://github.com/mamoe/mirai)
