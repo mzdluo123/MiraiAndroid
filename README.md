@@ -23,8 +23,6 @@
 
 <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
 
-<h2>因mirai协议支持库已archive，本项目后续只提供ui方面的更新，不提供任何功能方面的更新</h2>
-
 mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口
 
 关于mirai项目以及mirai-console的一切请点击[这里](https://github.com/mamoe/mirai)
@@ -36,6 +34,22 @@ mirai-console的Android前端程序，可作为qq机器人使用，支持多种�
 MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内相关规定或是有其他不当行为你可能会被无理由移出本群
 
 图标以及形象由画师<a href = "https://github.com/DazeCake">DazeCake</a>绘制
+
+## 声明
+
+### 一切开发旨在学习，请勿用于非法用途
+- MiraiAndroid 是完全免费且开放源代码的软件，仅供学习和娱乐用途使用
+- MiraiAndroid 不会通过任何方式强制收取费用，或对使用者提出物质条件
+- MiraiAndroid 由整个开源社区维护，并不是属于某个个体的作品，所有贡献者都享有其作品的著作权。
+
+### 许可证
+
+**协议原版权归属腾讯科技股份有限公司所有，本项目其他代码遵守**：  
+[**GNU AFFERO GENERAL PUBLIC LICENSE version 3**](https://www.gnu.org/licenses/agpl-3.0.html)(简称 `AGPLv3`)，建立在额外要求上:
+- **所有衍生软件 *(衍生软件: 间接或直接接触到 mirai, 即使没有修改 mirai 源码的软件)* 必须使用相同协议 (AGPLv3) 开源**
+- **尽管 `AGPLv3` 有其他说明，本软件及其所有衍生作品禁止用于一切商业活动**
+- **尽管 `AGPLv3` 有其他说明，本软件及其所有衍生作品禁止收费传递, 或传递时不提供源代码**
+
 
 # 已实现的功能
 
