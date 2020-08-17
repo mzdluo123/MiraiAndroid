@@ -166,16 +166,20 @@ class ConsoleFragment : Fragment() {
 
     private fun setAutoLogin() {
         val alertView = View.inflate(activity, R.layout.dialog_autologin, null)
-        val pwdInput = alertView.findViewById<EditText>(R.id.password_input)
-        val qqInput = alertView.findViewById<EditText>(R.id.qq_input)
+        val pwdInput = alertView.findViewById<EditText>(R.id.password_input).text.toString()
+        val qqInput = alertView.findViewById<EditText>(R.id.qq_input).text.toString()
         val accountStore = requireActivity().getSharedPreferences("account", Context.MODE_PRIVATE)
         val dialog = AlertDialog.Builder(activity)
             .setView(alertView)
             .setCancelable(true)
             .setTitle("设置自动登录")
-            .setPositiveButton("设置自动登录") { _, _ ->
-                accountStore.edit().putLong("qq", qqInput.text.toString().toLong())
-                    .putString("pwd", md5(pwdInput.text.toString())).apply()
+            .setPositiveButton("设置自动登录") { dialog, _ ->
+                if (qqInput.isBlank() or pwdInput.isBlank()) {
+                    toast("请输入账号或密码")
+                    dialog.dismiss()
+                }
+                accountStore.edit().putLong("qq", qqInput.toLong())
+                    .putString("pwd", md5(pwdInput)).apply()
                 Toast.makeText(activity, "设置成功,重启后生效", Toast.LENGTH_SHORT).show()
             }
 
