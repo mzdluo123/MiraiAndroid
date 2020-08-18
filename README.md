@@ -258,7 +258,7 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 我们已经测试无问题的Android版本：
 
 * Android 10
-* Android 8.1（无法在Android端编译部分插件）
+* Android 8.1（无法在Android端编译插件）
 
 其他版本还未进行测试，以下是测试要求：
 
