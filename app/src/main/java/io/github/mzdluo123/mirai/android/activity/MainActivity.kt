@@ -86,9 +86,11 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             toast("检查更新失败")
             throwable.printStackTrace()
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
+            finish()
+            BotApplication.context.stopBotService()
         }
 
-        if (BuildConfig.DEBUG) {
+        if (!BuildConfig.DEBUG) {
             toast("跳过更新检查")
         } else {
             lifecycleScope.launch(exceptionHandler) {
@@ -119,7 +121,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
         val json =
             BotApplication.json.value.parseToJsonElement(rep ?: throw IllegalStateException("返回为空"))
-        if (json.jsonObject.contains("url")) {
+        if (json.jsonObject.containsKey("url")) {
             val body = json.jsonObject["body"]?.jsonPrimitive?.content ?: "暂无更新记录"
             val htmlUrl = json.jsonObject["html_url"]!!.jsonPrimitive.content
             val version = json.jsonObject["tag_name"]!!.jsonPrimitive.content
@@ -133,6 +135,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                     }
                 }.show()
             }
+        } else {
+            throw IllegalStateException("检查更新失败")
         }
     }
 
