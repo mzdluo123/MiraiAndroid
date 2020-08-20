@@ -35,6 +35,24 @@ MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内�
 
 图标以及形象由画师<a href = "https://github.com/DazeCake">DazeCake</a>绘制
 
+## 声明
+
+### 一切开发旨在学习，请勿用于非法用途
+- MiraiAndroid 是完全免费且开放源代码的软件，仅供学习和娱乐用途使用
+- MiraiAndroid 不会通过任何方式强制收取费用，或对使用者提出物质条件
+- MiraiAndroid 由整个开源社区维护，并不是属于某个个体的作品，所有贡献者都享有其作品的著作权。
+
+### 许可证
+
+**协议原版权归属腾讯科技股份有限公司所有，本项目其他代码遵守**：  
+[**GNU AFFERO GENERAL PUBLIC LICENSE version 3 with Mamoe Exceptions**](https://github.com/mamoe/mirai/blob/master/LICENSE) （简称 `AGPLv3 with Mamoe Exceptions`）, 建立在 [**GNU AFFERO GENERAL PUBLIC LICENSE version 3**](https://www.gnu.org/licenses/agpl-3.0.html) （简称 `AGPLv3`）的基础之上添加额外条件。
+
+如果与 `AGPLv3` 冲突，则以 `AGPLv3 with Mamoe Exceptions` 的如下额外条件为准。
+
+- **所有衍生软件 *(衍生软件: 间接或直接接触到 mirai, 即使没有修改 mirai 源码的软件)* 必须使用相同协议 (AGPLv3 with Mamoe Exceptions) 开源**
+- **本软件禁止用于一切商业活动**
+- **本软件禁止收费传递, 或在传递时不提供源代码**
+
 # 已实现的功能
 
 * 兼容mirai-console插件(实验性)
@@ -240,7 +258,7 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 我们已经测试无问题的Android版本：
 
 * Android 10
-* Android 8.1（无法在Android端编译部分插件）
+* Android 8.1（无法在Android端编译插件）
 
 其他版本还未进行测试，以下是测试要求：
 
