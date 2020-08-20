@@ -7,10 +7,9 @@ import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.UnstableDefault
 
 @OptIn(ExperimentalUnsignedTypes::class)
-@UnstableDefault
+
 suspend fun paste(text: String): String {
     return withContext(Dispatchers.IO) {
         val res = BotApplication.httpClient.value.post<HttpResponse>("https://paste.ubuntu.com/") {

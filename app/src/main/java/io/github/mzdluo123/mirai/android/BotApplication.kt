@@ -10,9 +10,7 @@ import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.HttpClient
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.ToastConfigurationBuilder
@@ -20,14 +18,13 @@ import org.acra.data.StringFormat
 
 @ExperimentalUnsignedTypes
 class BotApplication : Application() {
-    @UnstableDefault
     companion object {
 
         lateinit var context: BotApplication
             private set
 
         val httpClient = lazy { HttpClient() }
-        val json = lazy { Json(JsonConfiguration.Default) }
+        val json = lazy { Json { } }
 
     }
 

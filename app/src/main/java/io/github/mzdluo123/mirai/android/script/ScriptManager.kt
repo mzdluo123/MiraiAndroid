@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.utils.copyToFileDir
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import java.io.File
@@ -21,7 +20,6 @@ class ScriptManager(
         get() = bots.size
 
     @ExperimentalUnsignedTypes
-    @UnstableDefault
     companion object {
         val instance: ScriptManager by lazy {
             val context: Context = BotApplication.context
@@ -32,7 +30,7 @@ class ScriptManager(
 
         fun unPackHostInfos(infoStrings: Array<String>): List<ScriptHost.ScriptInfo> =
             List(infoStrings.size) {
-                Json.parse(ScriptHost.ScriptInfo.serializer(), infoStrings[it])
+                Json.decodeFromString(ScriptHost.ScriptInfo.serializer(), infoStrings[it])
             }
 
         fun copyFileToScriptDir(context: Context, uri: Uri, name: String): File =

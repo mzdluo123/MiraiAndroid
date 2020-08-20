@@ -6,11 +6,9 @@ import android.content.Intent
 import android.os.Build
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.service.BotService
-import kotlinx.serialization.ImplicitReflectionSerializer
 import splitties.experimental.ExperimentalSplittiesApi
 
 @ExperimentalSplittiesApi
-@ImplicitReflectionSerializer
 class BootReceiver : BroadcastReceiver() {
     //    companion object{
 //        const val TAG = "BootReceiver"

@@ -5,7 +5,6 @@ import android.os.Build
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
-import kotlinx.serialization.UnstableDefault
 import splitties.experimental.ExperimentalSplittiesApi
 import java.text.SimpleDateFormat
 
@@ -22,7 +21,6 @@ class MiraiAndroidStatus (
 ) {
     @ExperimentalSplittiesApi
     @ExperimentalUnsignedTypes
-    @UnstableDefault
     companion object {
         var startTime: Long = 0
         fun recentStatus(context: Context = BotApplication.context): MiraiAndroidStatus =

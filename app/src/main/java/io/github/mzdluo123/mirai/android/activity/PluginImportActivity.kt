@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.UnstableDefault
 import net.lingala.zip4j.ZipFile
 import net.mamoe.mirai.console.plugins.PluginDescription
 import org.yaml.snakeyaml.Yaml
@@ -27,7 +26,6 @@ import java.io.FileReader
 
 
 @ExperimentalUnsignedTypes
-@UnstableDefault
 class PluginImportActivity : AppCompatActivity() {
 
     private lateinit var uri: Uri

@@ -24,7 +24,8 @@ object ScriptHostFactory {
         if (trueType == UNKNOWN) {
             if (configFile.exists()) {
                 FileReader(configFile).apply {
-                    trueType = Json.parse(ScriptHost.ScriptConfig.serializer(), readText()).type
+                    trueType =
+                        Json.decodeFromString(ScriptHost.ScriptConfig.serializer(), readText()).type
                 }.close()
                 if (trueType == UNKNOWN) trueType = getTypeFromSuffix(scriptFile.getSuffix())
             } else {

@@ -8,12 +8,10 @@ import io.github.mzdluo123.mirai.android.utils.DexCompiler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.UnstableDefault
 import java.io.File
 
 
 @ExperimentalUnsignedTypes
-@UnstableDefault
 class PluginViewModel : ViewModel() {
     val pluginList = MutableLiveData<List<File>>()
 

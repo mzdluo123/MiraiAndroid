@@ -1,7 +1,6 @@
 package io.github.mzdluo123.mirai.android.script
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
@@ -33,23 +32,23 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
     lateinit var config: ScriptConfig
     lateinit var info: ScriptInfo
 
-    @OptIn(UnstableDefault::class)
+
     fun load() {
         info = onCreate()
         if (configFile.exists()) {
             val reader = FileReader(configFile)
             val text = reader.readText()
             reader.close()
-            config = Json.parse(ScriptConfig.serializer(), text)
+            config = Json.decodeFromString(ScriptConfig.serializer(), text)
         }
         info.scriptType = config.type
         info.enable = config.enable
         saveConfig()
     }
 
-    @OptIn(UnstableDefault::class)
+
     fun getInfoString(): String {
-        return Json.stringify(ScriptInfo.serializer(), info)
+        return Json.encodeToString(ScriptInfo.serializer(), info)
     }
     fun disable() = onDisable()
     fun enable() = onEnable()
@@ -64,9 +63,9 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
     protected abstract fun onDisable() //脚本被禁用事件
     protected abstract fun onEnable() //脚本被启用事件
 
-    @OptIn(UnstableDefault::class)
+
     fun saveConfig() {
-        val data = Json.stringify(ScriptConfig.serializer(), config)
+        val data = Json.encodeToString(ScriptConfig.serializer(), config)
         if (!configFile.exists()) configFile.createNewFile()
         val writer = FileWriter(configFile)
         writer.write(data)

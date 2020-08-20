@@ -141,5 +141,4 @@ class PluginsAdapter() :
         holder.setText(R.id.pluginName_text, item.name)
         holder.setText(R.id.pluginSize_text, "${item.length() / 1024}kb")
     }
-
 }
