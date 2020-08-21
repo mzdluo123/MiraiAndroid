@@ -1,37 +1,43 @@
+@file:Suppress(
+    "EXPERIMENTAL_API_USAGE",
+    "DEPRECATION_ERROR",
+    "OverridingDeprecatedMember",
+    "INVISIBLE_REFERENCE",
+    "INVISIBLE_MEMBER"
+)
 package io.github.mzdluo123.mirai.android.miraiconsole
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.service.BotService
-import io.github.mzdluo123.mirai.android.utils.LoopQueue
-import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.utils.MiraiConsoleUI
+import net.mamoe.mirai.console.MiraiConsoleFrontEnd
+import net.mamoe.mirai.console.command.ConsoleCommandSender
+import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotOfflineEvent
 import net.mamoe.mirai.event.events.BotReloginEvent
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
+import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.LoginSolver
-import net.mamoe.mirai.utils.SimpleLogger
+import net.mamoe.mirai.utils.MiraiLogger
 import splitties.experimental.ExperimentalSplittiesApi
 
+@ConsoleExperimentalAPI
 @ExperimentalSplittiesApi
 @ExperimentalUnsignedTypes
-class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
-    private val logBuffer = AppSettings.logBuffer
-    private val printToLogcat = AppSettings.printToLogcat
-    val logStorage = LoopQueue<String>(logBuffer)
+class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleCommandSender() {
+
     val loginSolver =
         AndroidLoginSolver(context)
 
@@ -43,45 +49,49 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     private var sendOfflineMsgJob: Job? = null
 
-    companion object {
-        const val TAG = "MA"
-    }
+
+    override val name: String
+        get() = ""
+    override val version: String
+        get() = ""
 
     override fun createLoginSolver(): LoginSolver = loginSolver
 
-    override fun prePushBot(identity: Long) = Unit
+    override fun loggerFor(identity: String?): MiraiLogger = MiraiAndroidLogger
 
     override fun pushBot(bot: Bot) {
         bot.pushToScriptManager(ScriptManager.instance)
         bot.subscribeBotLifeEvent()
         bot.startRefreshNotificationJob()
-    }
-
-    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
-
-    override fun pushLog(identity: Long, message: String) {
-        logStorage.add(message)
-        if (printToLogcat) {
-            Log.i(TAG, message)
-        }
-    }
-
-    override fun pushLog(
-        priority: SimpleLogger.LogPriority,
-        identityStr: String,
-        identity: Long,
-        message: String
-    ) {
-        logStorage.add("[${priority.name}] $message")
-        if (printToLogcat) {
-            Log.i(TAG, "[${priority.name}] $message")
-        }
 
     }
 
-    override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
-        logStorage.add(MiraiAndroidStatus.recentStatus().format())
-    }
+
+//    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
+//
+//    override fun pushLog(identity: Long, message: String) {
+//        logStorage.add(message)
+//        if (printToLogcat) {
+//            Log.i(TAG, message)
+//        }
+//    }
+//
+//    override fun pushLog(
+//        priority: SimpleLogger.LogPriority,
+//        identityStr: String,
+//        identity: Long,
+//        message: String
+//    ) {
+//        logStorage.add("[${priority.name}] $message")
+//        if (printToLogcat) {
+//            Log.i(TAG, "[${priority.name}] $message")
+//        }
+//
+//    }
+//
+//    override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
+//        logStorage.add(MiraiAndroidStatus.recentStatus().format())
+//    }
 
     override suspend fun requestInput(hint: String): String = ""
 
@@ -116,7 +126,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     private suspend fun Bot.downloadAvatar(): Bitmap =
         try {
-            pushLog(0L, "[INFO] 正在加载头像....")
+            logger.info("[INFO] 正在加载头像....")
             HttpClient().get<ByteArray>(selfQQ.avatarUrl).let { avatarData ->
                 BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
             }
@@ -151,10 +161,10 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
                 }
             }
 
-            pushLog(0L, "[INFO] 发送离线通知....")
+            logger.info("[INFO] 发送离线通知....")
         }
         subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
-            pushLog(0L, "[INFO] 发送上线通知....")
+            logger.info("[INFO] 发送上线通知....")
             if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
                 sendOfflineMsgJob!!.cancel()
             }
@@ -165,5 +175,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleUI {
 
     private fun Bot.pushToScriptManager(manager: ScriptManager) {
         launch { manager.addBot(this@pushToScriptManager) }
+    }
+
+    override suspend fun sendMessage(message: Message) {
+        MiraiAndroidLogger.info(message.toString())
     }
 }

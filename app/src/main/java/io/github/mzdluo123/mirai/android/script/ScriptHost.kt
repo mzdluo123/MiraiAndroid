@@ -1,9 +1,9 @@
 package io.github.mzdluo123.mirai.android.script
 
+import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsole
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
@@ -28,7 +28,7 @@ abstract class ScriptHost(val scriptFile: File, val configFile: File) {
     )
 
     protected val logger: (String) -> Unit =
-        { MiraiConsole.frontEnd.pushLog(0L, "[${ScriptHostFactory.NAMES[config.type]}] $it") }
+        { MiraiAndroidLogger.info(it) }
     lateinit var config: ScriptConfig
     lateinit var info: ScriptInfo
 

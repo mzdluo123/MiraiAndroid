@@ -163,7 +163,7 @@ dependencies {
 
 
 //  https://mvnrepository.com/artifact/net.mamoe/mirai-console
-// implementation group: 'net.mamoe', name: 'mirai-console', version: '0.5.1'
+ implementation group: 'net.mamoe', name: 'mirai-console', version: '1.0-M2-1'
 // implementation "net.mamoe:mirai-core:0.39.1"
 // https://mvnrepository.com/artifact/org.yaml/snakeyaml
 // https://mvnrepository.com/artifact/com.moandjiezana.toml/toml4j

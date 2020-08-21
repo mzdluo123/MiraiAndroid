@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
-import net.mamoe.mirai.console.plugins.PluginDescription
+
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileReader
@@ -135,10 +135,10 @@ class PluginImportActivity : AppCompatActivity() {
         zipFile.extractFile("plugin.yml", cacheDir.absolutePath)
 
         val yml = Yaml()
-        lateinit var plugInfo: PluginDescription
+        lateinit var plugInfo: PluginInfo
         FileReader(File(cacheDir.absolutePath, "plugin.yml")).use {
             with(yml.load<LinkedHashMap<String, Any>>(it)) {
-                plugInfo = PluginDescription(
+                plugInfo = PluginInfo(
                     file = File(cacheDir.absolutePath, "tmpfile.jar"),
                     name = this.get("name") as String,
                     author = kotlin.runCatching {
@@ -161,11 +161,6 @@ class PluginImportActivity : AppCompatActivity() {
                     }.getOrElse {
                         "unknown"
                     },
-                    depends = kotlin.runCatching {
-                        this.get("depends") as List<String>
-                    }.getOrElse {
-                        listOf()
-                    }
                 )
 
             }
@@ -175,7 +170,15 @@ class PluginImportActivity : AppCompatActivity() {
 
         }
 
-
     }
 }
+
+data class PluginInfo(
+    val file: File,
+    val name: String,
+    val author: String,
+    val basePath: String,
+    val version: String,
+    val info: String
+)
 

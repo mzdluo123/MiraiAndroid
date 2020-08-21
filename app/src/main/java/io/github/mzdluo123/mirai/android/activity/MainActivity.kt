@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             BotApplication.context.stopBotService()
         }
 
-        if (!BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             toast("跳过更新检查")
         } else {
             lifecycleScope.launch(exceptionHandler) {

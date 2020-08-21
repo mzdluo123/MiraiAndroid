@@ -7,7 +7,6 @@ import io.github.mzdluo123.mirai.android.activity.CaptchaActivity
 import io.github.mzdluo123.mirai.android.activity.UnsafeLoginActivity
 import kotlinx.coroutines.CompletableDeferred
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.utils.LoginSolver
 
 
@@ -22,7 +21,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     }
 
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
-        MiraiConsole.frontEnd.pushLog(0L,"本次登录需要输入验证码，请在通知栏点击通知来输入")
+        MiraiAndroidLogger.info("本次登录需要输入验证码，请在通知栏点击通知来输入")
         verificationResult = CompletableDeferred()
         captchaData = data
         NotificationManagerCompat.from(context).apply {
@@ -49,7 +48,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     }
 
     private fun sendVerifyNotification() {
-        MiraiConsole.frontEnd.pushLog(0L,"本次登录需要进行验证，请在通知栏点击通知进行验证")
+        MiraiAndroidLogger.info("本次登录需要进行验证，请在通知栏点击通知进行验证")
 
         NotificationManagerCompat.from(context).apply {
             notify(
