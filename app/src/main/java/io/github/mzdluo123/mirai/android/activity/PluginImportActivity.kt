@@ -19,8 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
+import net.mamoe.yamlkt.Yaml
 
-import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileReader
 
@@ -137,27 +137,27 @@ class PluginImportActivity : AppCompatActivity() {
         val yml = Yaml()
         lateinit var plugInfo: PluginInfo
         FileReader(File(cacheDir.absolutePath, "plugin.yml")).use {
-            with(yml.load<LinkedHashMap<String, Any>>(it)) {
+            with(yml.decodeMapFromString(it.readText())) {
                 plugInfo = PluginInfo(
                     file = File(cacheDir.absolutePath, "tmpfile.jar"),
                     name = this.get("name") as String,
                     author = kotlin.runCatching {
-                        this.get("author") as String
+                        this["author"] as String
                     }.getOrElse {
                         "unknown"
                     },
                     basePath = kotlin.runCatching {
-                        this.get("path") as String
+                        this["path"] as String
                     }.getOrElse {
-                        this.get("main") as String
+                        this["main"] as String
                     },
                     version = kotlin.runCatching {
-                        this.get("version") as String
+                        this["version"] as String
                     }.getOrElse {
                         "unknown"
                     },
                     info = kotlin.runCatching {
-                        this.get("info") as String
+                        this["info"] as String
                     }.getOrElse {
                         "unknown"
                     },

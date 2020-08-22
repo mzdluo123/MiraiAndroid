@@ -18,9 +18,9 @@ private val printToSysLog = AppSettings.printToLogcat
 @OptIn(ExperimentalSplittiesApi::class)
 object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
-        logStorage.add("[${priority.simpleName}] ${message ?: e}")
+        logStorage.add("[${priority.name}] ${message ?: e}")
         if (printToSysLog) {
-            Log.i("MA", "[${priority.simpleName}] ${message ?: e}")
+            Log.i("MA", "[${priority.name}] ${message ?: e}")
         }
     }) {
     val logs: MutableList<String>

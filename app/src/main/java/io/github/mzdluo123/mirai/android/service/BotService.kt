@@ -28,10 +28,7 @@ import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleFrontEnd
@@ -39,7 +36,9 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.executeCommand
 import net.mamoe.mirai.console.command.ConsoleCommandSender
+import net.mamoe.mirai.console.plugin.DeferredPluginLoader
 import net.mamoe.mirai.console.plugin.PluginLoader
+import net.mamoe.mirai.console.plugin.jvm.JarPluginLoader
 import net.mamoe.mirai.console.setting.MultiFileSettingStorage
 import net.mamoe.mirai.console.setting.SettingStorage
 import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
@@ -264,7 +263,7 @@ class BotService : Service(), MiraiConsoleImplementation {
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
-                launch {
+                runBlocking {
                     consoleFrontEnd.executeCommand(cmd)
                 }
             }
@@ -357,7 +356,7 @@ class BotService : Service(), MiraiConsoleImplementation {
     }
 
     override val builtInPluginLoaders: List<PluginLoader<*, *>>
-        get() = listOf()
+        get() = listOf(DeferredPluginLoader { JarPluginLoader })
     override val consoleCommandSender: ConsoleCommandSender
         get() = consoleFrontEnd
     override val coroutineContext: CoroutineContext
@@ -371,7 +370,7 @@ class BotService : Service(), MiraiConsoleImplementation {
     override val rootDir: File
         get() = getExternalFilesDir(null)!!.absoluteFile
     override val settingStorageForBuiltIns: SettingStorage
-        get() = MultiFileSettingStorage(filesDir)
+        get() = MultiFileSettingStorage(getExternalFilesDir(null)!!.absoluteFile)
     override val settingStorageForJarPluginLoader: SettingStorage
         get() = MultiFileSettingStorage(File(getExternalFilesDir(null)!!.absoluteFile, "data"))
 

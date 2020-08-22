@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.service.BotService
@@ -51,9 +52,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
 
 
     override val name: String
-        get() = ""
+        get() = "MiraiAndroid"
     override val version: String
-        get() = ""
+        get() = BuildConfig.VERSION_NAME
 
     override fun createLoginSolver(): LoginSolver = loginSolver
 
@@ -126,7 +127,7 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
 
     private suspend fun Bot.downloadAvatar(): Bitmap =
         try {
-            logger.info("[INFO] 正在加载头像....")
+            logger.info("正在加载头像....")
             HttpClient().get<ByteArray>(selfQQ.avatarUrl).let { avatarData ->
                 BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
             }
@@ -161,10 +162,10 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
                 }
             }
 
-            logger.info("[INFO] 发送离线通知....")
+            logger.info("发送离线通知....")
         }
         subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
-            logger.info("[INFO] 发送上线通知....")
+            logger.info("发送上线通知....")
             if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
                 sendOfflineMsgJob!!.cancel()
             }

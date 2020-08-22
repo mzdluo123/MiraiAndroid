@@ -138,7 +138,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //yaml
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    implementation 'net.mamoe.yamlkt:yamlkt:0.4.0'
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
     //okhttp3
@@ -165,7 +165,5 @@ dependencies {
 //  https://mvnrepository.com/artifact/net.mamoe/mirai-console
  implementation group: 'net.mamoe', name: 'mirai-console', version: '1.0-M2-1'
 // implementation "net.mamoe:mirai-core:0.39.1"
-// https://mvnrepository.com/artifact/org.yaml/snakeyaml
-// https://mvnrepository.com/artifact/com.moandjiezana.toml/toml4j
 
 }
