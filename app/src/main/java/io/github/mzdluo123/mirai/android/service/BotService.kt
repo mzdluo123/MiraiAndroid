@@ -154,6 +154,9 @@ class BotService : Service(), MiraiConsoleImplementation {
             }
         }
 
+        // 新的自动登录
+        //MiraiConsole.addBot().alsoLogin()
+
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         MiraiConsole.frontEnd.pushBot(bot)
     }
@@ -370,9 +373,18 @@ class BotService : Service(), MiraiConsoleImplementation {
     override val rootDir: File
         get() = getExternalFilesDir(null)!!.absoluteFile
     override val settingStorageForBuiltIns: SettingStorage
-        get() = MultiFileSettingStorage(getExternalFilesDir(null)!!.absoluteFile)
+        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "files/settings").also {
+            if (!it.exists()) {
+                it.mkdir()
+            }
+        })
     override val settingStorageForJarPluginLoader: SettingStorage
-        get() = MultiFileSettingStorage(File(getExternalFilesDir(null)!!.absoluteFile, "data"))
+        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "files/data").also {
+            if (!it.exists()) {
+
+                it.mkdir()
+            }
+        })
 
 
 }
