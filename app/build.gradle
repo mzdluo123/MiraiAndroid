@@ -144,8 +144,6 @@ dependencies {
     //okhttp3
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
 
-
-
     //test
     implementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
 
