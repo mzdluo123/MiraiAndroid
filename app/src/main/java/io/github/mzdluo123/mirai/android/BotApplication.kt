@@ -9,11 +9,10 @@ import android.os.Process
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import io.github.mzdluo123.mirai.android.service.BotService
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import kotlinx.serialization.json.Json
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
-import org.acra.config.ToastConfigurationBuilder
 import org.acra.data.StringFormat
 
 @ExperimentalUnsignedTypes
@@ -24,7 +23,7 @@ class BotApplication : Application() {
             private set
 
         val httpClient = lazy { HttpClient() }
-        val json = lazy { Json { } }
+        val json = lazy { Json.Default }
 
     }
 
@@ -51,9 +50,9 @@ class BotApplication : Application() {
             setBuildConfigClass(BuildConfig::class.java)
                 .setReportFormat(StringFormat.JSON)
             setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
-            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
-                .setResText(R.string.acra_toast_text)
-                .setEnabled(true)
+//            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
+//                .setResText(R.string.acra_toast_text)
+//                .setEnabled(true)
             //不知道为什么开启的时候总是显示这个，先暂时禁用
         })
     }
