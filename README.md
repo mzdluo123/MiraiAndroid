@@ -44,14 +44,26 @@ MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内�
 
 ### 许可证
 
-**协议原版权归属腾讯科技股份有限公司所有，本项目其他代码遵守**：  
-[**GNU AFFERO GENERAL PUBLIC LICENSE version 3 with Mamoe Exceptions**](https://github.com/mamoe/mirai/blob/master/LICENSE) （简称 `AGPLv3 with Mamoe Exceptions`）, 建立在 [**GNU AFFERO GENERAL PUBLIC LICENSE version 3**](https://www.gnu.org/licenses/agpl-3.0.html) （简称 `AGPLv3`）的基础之上添加额外条件。
+    Copyright (C) 2019-2020 Mamoe Technologies and contributors.
 
-如果与 `AGPLv3` 冲突，则以 `AGPLv3 with Mamoe Exceptions` 的如下额外条件为准。
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
 
-- **所有衍生软件 *(衍生软件: 间接或直接接触到 mirai, 即使没有修改 mirai 源码的软件)* 必须使用相同协议 (AGPLv3 with Mamoe Exceptions) 开源**
-- **本软件禁止用于一切商业活动**
-- **本软件禁止收费传递, 或在传递时不提供源代码**
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+`MiraiAndroid` 采用 `AGPLv3` 协议开源。为了整个社区的良性发展，我们**强烈建议**您做到以下几点：
+
+- **间接接触（包括但不限于使用 `httpapi` 或 跨进程技术）到 `mirai` 的软件使用 `AGPLv3` 开源**
+- **不鼓励，不支持一切商业使用**
+
 
 # 已实现的功能
 
