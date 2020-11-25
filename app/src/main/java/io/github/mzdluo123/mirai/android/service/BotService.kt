@@ -192,6 +192,7 @@ class BotService : Service(), MiraiConsoleImplementation {
 
         MiraiConsoleImplementation.Companion.instance = this
         this.start()
+        MiraiAndroidLogger.info("工作目录: ${MiraiConsole.rootDir.toString()}")
 //        MiraiConsole.start(
 //            consoleFrontEnd,
 //            consoleVersion = BuildConfig.COREVERSION,
@@ -373,18 +374,9 @@ class BotService : Service(), MiraiConsoleImplementation {
     override val rootDir: File
         get() = getExternalFilesDir(null)!!.absoluteFile
     override val settingStorageForBuiltIns: SettingStorage
-        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "files/settings").also {
-            if (!it.exists()) {
-                it.mkdir()
-            }
-        })
+        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "builtin_settings"))
     override val settingStorageForJarPluginLoader: SettingStorage
-        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "files/data").also {
-            if (!it.exists()) {
-
-                it.mkdir()
-            }
-        })
+        get() = MultiFileSettingStorage(File(getExternalFilesDir(null), "settings"))
 
 
 }
