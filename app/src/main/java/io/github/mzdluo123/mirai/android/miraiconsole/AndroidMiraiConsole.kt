@@ -5,6 +5,7 @@
     "INVISIBLE_REFERENCE",
     "INVISIBLE_MEMBER"
 )
+
 package io.github.mzdluo123.mirai.android.miraiconsole
 
 import android.content.Context
@@ -13,31 +14,46 @@ import android.graphics.BitmapFactory
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.service.BotService
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
+import io.ktor.client.*
+import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.MiraiConsoleFrontEnd
-import net.mamoe.mirai.console.command.ConsoleCommandSender
-import net.mamoe.mirai.console.util.ConsoleExperimentalAPI
+import net.mamoe.mirai.console.ConsoleFrontEndImplementation
+import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
+import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
+import net.mamoe.mirai.console.data.PluginDataStorage
+import net.mamoe.mirai.console.internal.MiraiConsoleBuildConstants
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
+import net.mamoe.mirai.console.plugin.loader.PluginLoader
+import net.mamoe.mirai.console.util.ConsoleInput
+import net.mamoe.mirai.console.util.NamedSupervisorJob
+import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.event.Listener
 import net.mamoe.mirai.event.events.BotOfflineEvent
 import net.mamoe.mirai.event.events.BotReloginEvent
+import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
 import splitties.experimental.ExperimentalSplittiesApi
+import java.nio.file.Path
+import java.nio.file.Paths
 
-@ConsoleExperimentalAPI
+@ConsoleFrontEndImplementation
 @ExperimentalSplittiesApi
 @ExperimentalUnsignedTypes
-class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleCommandSender() {
+class AndroidMiraiConsole(
+    val context: Context,
+    rootPath: Path,
+) : MiraiConsoleImplementation,
+    CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid")) {
 
     val loginSolver =
         AndroidLoginSolver(context)
@@ -51,21 +67,49 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
     private var sendOfflineMsgJob: Job? = null
 
 
-    override val name: String
-        get() = "MiraiAndroid"
-    override val version: String
-        get() = BuildConfig.VERSION_NAME
+    @ConsoleFrontEndImplementation
 
-    override fun createLoginSolver(): LoginSolver = loginSolver
+    override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
 
-    override fun loggerFor(identity: String?): MiraiLogger = MiraiAndroidLogger
+    @ConsoleFrontEndImplementation
+    override fun createLogger(identity: String?): MiraiLogger = MiraiAndroidLogger
 
-    override fun pushBot(bot: Bot) {
-        bot.pushToScriptManager(ScriptManager.instance)
-        bot.subscribeBotLifeEvent()
-        bot.startRefreshNotificationJob()
+    @ConsoleFrontEndImplementation
+    override fun createLoginSolver(
+        requesterBot: Long,
+        configuration: BotConfiguration
+    ): LoginSolver = AndroidLoginSolver(context)
 
-    }
+    @ConsoleFrontEndImplementation
+    override val builtInPluginLoaders: List<Lazy<PluginLoader<*, *>>> =
+        listOf(lazy { JvmPluginLoader })
+
+    @ConsoleFrontEndImplementation
+    override val frontEndDescription: MiraiConsoleFrontEndDescription =
+        AndroidConsoleFrontEndDescImpl
+
+    @ConsoleFrontEndImplementation
+    override val consoleCommandSender: MiraiConsoleImplementation.ConsoleCommandSenderImpl =
+        AndroidConsoleCommandSenderImpl
+    override val consoleInput: ConsoleInput
+        get() = AndroidConsoleInput
+
+
+    @ConsoleFrontEndImplementation
+    override val dataStorageForJvmPluginLoader: PluginDataStorage =
+        MultiFilePluginDataStorage(rootPath.resolve("data"))
+
+    @ConsoleFrontEndImplementation
+    override val dataStorageForBuiltIns: PluginDataStorage =
+        MultiFilePluginDataStorage(rootPath.resolve("data"))
+
+    @ConsoleFrontEndImplementation
+    override val configStorageForJvmPluginLoader: PluginDataStorage =
+        MultiFilePluginDataStorage(rootPath.resolve("config"))
+
+    @ConsoleFrontEndImplementation
+    override val configStorageForBuiltIns: PluginDataStorage =
+        MultiFilePluginDataStorage(rootPath.resolve("config"))
 
 
 //    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
@@ -94,10 +138,9 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
 //        logStorage.add(MiraiAndroidStatus.recentStatus().format())
 //    }
 
-    override suspend fun requestInput(hint: String): String = ""
 
     private fun Bot.startRefreshNotificationJob() {
-        subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
+        this.globalEventChannel().subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
         launch {
             val avatar = downloadAvatar()  // 获取通知展示用的头像
             var msgSpeed = 0
@@ -128,7 +171,8 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
     private suspend fun Bot.downloadAvatar(): Bitmap =
         try {
             logger.info("正在加载头像....")
-            HttpClient().get<ByteArray>(selfQQ.avatarUrl).let { avatarData ->
+
+            HttpClient().get<ByteArray>(this.avatarUrl).let { avatarData ->
                 BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
             }
         } catch (e: Exception) {
@@ -178,7 +222,30 @@ class AndroidMiraiConsole(context: Context) : MiraiConsoleFrontEnd, ConsoleComma
         launch { manager.addBot(this@pushToScriptManager) }
     }
 
-    override suspend fun sendMessage(message: Message) {
-        MiraiAndroidLogger.info(message.toString())
+}
+
+
+object AndroidConsoleFrontEndDescImpl : MiraiConsoleFrontEndDescription {
+    override val name: String get() = "Android"
+    override val vendor: String get() = "Mamoe Technologies"
+
+    // net.mamoe.mirai.console.internal.MiraiConsoleBuildConstants.version
+    // is console's version not frontend's version
+    override val version: SemVersion = SemVersion(MiraiConsoleBuildConstants.versionConst)
+}
+
+@ConsoleFrontEndImplementation
+object AndroidConsoleCommandSenderImpl : MiraiConsoleImplementation.ConsoleCommandSenderImpl {
+
+    @JvmSynthetic
+    override suspend fun sendMessage(message: String) {
+        TODO("Not yet implemented")
     }
+
+    @JvmSynthetic
+    override suspend fun sendMessage(message: Message) {
+        TODO("Not yet implemented")
+    }
+
+
 }
