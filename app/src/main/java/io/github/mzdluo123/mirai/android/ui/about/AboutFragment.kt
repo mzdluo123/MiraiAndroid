@@ -33,6 +33,7 @@ class AboutFragment : Fragment() {
             0
         ).versionName
         aboutBinding.coreVersion = BuildConfig.COREVERSION
+        aboutBinding.consoleVersion = BuildConfig.CONSOLEVERSION
         return aboutBinding.root
     }
 
