@@ -155,8 +155,6 @@ class BotService : Service() {
             Log.e("wakeLockError", e.message ?: "null")
         }
         MiraiAndroidStatus.startTime = System.currentTimeMillis()
-
-
         consoleFrontEnd.start()
         MiraiAndroidLogger.info("工作目录: ${MiraiConsole.rootDir}")
 //        MiraiConsole.start(

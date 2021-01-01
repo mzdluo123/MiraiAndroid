@@ -11,6 +11,7 @@ package io.github.mzdluo123.mirai.android.miraiconsole
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
@@ -53,7 +54,12 @@ class AndroidMiraiConsole(
     val context: Context,
     rootPath: Path,
 ) : MiraiConsoleImplementation,
-    CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid")) {
+    CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.e("MiraiAndroid", "发生异常")
+        throwable.printStackTrace()
+
+    }
+    ) {
 
     val loginSolver =
         AndroidLoginSolver(context)
