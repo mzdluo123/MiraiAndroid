@@ -45,7 +45,6 @@ import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
 import splitties.experimental.ExperimentalSplittiesApi
 import java.nio.file.Path
-import java.nio.file.Paths
 
 @ConsoleFrontEndImplementation
 @ExperimentalSplittiesApi
@@ -74,8 +73,7 @@ class AndroidMiraiConsole(
 
 
     @ConsoleFrontEndImplementation
-
-    override val rootPath: Path = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath()
+    override val rootPath: Path = context.getExternalFilesDir("")!!.toPath()
 
     @ConsoleFrontEndImplementation
     override fun createLogger(identity: String?): MiraiLogger = MiraiAndroidLogger
@@ -245,12 +243,12 @@ object AndroidConsoleCommandSenderImpl : MiraiConsoleImplementation.ConsoleComma
 
     @JvmSynthetic
     override suspend fun sendMessage(message: String) {
-        TODO("Not yet implemented")
+        MiraiAndroidLogger.info(message)
     }
 
     @JvmSynthetic
     override suspend fun sendMessage(message: Message) {
-        TODO("Not yet implemented")
+        MiraiAndroidLogger.info(message.contentToString())
     }
 
 

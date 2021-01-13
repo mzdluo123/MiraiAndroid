@@ -36,6 +36,8 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import net.mamoe.mirai.console.command.ConsoleCommandSender
+import net.mamoe.mirai.console.command.executeCommand
 import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.message.data.At
 import splitties.experimental.ExperimentalSplittiesApi
@@ -232,7 +234,7 @@ class BotService : Service() {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
                 runBlocking {
-                    // todo cmd
+                    ConsoleCommandSender.executeCommand(cmd)
                 }
             }
         }

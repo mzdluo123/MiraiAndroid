@@ -6,7 +6,7 @@ apply plugin: 'kotlinx-serialization'
 
 
 def CORE_VERSION = "2.0-M2-1"
-def CONSOLE_VERSION = "2.0-M2"
+def CONSOLE_VERSION = "2.0-RC"
 def LUAMIRAI_VERSION = "0.5.0"
 
 android {
