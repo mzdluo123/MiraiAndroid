@@ -18,11 +18,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.lingala.zip4j.ZipFile
-import net.mamoe.yamlkt.Yaml
-
 import java.io.File
-import java.io.FileReader
 
 
 @ExperimentalUnsignedTypes
@@ -38,8 +34,9 @@ class PluginImportActivity : AppCompatActivity() {
         setContentView(R.layout.activity_plugin_import)
 //        uri = Uri.parse(intent.getStringExtra("uri"))
 
-        val errorHandel = CoroutineExceptionHandler { _, _ ->
+        val errorHandel = CoroutineExceptionHandler { _, e ->
             Toast.makeText(this, "无法打开这个文件，请检查这是不是一个合法的插件jar文件", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
             finish()
 
         }
@@ -47,7 +44,7 @@ class PluginImportActivity : AppCompatActivity() {
         pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
         activityPluginImportBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_plugin_import)
-        lifecycleScope.launch(errorHandel) { loadPluginData() }
+//        lifecycleScope.launch(errorHandel) { loadPluginData() }
         activityPluginImportBinding.importBtn.setOnClickListener {
             startImport()
         }
@@ -113,7 +110,7 @@ class PluginImportActivity : AppCompatActivity() {
                         copyToFileDir(
                             uri,
                             name,
-                            this@PluginImportActivity.getExternalFilesDir("plugins")!!.absolutePath
+                            this@PluginImportActivity.getExternalFilesDir("files/plugins")!!.absolutePath
                         )
                     }
                     dialog.dismiss()
@@ -127,58 +124,6 @@ class PluginImportActivity : AppCompatActivity() {
     }
 
 
-    private suspend fun loadPluginData() = withContext(Dispatchers.IO) {
-        val realFileName = "tmpfile.jar"
-        baseContext.copyToFileDir(uri, realFileName, cacheDir.absolutePath)
-        val cacheFile = File(cacheDir.absolutePath, realFileName)
-        val zipFile = ZipFile(cacheFile)
-        zipFile.extractFile("plugin.yml", cacheDir.absolutePath)
-
-        val yml = Yaml()
-        lateinit var plugInfo: PluginInfo
-        FileReader(File(cacheDir.absolutePath, "plugin.yml")).use {
-            with(yml.decodeMapFromString(it.readText())) {
-                plugInfo = PluginInfo(
-                    file = File(cacheDir.absolutePath, "tmpfile.jar"),
-                    name = this.get("name") as String,
-                    author = kotlin.runCatching {
-                        this["author"] as String
-                    }.getOrElse {
-                        "unknown"
-                    },
-                    basePath = kotlin.runCatching {
-                        this["path"] as String
-                    }.getOrElse {
-                        this["main"] as String
-                    },
-                    version = kotlin.runCatching {
-                        this["version"] as String
-                    }.getOrElse {
-                        "unknown"
-                    },
-                    info = kotlin.runCatching {
-                        this["info"] as String
-                    }.getOrElse {
-                        "unknown"
-                    },
-                )
-
-            }
-            withContext(Dispatchers.Main) {
-                activityPluginImportBinding.pluginData = plugInfo
-            }
-
-        }
-
-    }
 }
 
-data class PluginInfo(
-    val file: File,
-    val name: String,
-    val author: String,
-    val basePath: String,
-    val version: String,
-    val info: String
-)
 

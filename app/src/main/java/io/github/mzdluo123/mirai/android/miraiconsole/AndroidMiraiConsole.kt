@@ -16,7 +16,6 @@ import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.NotificationFactory
-import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -33,6 +32,8 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
+import net.mamoe.mirai.event.events.BotOfflineEvent
+import net.mamoe.mirai.event.events.BotReloginEvent
 import net.mamoe.mirai.event.globalEventChannel
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.Message
@@ -111,38 +112,51 @@ class AndroidMiraiConsole(
     override val configStorageForBuiltIns: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("config"))
 
+    fun afterBotLogin(bot: Bot) {
+        startRefreshNotificationJob(bot)
+        bot.eventChannel.subscribeAlways<BotOfflineEvent>() {
+            if (this is BotOfflineEvent.Force) {
+                NotificationManagerCompat.from(BotApplication.context).apply {
+                    notify(
+                        BotService.OFFLINE_NOTIFICATION_ID,
+                        NotificationFactory.offlineNotification(message, true)
+                    )
+                }
+                return@subscribeAlways
+            }
+            if (this is BotOfflineEvent.Dropped) {
+                sendOfflineMsgJob = GlobalScope.launch {
+                    delay(2000)
+                    if (!isActive) {
+                        return@launch
+                    }
+                    NotificationManagerCompat.from(BotApplication.context).apply {
+                        notify(
+                            BotService.OFFLINE_NOTIFICATION_ID,
+                            NotificationFactory.offlineNotification("请检查网络设置")
+                        )
+                    }
+                }
+            }
 
-//    override fun pushBotAdminStatus(identity: Long, admins: List<Long>) = Unit
-//
-//    override fun pushLog(identity: Long, message: String) {
-//        logStorage.add(message)
-//        if (printToLogcat) {
-//            Log.i(TAG, message)
-//        }
-//    }
-//
-//    override fun pushLog(
-//        priority: SimpleLogger.LogPriority,
-//        identityStr: String,
-//        identity: Long,
-//        message: String
-//    ) {
-//        logStorage.add("[${priority.name}] $message")
-//        if (printToLogcat) {
-//            Log.i(TAG, "[${priority.name}] $message")
-//        }
-//
-//    }
-//
-//    override fun pushVersion(consoleVersion: String, consoleBuild: String, coreVersion: String) {
-//        logStorage.add(MiraiAndroidStatus.recentStatus().format())
-//    }
+            bot.logger.info("发送离线通知....")
+        }
+        bot.eventChannel.subscribeAlways<BotReloginEvent>() {
+            bot.logger.info("发送上线通知....")
+            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
+                sendOfflineMsgJob!!.cancel()
+            }
+            NotificationManagerCompat.from(BotApplication.context)
+                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
+        }
+
+    }
 
 
-    private fun Bot.startRefreshNotificationJob() {
+    private fun startRefreshNotificationJob(bot: Bot) {
         this.globalEventChannel().subscribeMessages { always { msgSpeeds[refreshCurrentPos] += 1 } }
         launch {
-            val avatar = downloadAvatar()  // 获取通知展示用的头像
+            val avatar = downloadAvatar(bot)  // 获取通知展示用的头像
             var msgSpeed = 0
             while (isActive) {
                 /*
@@ -168,59 +182,17 @@ class AndroidMiraiConsole(
         }
     }
 
-    private suspend fun Bot.downloadAvatar(): Bitmap =
+    private suspend fun downloadAvatar(bot: Bot): Bitmap =
         try {
-            logger.info("正在加载头像....")
+            bot.logger.info("正在加载头像....")
 
-            HttpClient().get<ByteArray>(this.avatarUrl).let { avatarData ->
+            HttpClient().get<ByteArray>(bot.avatarUrl).let { avatarData ->
                 BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
             }
         } catch (e: Exception) {
             delay(1000)
-            downloadAvatar()
+            downloadAvatar(bot)
         }
-
-//    private fun Bot.subscribeBotLifeEvent() {
-//        subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
-//            if (this is BotOfflineEvent.Force) {
-//                NotificationManagerCompat.from(BotApplication.context).apply {
-//                    notify(
-//                        BotService.OFFLINE_NOTIFICATION_ID,
-//                        NotificationFactory.offlineNotification(message, true)
-//                    )
-//                }
-//                return@subscribeAlways
-//            }
-//            if (this is BotOfflineEvent.Dropped) {
-//                sendOfflineMsgJob = GlobalScope.launch {
-//                    delay(2000)
-//                    if (!isActive) {
-//                        return@launch
-//                    }
-//                    NotificationManagerCompat.from(BotApplication.context).apply {
-//                        notify(
-//                            BotService.OFFLINE_NOTIFICATION_ID,
-//                            NotificationFactory.offlineNotification("请检查网络设置")
-//                        )
-//                    }
-//                }
-//            }
-//
-//            logger.info("发送离线通知....")
-//        }
-//        subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
-//            logger.info("发送上线通知....")
-//            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
-//                sendOfflineMsgJob!!.cancel()
-//            }
-//            NotificationManagerCompat.from(BotApplication.context)
-//                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
-//        }
-//    }
-
-    private fun Bot.pushToScriptManager(manager: ScriptManager) {
-        launch { manager.addBot(this@pushToScriptManager) }
-    }
 
 }
 
@@ -246,6 +218,5 @@ object AndroidConsoleCommandSenderImpl : MiraiConsoleImplementation.ConsoleComma
     override suspend fun sendMessage(message: Message) {
         MiraiAndroidLogger.info(message.contentToString())
     }
-
 
 }

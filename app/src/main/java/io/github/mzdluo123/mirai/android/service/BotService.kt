@@ -53,7 +53,7 @@ class BotService : Service() {
     private val binder = BotBinder()
     private var isStart = false
     private lateinit var powerManager: PowerManager
-    private lateinit var wakeLock: PowerManager.WakeLock
+    // private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
     private val allowPushMsg = AppSettings.allowPushMsg
@@ -103,22 +103,23 @@ class BotService : Service() {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
-        System.getProperties().setProperty("user.dir", getExternalFilesDir("")!!.absolutePath)
+
         botJob = Job()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
         powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
+//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
 
+    @ConsoleFrontEndImplementation
     private fun autoLogin(intent: Intent) {
         val qq = intent.getLongExtra("qq", 0)
         val pwd = intent.getStringExtra("pwd")
         if (qq == 0L) return
 
         //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
-        MiraiAndroidLogger.info("[INFO] 自动登录....")
+        MiraiAndroidLogger.info("自动登录....")
         val handler = CoroutineExceptionHandler { _, throwable ->
-            MiraiAndroidLogger.info("[ERROR] 自动登录失败 $throwable")
+            MiraiAndroidLogger.info("自动登录失败 $throwable")
         }
 
         // 新的自动登录
@@ -127,6 +128,7 @@ class BotService : Service() {
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
         runBlocking { bot.login() }
+        consoleFrontEnd.afterBotLogin(bot)
     }
 
     private fun registerDefaultCommand() {
@@ -152,11 +154,11 @@ class BotService : Service() {
     private fun startConsole(intent: Intent?) {
         if (isStart) return
         Log.e(TAG, "启动服务")
-        try {
-            wakeLock.acquire()
-        } catch (e: Exception) {
-            Log.e("wakeLockError", e.message ?: "null")
-        }
+//        try {
+//            wakeLock.acquire()
+//        } catch (e: Exception) {
+//            Log.e("wakeLockError", e.message ?: "null")
+//        }
         MiraiAndroidStatus.startTime = System.currentTimeMillis()
         consoleFrontEnd.start()
         MiraiAndroidLogger.info("工作目录: ${MiraiConsole.rootDir}")
@@ -179,9 +181,9 @@ class BotService : Service() {
             unregisterReceiver(msgReceiver)
         }
         ScriptManager.instance.disableAll()
-        if (wakeLock.isHeld) {
-            wakeLock.release()
-        }
+//        if (wakeLock.isHeld) {
+//            wakeLock.release()
+//        }
         botJob.cancel()
         stopForeground(true)
         stopSelf()

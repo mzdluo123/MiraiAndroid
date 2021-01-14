@@ -69,7 +69,9 @@ public class DexCompiler {
                 resources.add(file);
             }
         }
-        newZip.addFiles(resources);
+        if (resources.size() != 0) {
+            newZip.addFiles(resources);
+        }
         newZip.addFolder(new File(tempDir, "META-INF"));
         newFile.renameTo(new File(pluginDir, newFile.getName()));
     }

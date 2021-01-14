@@ -56,7 +56,6 @@
 -keep class net.mamoe.mirai.qqandroid.QQAndroid.$Companion { *; }
 -keepclasseswithmembers class * extends net.mamoe.mirai.BotFactory{ *;}
 
--keep class net.mamoe.mirai.console.** { *; }
 -keep class net.mamoe.mirai.contact.** { *; }
 -keep class net.mamoe.mirai.event.** { *; }
 -keep class net.mamoe.mirai.message.** { *; }
@@ -85,3 +84,5 @@
 # okhttp
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
+
+-keep class net.mamoe.mirai.console.** {*;}
