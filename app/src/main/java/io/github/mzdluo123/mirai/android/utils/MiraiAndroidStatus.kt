@@ -8,16 +8,16 @@ import io.github.mzdluo123.mirai.android.BuildConfig
 import splitties.experimental.ExperimentalSplittiesApi
 import java.text.SimpleDateFormat
 
-class MiraiAndroidStatus (
-    var miraiAndroidVersion:String,
-    var coreVersion:String,
-    var luaMiraiVersion:String,
-    var releaseVersion:String,
-    var sdkVersion:Int,
-    var memorySize:String,
-    var netType:String,
-    var startTime:String,
-    var logBuffer:Int
+class MiraiAndroidStatus(
+    var miraiAndroidVersion: String,
+    var coreVersion: String,
+    var miraiConsoleVersion: String,
+    var releaseVersion: String,
+    var sdkVersion: Int,
+    var memorySize: String,
+    var netType: String,
+    var startTime: String,
+    var logBuffer: Int
 ) {
     @ExperimentalSplittiesApi
     @ExperimentalUnsignedTypes
@@ -27,7 +27,7 @@ class MiraiAndroidStatus (
             MiraiAndroidStatus(
                 context.packageManager.getPackageInfo(context.packageName, 0).versionName,
                 BuildConfig.COREVERSION,
-                BuildConfig.LUAMIRAI_VERSION,
+                BuildConfig.CONSOLEVERSION,
                 Build.VERSION.RELEASE,
                 Build.VERSION.SDK_INT,
                 DeviceStatus.getSystemAvaialbeMemorySize(context.applicationContext),
@@ -46,8 +46,8 @@ class MiraiAndroidStatus (
         append(coreVersion)
         append("\n")
 
-        append("LuaMirai v")
-        append(luaMiraiVersion)
+        append("MiraiConsole v")
+        append(miraiConsoleVersion)
         append("\n")
 
         append("系统版本 ")

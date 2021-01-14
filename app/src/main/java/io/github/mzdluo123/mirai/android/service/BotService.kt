@@ -23,6 +23,7 @@ import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
+import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
@@ -35,6 +36,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
+import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.command.executeCommand
 import net.mamoe.mirai.console.rootDir
@@ -132,6 +134,7 @@ class BotService : Service() {
     }
 
     private fun registerDefaultCommand() {
+        AndroidStatusCommand.register()
 //        register(_description = "显示MiraiAndroid运行状态", _name = "android") { sender, _ ->
 //            sender.sendMessage(MiraiAndroidStatus.recentStatus().format())
 //            true
