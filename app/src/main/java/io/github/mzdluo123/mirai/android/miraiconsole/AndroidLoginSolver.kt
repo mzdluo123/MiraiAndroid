@@ -36,6 +36,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? {
         verificationResult = CompletableDeferred()
         this.url = url
+        MiraiAndroidLogger.info(url)
         sendVerifyNotification()
         return verificationResult.await()
     }
@@ -46,6 +47,9 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
         sendVerifyNotification()
         return verificationResult.await()
     }
+
+    override val isSliderCaptchaSupported: Boolean
+        get() = true
 
     private fun sendVerifyNotification() {
         MiraiAndroidLogger.info("本次登录需要进行验证，请在通知栏点击通知进行验证")

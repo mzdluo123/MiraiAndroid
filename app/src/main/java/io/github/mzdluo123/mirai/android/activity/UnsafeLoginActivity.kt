@@ -5,12 +5,11 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
-import android.webkit.ConsoleMessage
-import android.webkit.WebChromeClient
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.google.gson.JsonParser
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
@@ -22,7 +21,7 @@ import kotlinx.coroutines.launch
 class UnsafeLoginActivity : AppCompatActivity() {
 
     private lateinit var conn: ServiceConnector
-
+    val gson = JsonParser()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         conn = ServiceConnector(this)
@@ -55,22 +54,33 @@ class UnsafeLoginActivity : AppCompatActivity() {
 //                return super.shouldInterceptRequest(view, request)
 //            }
 
-
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                unsafe_login_web.evaluateJavascript(
+                    """
+                    mqq.invoke = function(a,b,c){ return bridge.invoke(a,b,JSON.stringify(c))}"""
+                        .trimIndent()
+                ) {}
+            }
         }
         unsafe_login_web.webChromeClient = object : WebChromeClient() {
 
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                val msg = consoleMessage?.message()
                 // 按下回到qq按钮之后会打印这句话，于是就用这个解决了。。。。
-                if (consoleMessage?.message()?.startsWith("手Q扫码验证") == true) {
-                    authFinish()
+                if (msg?.startsWith("手Q扫码验证") == true) {
+                    authFinish("")
                 }
                 return super.onConsoleMessage(consoleMessage)
             }
         }
+        WebView.setWebContentsDebuggingEnabled(true)
         unsafe_login_web.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
         }
+        unsafe_login_web.addJavascriptInterface(Bridge(), "bridge")
+
         conn.connectStatus.observe(this, Observer {
             if (it) {
                 unsafe_login_web.loadUrl(conn.botService.url)
@@ -78,8 +88,8 @@ class UnsafeLoginActivity : AppCompatActivity() {
         })
     }
 
-    private fun authFinish() {
-        conn.botService.submitVerificationResult("")
+    private fun authFinish(token: String) {
+        conn.botService.submitVerificationResult(token)
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(AndroidLoginSolver.CAPTCHA_NOTIFICATION_ID)
@@ -107,4 +117,16 @@ class UnsafeLoginActivity : AppCompatActivity() {
 //        return true
 //    }
 
+    inner class Bridge {
+        @JavascriptInterface
+        fun invoke(cls: String?, method: String?, data: String?) {
+            if (data != null) {
+                val jsData = gson.parse(data)
+                if (method == "onVerifyCAPTCHA") {
+                    authFinish(jsData.asJsonObject["ticket"].asString)
+                }
+            }
+        }
+    }
 }
+

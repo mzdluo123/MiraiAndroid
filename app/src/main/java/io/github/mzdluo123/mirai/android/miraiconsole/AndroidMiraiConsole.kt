@@ -33,11 +33,7 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
-import net.mamoe.mirai.event.Listener
-import net.mamoe.mirai.event.events.BotOfflineEvent
-import net.mamoe.mirai.event.events.BotReloginEvent
 import net.mamoe.mirai.event.globalEventChannel
-import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.event.subscribeMessages
 import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.BotConfiguration
@@ -82,7 +78,7 @@ class AndroidMiraiConsole(
     override fun createLoginSolver(
         requesterBot: Long,
         configuration: BotConfiguration
-    ): LoginSolver = AndroidLoginSolver(context)
+    ): LoginSolver = loginSolver
 
     @ConsoleFrontEndImplementation
     override val builtInPluginLoaders: List<Lazy<PluginLoader<*, *>>> =
@@ -184,43 +180,43 @@ class AndroidMiraiConsole(
             downloadAvatar()
         }
 
-    private fun Bot.subscribeBotLifeEvent() {
-        subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
-            if (this is BotOfflineEvent.Force) {
-                NotificationManagerCompat.from(BotApplication.context).apply {
-                    notify(
-                        BotService.OFFLINE_NOTIFICATION_ID,
-                        NotificationFactory.offlineNotification(message, true)
-                    )
-                }
-                return@subscribeAlways
-            }
-            if (this is BotOfflineEvent.Dropped) {
-                sendOfflineMsgJob = GlobalScope.launch {
-                    delay(2000)
-                    if (!isActive) {
-                        return@launch
-                    }
-                    NotificationManagerCompat.from(BotApplication.context).apply {
-                        notify(
-                            BotService.OFFLINE_NOTIFICATION_ID,
-                            NotificationFactory.offlineNotification("请检查网络设置")
-                        )
-                    }
-                }
-            }
-
-            logger.info("发送离线通知....")
-        }
-        subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
-            logger.info("发送上线通知....")
-            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
-                sendOfflineMsgJob!!.cancel()
-            }
-            NotificationManagerCompat.from(BotApplication.context)
-                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
-        }
-    }
+//    private fun Bot.subscribeBotLifeEvent() {
+//        subscribeAlways<BotOfflineEvent>(priority = Listener.EventPriority.HIGHEST) {
+//            if (this is BotOfflineEvent.Force) {
+//                NotificationManagerCompat.from(BotApplication.context).apply {
+//                    notify(
+//                        BotService.OFFLINE_NOTIFICATION_ID,
+//                        NotificationFactory.offlineNotification(message, true)
+//                    )
+//                }
+//                return@subscribeAlways
+//            }
+//            if (this is BotOfflineEvent.Dropped) {
+//                sendOfflineMsgJob = GlobalScope.launch {
+//                    delay(2000)
+//                    if (!isActive) {
+//                        return@launch
+//                    }
+//                    NotificationManagerCompat.from(BotApplication.context).apply {
+//                        notify(
+//                            BotService.OFFLINE_NOTIFICATION_ID,
+//                            NotificationFactory.offlineNotification("请检查网络设置")
+//                        )
+//                    }
+//                }
+//            }
+//
+//            logger.info("发送离线通知....")
+//        }
+//        subscribeAlways<BotReloginEvent>(priority = Listener.EventPriority.HIGHEST) {
+//            logger.info("发送上线通知....")
+//            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
+//                sendOfflineMsgJob!!.cancel()
+//            }
+//            NotificationManagerCompat.from(BotApplication.context)
+//                .cancel(BotService.OFFLINE_NOTIFICATION_ID)
+//        }
+//    }
 
     private fun Bot.pushToScriptManager(manager: ScriptManager) {
         launch { manager.addBot(this@pushToScriptManager) }

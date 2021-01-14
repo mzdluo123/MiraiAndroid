@@ -14,7 +14,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
-import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.provider.MediaStore
@@ -104,6 +103,7 @@ class BotService : Service() {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
+        System.getProperties().setProperty("user.dir", getExternalFilesDir("")!!.absolutePath)
         botJob = Job()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
         powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -125,7 +125,8 @@ class BotService : Service() {
         //MiraiConsole.addBot().alsoLogin()
 
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
-        MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
+        val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
+        runBlocking { bot.login() }
     }
 
     private fun registerDefaultCommand() {
@@ -302,15 +303,12 @@ class BotService : Service() {
         override fun openScript(index: Int) {
             val scriptFile = ScriptManager.instance.hosts[index].scriptFile
             val provideUri: Uri
-            provideUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            provideUri =
                 FileProvider.getUriForFile(
                     this@BotService,
                     "io.github.mzdluo123.mirai.android.scriptprovider",
                     scriptFile
                 )
-            } else {
-                Uri.fromFile(scriptFile)
-            }
             startActivity(
                 Intent("android.intent.action.VIEW").apply {
                     addCategory("android.intent.category.DEFAULT")
