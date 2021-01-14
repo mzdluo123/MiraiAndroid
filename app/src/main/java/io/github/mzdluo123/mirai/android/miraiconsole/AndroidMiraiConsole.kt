@@ -27,7 +27,6 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginDataStorage
 import net.mamoe.mirai.console.internal.MiraiConsoleBuildConstants
-import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
@@ -83,7 +82,7 @@ class AndroidMiraiConsole(
 
     @ConsoleFrontEndImplementation
     override val builtInPluginLoaders: List<Lazy<PluginLoader<*, *>>> =
-        listOf(lazy { JvmPluginLoader })
+        listOf(lazy { DexPluginLoader(context.getExternalFilesDir("odex")!!.path) })
 
     @ConsoleFrontEndImplementation
     override val frontEndDescription: MiraiConsoleFrontEndDescription =

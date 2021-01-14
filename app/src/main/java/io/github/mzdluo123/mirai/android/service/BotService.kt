@@ -184,6 +184,8 @@ class BotService : Service() {
 //        if (wakeLock.isHeld) {
 //            wakeLock.release()
 //        }
+
+        MiraiConsole.job.cancel()
         botJob.cancel()
         stopForeground(true)
         stopSelf()

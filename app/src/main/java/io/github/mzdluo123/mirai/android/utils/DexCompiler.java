@@ -1,7 +1,5 @@
 package io.github.mzdluo123.mirai.android.utils;
 
-import android.util.Log;
-
 import com.android.tools.r8.CompilationFailedException;
 import com.android.tools.r8.D8;
 import com.android.tools.r8.D8Command;
@@ -33,7 +31,6 @@ public class DexCompiler {
 //        if (!outFile.exists()) {
 //            outFile.createNewFile();
 //        }
-        Log.e("输出路径", outFile.getAbsolutePath());
         D8Command.Builder command = D8Command.builder()
                 .addProgramFiles(jarFile.getAbsoluteFile().toPath())
                 .setOutput(outFile.toPath(), OutputMode.DexIndexed)
