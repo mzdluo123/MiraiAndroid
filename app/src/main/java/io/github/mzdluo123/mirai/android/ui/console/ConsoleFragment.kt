@@ -156,8 +156,8 @@ class ConsoleFragment : Fragment() {
     private fun submitCmd() {
         var command = command_input.text.toString()
         lifecycleScope.launch(Dispatchers.Default) {
-            if (command.startsWith("/")) {
-                command = command.substring(1)
+            if (!command.startsWith("/")) {
+                command = "/$command"
             }
             conn.botService.runCmd(command)
         }

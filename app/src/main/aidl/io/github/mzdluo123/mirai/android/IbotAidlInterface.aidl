@@ -4,7 +4,7 @@ package io.github.mzdluo123.mirai.android;
 // Declare any non-default types here with import statements
 interface IbotAidlInterface {
     //Console
-    String[] getLog();
+    List<String> getLog();
     void clearLog();
     void sendLog(String log);
     void runCmd(String cmd);
