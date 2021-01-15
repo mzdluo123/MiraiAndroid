@@ -47,11 +47,12 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 R.id.nav_plugins,
                 R.id.nav_scripts,
                 R.id.nav_setting,
-                R.id.nav_about
+                R.id.nav_about,
+                R.id.nav_tools
             ), drawer_layout
         )
     }
-    private val navController:NavController by lazy{
+    private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
 
@@ -86,8 +87,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             toast("检查更新失败")
             throwable.printStackTrace()
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
-            finish()
-            BotApplication.context.stopBotService()
+//            finish()
+//            BotApplication.context.stopBotService()
         }
 
         if (BuildConfig.DEBUG) {

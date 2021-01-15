@@ -52,4 +52,9 @@
         android:id="@+id/nav_setting"
         android:name="io.github.mzdluo123.mirai.android.ui.setting.SettingFragment"
         android:label="设置" />
+    <fragment
+        android:id="@+id/nav_tools"
+        android:name="io.github.mzdluo123.mirai.android.ui.tools.ToolsFragment"
+        android:label="工具"
+        tools:layout="@layout/fragment_tools" />
 </navigation>

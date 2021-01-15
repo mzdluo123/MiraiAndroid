@@ -83,12 +83,12 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="io.github.mzdluo123.mirai.android.scriptprovider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/path_script" />
+                android:resource="@xml/path_shared_file" />
         </provider>
     </application>
 

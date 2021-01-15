@@ -3,4 +3,8 @@
     <external-files-path
         name="script"
         path="scripts" />
+    <external-files-path
+        name="all"
+        path="." />
+
 </paths>

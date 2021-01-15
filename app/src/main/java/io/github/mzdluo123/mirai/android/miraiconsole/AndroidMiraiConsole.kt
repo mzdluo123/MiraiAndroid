@@ -183,7 +183,7 @@ class AndroidMiraiConsole(
 
     private suspend fun downloadAvatar(bot: Bot): Bitmap =
         try {
-            bot.logger.info("正在加载头像....")
+//            bot.logger.info("正在加载头像....")
 
             HttpClient().get<ByteArray>(bot.avatarUrl).let { avatarData ->
                 BitmapFactory.decodeByteArray(avatarData, 0, avatarData.size)
