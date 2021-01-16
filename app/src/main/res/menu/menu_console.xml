@@ -10,6 +10,11 @@
         android:icon="@drawable/ic_share_24"
         android:title="分享日志"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_clean"
+        android:icon="@drawable/ic_baseline_clear_24"
+        android:title="清除日志"
+        app:showAsAction="always" />
     <!--item
         android:id="@+id/action_battery"
         android:title="忽略电池优化" /-->

@@ -135,6 +135,10 @@ class ConsoleFragment : Fragment() {
                     append(conn.botService.log.joinToString(separator = "\n"))
                 }, lifecycleScope
             )
+            R.id.action_clean -> {
+                log_text.text = ""
+                conn.botService.clearLog()
+            }
             /*
             R.id.action_battery -> {
                 ignoreBatteryOptimization(requireActivity())
