@@ -16,16 +16,26 @@ private val logStorage = LoopQueue<String>(AppSettings.logBuffer)
 @ExperimentalSplittiesApi
 private val printToSysLog = AppSettings.printToLogcat
 
+private enum class LogColor(val color: String) {
+    INFO("#28BB28"),
+    VERBOSE("#37505C"),
+    DEBUG(" #136E70"),
+    WARNING("#FEAC48"),
+    ERROR(" #DD1C1A")
+}
 
 @ExperimentalUnsignedTypes
 @OptIn(ExperimentalSplittiesApi::class)
 object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
         val log = "[${priority.name}] ${message ?: e}"
-        logStorage.add(log)
+        val colorLog =
+            "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font> ${message ?: e}"
+        Log.d("MA", colorLog)
+        logStorage.add(colorLog)
         for (i in 0 until BotService.consoleUi.beginBroadcast()) {
             try {
-                BotService.consoleUi.getBroadcastItem(i).newLog(log)
+                BotService.consoleUi.getBroadcastItem(i).newLog(colorLog)
             } catch (remoteE: Exception) {
                 Log.e("MA", remoteE.message ?: "发生错误")
                 remoteE.printStackTrace()
@@ -35,7 +45,7 @@ object MiraiAndroidLogger :
         BotService.consoleUi.finishBroadcast()
 
         if (BuildConfig.DEBUG || printToSysLog) {
-            Log.i("MA", "[${priority.name}] ${message ?: "error"}")
+            Log.i("MA", log)
             e?.printStackTrace()
         }
     }) {

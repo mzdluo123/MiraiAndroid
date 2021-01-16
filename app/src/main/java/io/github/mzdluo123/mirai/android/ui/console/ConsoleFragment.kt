@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.DeadObjectException
+import android.text.Html
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -81,7 +82,7 @@ class ConsoleFragment : Fragment() {
         conn.registerConsole(object : IConsole.Stub() {
             override fun newLog(log: String) {
                 lifecycleScope.launch(Dispatchers.Main) {
-                    log_text.append(log)
+                    log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
                     log_text.append("\n")
                     if (autoScroll) {
                         delay(20)
@@ -95,9 +96,9 @@ class ConsoleFragment : Fragment() {
             Log.d(TAG, "service status $it")
             if (it) {
                 lifecycleScope.launch(Dispatchers.Default) {
-                    val text = conn.botService.log.joinToString(separator = "\n")
+                    val text = conn.botService.log.joinToString(separator = "<br>")
                     withContext(Dispatchers.Main) {
-                        log_text?.text = text
+                        log_text?.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
                         if (autoScroll) {
                             delay(20)
                             main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
