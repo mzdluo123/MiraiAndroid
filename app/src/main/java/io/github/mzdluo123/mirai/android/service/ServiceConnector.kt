@@ -34,6 +34,7 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
         if (callback != null) {
             botService.registerConsole(callback)
         }
+
         if (!IdleResources.botServiceLoading.isIdleNow) {
             IdleResources.botServiceLoading.decrement()
         }
@@ -53,6 +54,24 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
         }
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onStart() {
+        if (connectStatus.value!!) {
+            if (callback != null) {
+                botService.registerConsole(callback)
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onStop() {
+        if (connectStatus.value!!) {
+            if (callback != null) {
+                botService.unregisterConsole(callback)
+                callback = null
+            }
+        }
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun disconnect() {

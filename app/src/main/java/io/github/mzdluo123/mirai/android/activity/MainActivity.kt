@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             NotificationFactory.dismissAllNotification()
             launch {
                 BotApplication.context.stopBotService()
-                delay(200)
+                delay(1000)
                 BotApplication.context.startBotService()
                 navController.popBackStack()
                 navController.navigate(R.id.nav_console)  // 重新启动console fragment，使其能够链接到服务

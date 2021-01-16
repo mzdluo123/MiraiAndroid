@@ -81,7 +81,6 @@ class ConsoleFragment : Fragment() {
         conn.registerConsole(object : IConsole.Stub() {
             override fun newLog(log: String) {
                 lifecycleScope.launch(Dispatchers.Main) {
-
                     log_text.append(log)
                     log_text.append("\n")
                     if (autoScroll) {
@@ -100,6 +99,7 @@ class ConsoleFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         log_text?.text = text
                         if (autoScroll) {
+                            delay(20)
                             main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
                         }
                     }
