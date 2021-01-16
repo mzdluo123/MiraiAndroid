@@ -25,4 +25,11 @@ interface IbotAidlInterface {
     void disableScript(int index);
     String getBotInfo();
 
+
+    void registerConsole(in IConsole instance);
+    void unregisterConsole(in IConsole instance);
+
+}
+interface IConsole{
+    void newLog(String log);
 }

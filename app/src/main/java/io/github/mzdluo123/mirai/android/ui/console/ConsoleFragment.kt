@@ -16,11 +16,15 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import splitties.toast.toast
 import java.security.MessageDigest
 
@@ -31,7 +35,6 @@ class ConsoleFragment : Fragment() {
         const val TAG = "ConsoleFragment"
     }
 
-    private var logRefreshJob: Job? = null
 
     private lateinit var conn: ServiceConnector
 
@@ -75,13 +78,32 @@ class ConsoleFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
+        conn.registerConsole(object : IConsole.Stub() {
+            override fun newLog(log: String) {
+                lifecycleScope.launch(Dispatchers.Main) {
+
+                    log_text.append(log)
+                    log_text.append("\n")
+                    if (autoScroll) {
+                        delay(20)
+                        main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+                    }
+                }
+            }
+        })
+
         conn.connectStatus.observe(this, Observer {
             Log.d(TAG, "service status $it")
-            if (logRefreshJob != null && logRefreshJob!!.isActive) {
-                return@Observer
-            }
             if (it) {
-                startRefreshLoop()
+                lifecycleScope.launch(Dispatchers.Default) {
+                    val text = conn.botService.log.joinToString(separator = "\n")
+                    withContext(Dispatchers.Main) {
+                        log_text?.text = text
+                        if (autoScroll) {
+                            main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+                        }
+                    }
+                }
             }
         })
     }
@@ -89,17 +111,10 @@ class ConsoleFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         startLoadAvatar()
-        if (logRefreshJob != null && logRefreshJob!!.isActive) {
-            logRefreshJob!!.cancel()
-        }
-        startRefreshLoop()
     }
 
     override fun onPause() {
         super.onPause()
-        if (logRefreshJob != null && logRefreshJob!!.isActive) {
-            logRefreshJob!!.cancel()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -189,30 +204,30 @@ class ConsoleFragment : Fragment() {
         dialog.show()
     }
 
-    private fun startRefreshLoop() {
-        if (!conn.connectStatus.value!!) {
-            return
-        }
-        logRefreshJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
-            log_text?.clearComposingText()
-            try {
-                withContext(Dispatchers.Main) { Log.d(TAG, "start loop") }
-                while (isActive) {
-                    val text = conn.botService.log.joinToString(separator = "\n")
-                    withContext(Dispatchers.Main) {
-                        log_text?.text = text
-                        if (autoScroll) {
-                            main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
-                        }
-                    }
-                    delay(200)
-                }
-            } catch (e: DeadObjectException) {
-                // ignore
-            }
-            withContext(Dispatchers.Main) { log_text?.append("\n无法连接到服务，可能是正在重启") }
-        }
-    }
+//    private fun startRefreshLoop() {
+//        if (!conn.connectStatus.value!!) {
+//            return
+//        }
+//        logRefreshJob = viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+//            log_text?.clearComposingText()
+//            try {
+//                withContext(Dispatchers.Main) { Log.d(TAG, "start loop") }
+//                while (isActive) {
+//                    val text = conn.botService.log.joinToString(separator = "\n")
+//                    withContext(Dispatchers.Main) {
+//                        log_text?.text = text
+//                        if (autoScroll) {
+//                            main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
+//                        }
+//                    }
+//                    delay(200)
+//                }
+//            } catch (e: DeadObjectException) {
+//                // ignore
+//            }
+//            withContext(Dispatchers.Main) { log_text?.append("\n无法连接到服务，可能是正在重启") }
+//        }
+//    }
 
     private fun startLoadAvatar() {
         viewLifecycleOwner.lifecycleScope.launch {

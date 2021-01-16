@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.OnLifecycleEvent
+import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.IdleResources
 
@@ -21,6 +22,8 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     var connectStatus = MutableLiveData(false)
         private set
 
+    private var callback: IConsole? = null
+
     override fun onServiceDisconnected(name: ComponentName?) {
         connectStatus.value = false
     }
@@ -28,6 +31,9 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         botService = IbotAidlInterface.Stub.asInterface(service)
         connectStatus.value = true
+        if (callback != null) {
+            botService.registerConsole(callback)
+        }
         if (!IdleResources.botServiceLoading.isIdleNow) {
             IdleResources.botServiceLoading.decrement()
         }
@@ -51,9 +57,18 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun disconnect() {
         if (connectStatus.value!!) {
+            if (callback != null) {
+                botService.unregisterConsole(callback)
+            }
+
             context.unbindService(this)
             connectStatus.value = false
         }
+    }
+
+    fun registerConsole(callback: IConsole) {
+        this.callback = callback
+
     }
 
 }

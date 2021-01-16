@@ -16,10 +16,12 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.RemoteCallbackList
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.FileProvider
 import io.github.mzdluo123.mirai.android.AppSettings
+import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
@@ -55,6 +57,7 @@ class BotService : Service() {
     private val binder = BotBinder()
     private var isStart = false
     private lateinit var powerManager: PowerManager
+
     // private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
@@ -72,6 +75,8 @@ class BotService : Service() {
         const val NOTIFICATION_ID = 1
         const val OFFLINE_NOTIFICATION_ID = 3
         const val TAG = "BOT_SERVICE"
+
+        val consoleUi: RemoteCallbackList<IConsole> = RemoteCallbackList()
     }
 
     private fun createNotification() {
@@ -238,6 +243,7 @@ class BotService : Service() {
             .toList().toByteArray()
 
     inner class BotBinder : IbotAidlInterface.Stub() {
+
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
@@ -245,6 +251,14 @@ class BotService : Service() {
                     ConsoleCommandSender.executeCommand(cmd)
                 }
             }
+        }
+
+        override fun registerConsole(instance: IConsole) {
+            consoleUi.register(instance)
+        }
+
+        override fun unregisterConsole(instance: IConsole) {
+            consoleUi.unregister(instance)
         }
 
         override fun getLog(): MutableList<String>? {
