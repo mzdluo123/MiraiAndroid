@@ -19,15 +19,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-<!--        <receiver-->
-<!--            android:name=".receiver.PushMsgReceiver"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="io.github.mzdluo123.mirai.android.PushMsg"/>-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
-
+        <activity
+            android:name=".activity.CrashReportActivity"
+            android:theme="@style/AppTheme"
+            android:process=":acrc"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance" />
+        <!-- <receiver -->
+        <!-- android:name=".receiver.PushMsgReceiver" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="io.github.mzdluo123.mirai.android.PushMsg"/> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
         <activity
             android:name=".activity.UnsafeLoginActivity"
             android:excludeFromRecents="true"
