@@ -83,7 +83,7 @@ class ConsoleFragment : Fragment() {
             override fun newLog(log: String) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
-                    log_text.append("\n")
+                    log_text.append("<br>")
                     if (autoScroll) {
                         delay(20)
                         main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
