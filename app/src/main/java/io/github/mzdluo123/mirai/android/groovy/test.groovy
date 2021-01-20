@@ -4,7 +4,7 @@ import net.mamoe.mirai.event.EventHandler
 import net.mamoe.mirai.event.events.GroupMessageEvent
 import org.jetbrains.annotations.NotNull
 
-class A extends GroovyScript {
+class Test extends GroovyScript {
     @Override
     void onEnable(@NotNull Bot bot) {
         super.onEnable(bot)
@@ -13,6 +13,6 @@ class A extends GroovyScript {
 
     @EventHandler
     void onGroupMessage(GroupMessageEvent event) {
-
+        logger.info(event.sender)
     }
 }

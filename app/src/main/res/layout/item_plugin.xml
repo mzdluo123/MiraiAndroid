@@ -33,7 +33,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:text="大小"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/pluginName_text"
                 app:layout_constraintTop_toBottomOf="@+id/pluginName_text" />

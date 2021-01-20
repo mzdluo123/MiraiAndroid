@@ -21,7 +21,7 @@ private enum class LogColor(val color: String) {
     VERBOSE("#37505C"),
     DEBUG(" #136E70"),
     WARNING("#FEAC48"),
-    ERROR(" #DD1C1A")
+    ERROR("#DD1C1A")
 }
 
 @ExperimentalUnsignedTypes

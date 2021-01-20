@@ -25,6 +25,7 @@ import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
+import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
@@ -170,8 +171,10 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         createNotification()
         registerDefaultCommand()
         intent?.let { autoLogin(it) }
+        ScriptManager.onLoad()
         GlobalEventChannel.subscribeAlways<BotOnlineEvent> {
             consoleFrontEnd.afterBotLogin(bot)
+            ScriptManager.onEnable(bot)
         }
     }
 
@@ -187,6 +190,7 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
 //        }
 
         MiraiConsole.job.cancel()
+        ScriptManager.onDisable()
         this.cancel()
         stopForeground(true)
         stopSelf()

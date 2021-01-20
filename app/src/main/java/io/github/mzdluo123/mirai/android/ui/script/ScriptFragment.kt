@@ -49,8 +49,9 @@ class ScriptFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_script, container, false).also {
+    ): View? {
         setHasOptionsMenu(true)
+        adapter.addChildClickViewIds()
         adapter.setEmptyView(inflater.inflate(R.layout.fragment_script_empty, null))
         adapter.setOnItemClickListener { _, view, position ->
             val menu = PopupMenu(requireContext(), view)
@@ -61,6 +62,7 @@ class ScriptFragment : Fragment() {
                     R.id.action_delete -> {
                         ScriptManager.deleteScript(scriptViewModel.scriptList.value!!.get(position))
                         Toast.makeText(activity, "删除成功，重启后生效", Toast.LENGTH_SHORT).show()
+                        scriptViewModel.refreshScriptList()
                         return@setOnMenuItemClickListener true
                     }
 
@@ -69,7 +71,7 @@ class ScriptFragment : Fragment() {
             }
             menu.show()
         }
-
+        return inflater.inflate(R.layout.fragment_script, container, false)
     }
 
 

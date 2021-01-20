@@ -7,15 +7,17 @@ import java.nio.file.Path
 
 class ScriptRuntime(val scriptPath: Path) {
 
-
-    private val engine = GroovyScriptEngine(BotApplication.context.cacheDir.path)
+    private val engine =
+        GroovyScriptEngine(BotApplication.context.cacheDir.path, javaClass.classLoader)
     private val scriptClass = engine.loadScriptByName(scriptPath.toString()) as Class<GroovyScript>
-    private lateinit var scriptInstance: GroovyScript
+    private val scriptInstance: GroovyScript = scriptClass.newInstance()
+    val fileName = scriptPath.fileName
 
     fun onEnable(bot: Bot) {
-        scriptInstance = scriptClass.newInstance()
         scriptInstance.onEnable(bot)
-        bot.eventChannel.registerListenerHost(scriptInstance)
     }
 
+    fun onDisable() {
+        scriptInstance.onDisable()
+    }
 }
