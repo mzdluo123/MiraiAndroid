@@ -4,6 +4,7 @@ import androidx.test.espresso.IdlingRegistry
 import org.junit.After
 import org.junit.Before
 
+
 open class TestWithIdleResources {
 
     /**
