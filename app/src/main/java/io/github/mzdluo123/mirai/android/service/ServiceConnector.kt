@@ -79,7 +79,6 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
             if (callback != null) {
                 botService.unregisterConsole(callback)
             }
-
             context.unbindService(this)
             connectStatus.value = false
         }

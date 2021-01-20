@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.TaskStackBuilder
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.BotService
@@ -21,12 +22,6 @@ object NotificationFactory {
         BotApplication.context
     }
 
-    private val notifyIntent = Intent(context, MainActivity::class.java).apply {
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-    }
-    private val launchMainActivity = PendingIntent.getActivity(
-        context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-    )
 
     internal fun initNotification() {
         val notificationManager =
@@ -87,7 +82,13 @@ object NotificationFactory {
             .setShowWhen(true) //右上角的时间显示
             .setOnlyAlertOnce(true)
             .setStyle(NotificationCompat.BigTextStyle())
-            .setContentIntent(launchMainActivity)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(context, MainActivity::class.java), PendingIntent.FLAG_NO_CREATE
+                )
+            )
             .setContentTitle("MiraiAndroid") //创建通知
             .setContentText(content)
             .setLargeIcon(avatar)
@@ -118,11 +119,16 @@ object NotificationFactory {
     internal fun captchaNotification(activity: Class<*>): Notification {
 
         val notifyIntent = Intent(context, activity).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
         }
-        val notifyPendingIntent = PendingIntent.getActivity(
-            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        )
+//        val notifyPendingIntent = PendingIntent.getActivity(
+//            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+//        )
+        val notifyPendingIntent = TaskStackBuilder.create(BotApplication.context)
+            .addParentStack(MainActivity::class.java)
+            .addNextIntent(notifyIntent)
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+
 
         return NotificationCompat.Builder(
             context,

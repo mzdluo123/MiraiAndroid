@@ -26,10 +26,7 @@ import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -38,6 +35,8 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.command.executeCommand
 import net.mamoe.mirai.console.rootDir
+import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.message.data.At
 import splitties.experimental.ExperimentalSplittiesApi
 import kotlin.system.exitProcess
@@ -45,7 +44,7 @@ import kotlin.system.exitProcess
 
 @ExperimentalSplittiesApi
 @ExperimentalUnsignedTypes
-class BotService : Service() {
+class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
     @ConsoleFrontEndImplementation
     lateinit var consoleFrontEnd: AndroidMiraiConsole
         private set
@@ -57,7 +56,7 @@ class BotService : Service() {
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
     private val allowPushMsg = AppSettings.allowPushMsg
-    private lateinit var botJob: Job
+
 
 // 多进程调试辅助
 //  init {
@@ -105,8 +104,6 @@ class BotService : Service() {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
-
-        botJob = Job()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
         powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
@@ -121,16 +118,14 @@ class BotService : Service() {
         //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
         MiraiAndroidLogger.info("自动登录....")
         val handler = CoroutineExceptionHandler { _, throwable ->
-            MiraiAndroidLogger.info("自动登录失败 $throwable")
+            MiraiAndroidLogger.error("自动登录失败 $throwable")
         }
 
         // 新的自动登录
         //MiraiConsole.addBot().alsoLogin()
-
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
-        runBlocking { bot.login() }
-        consoleFrontEnd.afterBotLogin(bot)
+        launch(handler) { bot.login() }
     }
 
     private fun registerDefaultCommand() {
@@ -175,6 +170,9 @@ class BotService : Service() {
         createNotification()
         registerDefaultCommand()
         intent?.let { autoLogin(it) }
+        GlobalEventChannel.subscribeAlways<BotOnlineEvent> {
+            consoleFrontEnd.afterBotLogin(bot)
+        }
     }
 
     private fun stopConsole() {
@@ -189,7 +187,7 @@ class BotService : Service() {
 //        }
 
         MiraiConsole.job.cancel()
-        botJob.cancel()
+        this.cancel()
         stopForeground(true)
         stopSelf()
         exitProcess(0)
@@ -268,7 +266,6 @@ class BotService : Service() {
                 consoleFrontEnd.loginSolver.verificationResult.complete(it)
             }
         }
-
 
 
         override fun clearLog() {

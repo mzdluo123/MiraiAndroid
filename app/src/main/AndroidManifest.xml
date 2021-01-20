@@ -63,10 +63,11 @@
         </activity>
         <activity
             android:name=".activity.CaptchaActivity"
-            android:excludeFromRecents="true"
             android:label="请输入验证码"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
             android:launchMode="singleTask"
-            android:taskAffinity="" />
+            android:parentActivityName=".activity.MainActivity" />
 
         <receiver
             android:name=".receiver.BootReceiver"

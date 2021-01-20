@@ -23,6 +23,7 @@ class CaptchaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_captcha)
+
         conn = ServiceConnector(this)
         lifecycle.addObserver(conn)
         conn.connectStatus.observe(this, Observer {

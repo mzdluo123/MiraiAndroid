@@ -7,6 +7,12 @@ import java.io.InputStream
 
 object ScriptManager {
     val scriptFolder = BotApplication.context.getExternalFilesDir("script")!!
+
+    init {
+
+
+    }
+
     fun onEnable(bot: Bot) {
 
     }
