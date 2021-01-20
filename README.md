@@ -23,7 +23,7 @@
 
 <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mzdluo123/MiraiAndroid?style=flat-square">
 
-mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口
+mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口，已适配MiraiConsole 2.0
 
 关于mirai项目以及mirai-console的一切请点击[这里](https://github.com/mamoe/mirai)
 
@@ -75,134 +75,7 @@ MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内�
 
 # 安装脚本
 
-目前MiraiAndroid已支持lua和JavaScript脚本，感谢[lua-mirai](https://github.com/only52607/lua-mirai)和[mirai-js](https://github.com/iTXTech/mirai-js)项目
-
-## lua脚本
-
-以下是一个简单的示例
-
-```lua
-Event.onLoad = function (bot)
-    bot:subscribeGroupMsg(
-        function(bot, msg, group, sender)
-            group:sendMsg( msg )
-        end
-    )   
-end
-```
-
-这个脚本实现了最简单的"复读机"功能，更多API请看[lua-mirai android api](https://github.com/only52607/lua-mirai/blob/master/docs/miraiandroid.md)
-
-## JavaScript脚本
-
-以下是一个~~简单~~复杂的示例
-
-```JavaScript
-// 插件信息
-pluginInfo = {
-    name: "JsPluginExample",
-    version: "1.0.0",
-    author: "PeratX",
-    website: "https://github.com/iTXTech/mirai-js/blob/master/examples/reply.js"
-};
-
-let verbose = true;
-
-// onLoad 事件
-plugin.ev.onLoad = () => {
-    logger.info("插件已加载：" + plugin.dataDir);
-
-    // 插件数据读写
-    let file = plugin.getDataFile("test.txt")
-    // 第三个编码参数默认为 UTF-8，可空，同readText第二个参数
-    stor.writeText(file, "真的很强。", Charset.forName("GBK"));
-    logger.info("读取文件：" + file + " 内容：" + stor.readText(file, Charset.forName("GBK")));
-
-    let config = new JsonConfig(plugin.getDataFile("test.json"));
-    config.put("wow", "Hello World!");
-    config.save();
-
-    let v = 0;
-    // 启动协程
-    core.launch(() => {
-        v++;
-        logger.info("正在等待：" + v);
-        if (verbose) {
-            // 100ms执行一次
-            return 100;
-        }
-        // 停止协程，返回 -1
-        return -1;
-    });
-    // 延时1000ms执行一次
-    core.launch(() => {
-        verbose = false
-        return -1;
-    }, 1000);
-    // 命令名称，描述，帮助，别名，回调
-    core.registerCommand("test", "测试命令", "test", null, (sender, args) => {
-        logger.info("发送者：" + sender)
-        logger.info("参数：" + args)
-        return true
-    });
-};
-
-plugin.ev.onEnable = () => {
-    logger.info("插件已启用。" + (plugin.enabled ? "是真的" : "是假的"));
-    try {
-        // Http 基于 OkHttp，可使用 OkHttp 的 API 自行构造
-        let result = http.get("https://github.com/mamoe/mirai");
-        if (result.isSuccessful()) {
-            logger.info("Mirai GitHub主页长度：" + result.body().string().length());
-        } else {
-            logger.error("无法访问Mirai GitHub主页");
-        }
-        // 手动调用 OkHttp
-        let client = http.newClient()
-            .connectTimeout(5000, TimeUnit.MILLISECONDS)
-            .readTimeout(5000, TimeUnit.MILLISECONDS)
-            .build()
-        let response = client.newCall(
-            http.newRequest()
-                .url("https://im.qq.com")
-                .header("User-Agent", "NMSL Browser 1.0")
-                .build()
-        ).execute();
-        if (response.isSuccessful()) {
-            logger.info("QQ主页长度：" + response.body().string().length());
-        } else {
-            logger.error("无法访问QQ主页");
-        }
-    } catch (e) {
-        logger.error("无法获取网页", e)
-    }
-    regEv();
-};
-
-plugin.ev.onDisable = () => {
-    logger.info("插件已禁用。");
-};
-
-plugin.ev.onUnload = () => {
-    logger.info("插件已卸载。");
-};
-
-function regEv() {
-    core.subscribeAlways(BotOnlineEvent, ev => {
-        logger.info(ev);
-    });
-    core.subscribeAlways(GroupMessageEvent, ev => {
-        logger.info(ev);
-        ev.group.sendMessage(new PlainText("MiraiJs 收到消息：").plus(ev.message));
-    })
-}
-```
-你可以在[这里](https://github.com/iTXTech/mirai-js/blob/master/examples/reply.js)找到它，更多内容请查看项目介绍
-
-在脚本管理界面点击右上角`+`可直接添加脚本到MiraiAndroid
-
-目前该功能仍在开发中
-
+目前脚本系统仍在开发中，对于2.x版本的lua或js脚本系统正在迁移中，请等待后续更新
 
 # 安装插件
 
@@ -256,31 +129,15 @@ A：如果是后台报错一般是插件或者是mirai-core的问题，是mirai-
 以下插件由群友测试未发现问题，你可以到群内下载，或是到[插件中心](https://github.com/mamoe/mirai-plugins)手动下载jvm版并导入
 
 * mirai-api-http
-* HsoSe
-* keywordReply
-* forward
-* CQHTTPMirai
+* chatcommand
 
 对于其他插件请自行尝试；此外，如果你的插件使用了一些Android不支持的api(例如BufferedImage)那么使用了这个api的功能将绝对不能正常工作
 
 # 关于支持的Android版本
 
-我们尚不清楚MiraiAndroid究竟能在哪些Android版本上正常工作，需要大家进行测试
+MiraiAndroid只能在Android8.0及以上版本的系统中工作，因为上游MiaiCore使用了大量Java8特性
 
-我们已经测试无问题的Android版本：
-
-* Android 10
-* Android 8.1（无法在Android端编译插件）
-
-其他版本还未进行测试，以下是测试要求：
-
-* 程序不闪退，不报错，不出现无响应，通知显示正常，能正常完成登录
-* 能够在Android端编译jvm插件（可选）
-* 能够使用编译好的jvm插件发送消息，发送图片，处理事件和正确读写配置
-* 能够正常运行两个脚本引擎的demo
-
-从下一个release版本开始项目的minsdk版本将调整至21（Android 5.1），测试结果可以通过issue和交流群告诉我们，谢谢！（反馈时记得带上日志和Android版本，抓取日志可以在控制台右上角菜单内找到）
-
+目前测试过的版本中Android10无问题，Android8.1无法在移动端编译插件
 
 # 消息推送(2.9新增)
 

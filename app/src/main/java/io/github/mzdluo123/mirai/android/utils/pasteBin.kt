@@ -1,25 +1,25 @@
 package io.github.mzdluo123.mirai.android.utils
 
 import io.github.mzdluo123.mirai.android.BotApplication
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.post
-import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
+import okhttp3.Request
 
 @OptIn(ExperimentalUnsignedTypes::class)
 
 suspend fun paste(text: String): String {
-    return withContext(Dispatchers.IO) {
-        val res = BotApplication.httpClient.value.post<HttpResponse>("https://paste.ubuntu.com/") {
-            body = MultiPartFormDataContent(formData {
-                append("poster", "MiraiAndroid")
-                append("syntax", "text")
-                append("expiration", "")
-                append("content", text)
-            })
-        }
-        return@withContext "https://paste.ubuntu.com" + res.headers["Location"].toString()
+    val res = withContext(Dispatchers.IO) {
+        BotApplication.httpClient.value.newCall(
+            Request.Builder().url("https://paste.ubuntu.com/")
+                .post(
+                    FormBody.Builder().add("poster", "MiraiAndroid")
+                        .add("syntax", "text")
+                        .add("expiration", "")
+                        .add("content", text).build()
+                ).build()
+        ).execute()
     }
+
+    return res.request.url.toString()
 }

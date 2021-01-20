@@ -7,12 +7,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.Process
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
+import io.github.mzdluo123.mirai.android.activity.CrashReportActivity
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import io.github.mzdluo123.mirai.android.service.BotService
-import io.ktor.client.*
 import kotlinx.serialization.json.Json
+import okhttp3.OkHttpClient
 import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
+import org.acra.config.DialogConfigurationBuilder
 import org.acra.data.StringFormat
 
 @ExperimentalUnsignedTypes
@@ -22,7 +24,7 @@ class BotApplication : Application() {
         lateinit var context: BotApplication
             private set
 
-        val httpClient = lazy { HttpClient() }
+        val httpClient = lazy { OkHttpClient() }
         val json = lazy { Json.Default }
 
     }
@@ -50,6 +52,12 @@ class BotApplication : Application() {
             setBuildConfigClass(BuildConfig::class.java)
                 .setReportFormat(StringFormat.JSON)
             setReportSenderFactoryClasses(MiraiAndroidReportSenderFactory::class.java)
+                .setBuildConfigClass(BuildConfig::class.java)
+            getPluginConfigurationBuilder(DialogConfigurationBuilder::class.java)
+                .setReportDialogClass(CrashReportActivity::class.java)
+                .setEnabled(true)
+
+
 //            getPluginConfigurationBuilder(ToastConfigurationBuilder::class.java)
 //                .setResText(R.string.acra_toast_text)
 //                .setEnabled(true)

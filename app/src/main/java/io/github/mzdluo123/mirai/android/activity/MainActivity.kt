@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 checkUpdate()
             }
         }
-        //throw Exception("测试异常")
+            // throw Exception("测试异常")
     }
 
 

@@ -18,7 +18,7 @@ private val printToSysLog = AppSettings.printToLogcat
 
 private enum class LogColor(val color: String) {
     INFO("#28BB28"),
-    VERBOSE("#37505C"),
+    VERBOSE("#44cef6"),
     DEBUG(" #136E70"),
     WARNING("#FEAC48"),
     ERROR("#DD1C1A")
@@ -30,8 +30,12 @@ object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
         val log = "[${priority.name}] ${message ?: e}"
         val colorLog =
-            "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font> ${message ?: e}"
-        Log.d("MA", colorLog)
+            "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font> ${
+                message?.replace(
+                    "\n",
+                    "<br>"
+                ) ?: e
+            }"
         logStorage.add(colorLog)
         for (i in 0 until BotService.consoleUi.beginBroadcast()) {
             try {
