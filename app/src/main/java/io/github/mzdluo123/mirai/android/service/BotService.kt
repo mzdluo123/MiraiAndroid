@@ -13,13 +13,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.RemoteCallbackList
-import android.provider.MediaStore
 import android.util.Log
-import androidx.core.content.FileProvider
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -28,7 +25,6 @@ import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
-import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
@@ -44,7 +40,6 @@ import net.mamoe.mirai.console.command.executeCommand
 import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.message.data.At
 import splitties.experimental.ExperimentalSplittiesApi
-import java.io.File
 import kotlin.system.exitProcess
 
 
@@ -188,7 +183,7 @@ class BotService : Service() {
         if (allowPushMsg) {
             unregisterReceiver(msgReceiver)
         }
-        ScriptManager.instance.disableAll()
+
 //        if (wakeLock.isHeld) {
 //            wakeLock.release()
 //        }
@@ -274,35 +269,16 @@ class BotService : Service() {
             }
         }
 
-        override fun setScriptConfig(config: String?) {
 
-        }
-
-        override fun createScript(name: String, type: Int): Boolean {
-            return ScriptManager.instance.createScriptFromFile(File(name), type)
-        }
-
-        override fun reloadScript(index: Int): Boolean {
-            ScriptManager.instance.reload(index)
-            return true
-        }
 
         override fun clearLog() {
             MiraiAndroidLogger.clearLog()
         }
 
-        override fun enableScript(index: Int) {
-            ScriptManager.instance.enable(index)
-        }
-
-        override fun disableScript(index: Int) {
-            ScriptManager.instance.disable(index)
-        }
 
         @ConsoleFrontEndImplementation
         override fun getUrl(): String = consoleFrontEnd.loginSolver.url
 
-        override fun getScriptSize(): Int = ScriptManager.instance.hosts.size
 
         @ConsoleFrontEndImplementation
         override fun getCaptcha(): ByteArray = consoleFrontEnd.loginSolver.captchaData
@@ -321,31 +297,6 @@ class BotService : Service() {
 
         override fun getBotInfo(): String = MiraiAndroidStatus.recentStatus().format()
 
-        override fun openScript(index: Int) {
-            val scriptFile = ScriptManager.instance.hosts[index].scriptFile
-            val provideUri: Uri
-            provideUri =
-                FileProvider.getUriForFile(
-                    this@BotService,
-                    "io.github.mzdluo123.mirai.android.scriptprovider",
-                    scriptFile
-                )
-            startActivity(
-                Intent("android.intent.action.VIEW").apply {
-                    addCategory("android.intent.category.DEFAULT")
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    putExtra(MediaStore.EXTRA_OUTPUT, provideUri)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    type = "text/plain"
-                    setDataAndType(provideUri, type)
-                })
-        }
-
-        override fun deleteScript(index: Int) {
-            ScriptManager.instance.delete(index)
-        }
-
-        override fun getHostList(): Array<String> = ScriptManager.instance.getHostInfoStrings()
     }
 
 }

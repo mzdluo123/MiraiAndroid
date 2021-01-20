@@ -14,15 +14,15 @@ interface IbotAidlInterface {
     long getLogonId();
 
     //Script
-    String[] getHostList();
-    boolean reloadScript(int index);
-    void setScriptConfig(String config);
-    void deleteScript(int index);
-    int getScriptSize();
-    void openScript(int index);
-    boolean createScript(String name,int type);
-    void enableScript(int index);
-    void disableScript(int index);
+//    String[] getHostList();
+//    boolean reloadScript(int index);
+//    void setScriptConfig(String config);
+//    void deleteScript(int index);
+//    int getScriptSize();
+//    void openScript(int index);
+//    boolean createScript(String name,int type);
+//    void enableScript(int index);
+//    void disableScript(int index);
     String getBotInfo();
 
 
