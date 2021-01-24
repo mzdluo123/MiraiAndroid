@@ -42,9 +42,6 @@ import net.mamoe.mirai.utils.MiraiLogger
 import splitties.experimental.ExperimentalSplittiesApi
 import java.nio.file.Path
 
-@ConsoleFrontEndImplementation
-@ExperimentalSplittiesApi
-@ExperimentalUnsignedTypes
 class AndroidMiraiConsole(
     val context: Context,
     rootPath: Path,

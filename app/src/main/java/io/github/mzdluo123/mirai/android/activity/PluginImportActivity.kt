@@ -21,7 +21,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 
-@ExperimentalUnsignedTypes
 class PluginImportActivity : AppCompatActivity() {
 
     private lateinit var uri: Uri

@@ -10,10 +10,8 @@ import splitties.experimental.ExperimentalSplittiesApi
 
 private const val LOGGER_IDENTITY = "MA"
 
-@ExperimentalSplittiesApi
 private val logStorage = LoopQueue<String>(AppSettings.logBuffer)
 
-@ExperimentalSplittiesApi
 private val printToSysLog = AppSettings.printToLogcat
 
 private enum class LogColor(val color: String) {
@@ -24,8 +22,6 @@ private enum class LogColor(val color: String) {
     ERROR("#DD1C1A")
 }
 
-@ExperimentalUnsignedTypes
-@OptIn(ExperimentalSplittiesApi::class)
 object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
         val log = "[${priority.name}] ${message ?: e}"

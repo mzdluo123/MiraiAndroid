@@ -9,7 +9,6 @@ import okhttp3.Dns
 import okhttp3.Request
 import java.net.InetAddress
 
-@ExperimentalUnsignedTypes
 class SafeDns : Dns {
     override fun lookup(hostname: String): List<InetAddress> {
         return runBlocking {

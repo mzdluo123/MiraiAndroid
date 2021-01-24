@@ -11,7 +11,6 @@ import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.BotService
 
-@ExperimentalUnsignedTypes
 object NotificationFactory {
 
     const val SERVICE_NOTIFICATION = "service"

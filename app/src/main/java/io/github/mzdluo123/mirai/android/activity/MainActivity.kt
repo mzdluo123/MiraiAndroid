@@ -34,7 +34,6 @@ import java.io.File
 import java.io.FileReader
 
 
-@ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     companion object {
         const val TAG = "MainActivity"

@@ -17,7 +17,6 @@ import kotlinx.android.synthetic.main.activity_unsafe_login.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@ExperimentalUnsignedTypes
 class UnsafeLoginActivity : AppCompatActivity() {
 
     private lateinit var conn: ServiceConnector

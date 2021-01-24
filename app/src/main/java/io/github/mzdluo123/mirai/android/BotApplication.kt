@@ -17,7 +17,6 @@ import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.data.StringFormat
 
-@ExperimentalUnsignedTypes
 class BotApplication : Application() {
     companion object {
 

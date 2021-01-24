@@ -10,7 +10,6 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.utils.LoginSolver
 
 
-@ExperimentalUnsignedTypes
 class AndroidLoginSolver(private val context: Context) : LoginSolver() {
     lateinit var verificationResult: CompletableDeferred<String>
     lateinit var captchaData: ByteArray

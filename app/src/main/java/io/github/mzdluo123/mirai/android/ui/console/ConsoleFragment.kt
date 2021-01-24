@@ -30,7 +30,6 @@ import splitties.toast.toast
 import java.security.MessageDigest
 
 
-@ExperimentalUnsignedTypes
 class ConsoleFragment : Fragment() {
     companion object {
         const val TAG = "ConsoleFragment"

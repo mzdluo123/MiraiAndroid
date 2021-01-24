@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.activity_captcha.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@ExperimentalUnsignedTypes
 class CaptchaActivity : AppCompatActivity() {
     private lateinit var conn: ServiceConnector
 

@@ -76,6 +76,13 @@ android {
     }
 }
 
+kotlin.sourceSets.all {
+    languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+    languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+    languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
+    languageSettings.useExperimentalAnnotation("splitties.experimental.ExperimentalSplittiesApi")
+}
+
 dependencies {
     implementation (fileTree(dir: 'libs', include: ['*.jar']))
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

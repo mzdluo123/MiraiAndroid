@@ -4,7 +4,6 @@ import splitties.experimental.ExperimentalSplittiesApi
 import splitties.preferences.Preferences
 import kotlin.reflect.KProperty
 
-@ExperimentalSplittiesApi
 object AppSettings : Preferences("setting") {
 
     class IntPrefSaveAsStr(private val key: String, private val defaultValue: Int) {

@@ -43,8 +43,6 @@ import splitties.experimental.ExperimentalSplittiesApi
 import kotlin.system.exitProcess
 
 
-@ExperimentalSplittiesApi
-@ExperimentalUnsignedTypes
 class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
     @ConsoleFrontEndImplementation
     lateinit var consoleFrontEnd: AndroidMiraiConsole

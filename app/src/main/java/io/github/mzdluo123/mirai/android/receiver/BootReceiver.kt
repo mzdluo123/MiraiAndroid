@@ -8,7 +8,6 @@ import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.service.BotService
 import splitties.experimental.ExperimentalSplittiesApi
 
-@ExperimentalSplittiesApi
 class BootReceiver : BroadcastReceiver() {
     //    companion object{
 //        const val TAG = "BootReceiver"
