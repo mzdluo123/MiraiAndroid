@@ -39,7 +39,6 @@ import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.message.data.At
-import splitties.experimental.ExperimentalSplittiesApi
 import kotlin.system.exitProcess
 
 
@@ -94,7 +93,9 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
             }
         } catch (e: Exception) {
             Log.e("onStartCommand", e.message ?: "null")
-            MiraiAndroidLogger.info("onStartCommand:发生错误 $e")
+            e.printStackTrace()
+            MiraiAndroidLogger.error("onStartCommand:发生错误")
+            MiraiAndroidLogger.error(e)
         }
         return super.onStartCommand(intent, flags, startId)
     }
@@ -174,6 +175,7 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
             consoleFrontEnd.afterBotLogin(bot)
             ScriptManager.onEnable(bot)
         }
+
     }
 
     private fun stopConsole() {
