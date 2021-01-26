@@ -62,6 +62,6 @@ object ScriptManager {
     }
 
     fun listScript(): List<String> {
-        return scriptFolder.list().toList()
+        return scriptFolder.list()!!.toList()
     }
 }

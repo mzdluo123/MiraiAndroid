@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 
 
-def CORE_VERSION = "2.0-RC"
+def CORE_VERSION = "2.1.0"
 def CONSOLE_VERSION = "2.0.0"
 def LUAMIRAI_VERSION = "0.5.0"
 
@@ -63,6 +63,7 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
         exclude("META-INF/*.kotlin_module")
+
     }
 
     lintOptions {
@@ -128,7 +129,10 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
 
     //mirai-core
-    implementation "net.mamoe:mirai-core:$CORE_VERSION"
+    implementation("net.mamoe:mirai-core:$CORE_VERSION"){
+        exclude  module: "mirai-core-utils"
+         // 修复Duplicate class
+    }
 
 //    //mirai-lua
 //    implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
@@ -153,7 +157,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //yaml
-    implementation 'net.mamoe.yamlkt:yamlkt:0.4.0'
+    implementation 'net.mamoe.yamlkt:yamlkt:0.7.5'
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
     //okhttp3
@@ -178,7 +182,7 @@ dependencies {
 
 
 
-//  https://mvnrepository.com/artifact/net.mamoe/mirai-console
- implementation group: 'net.mamoe', name: 'mirai-console', version: CONSOLE_VERSION
+    //  https://mvnrepository.com/artifact/net.mamoe/mirai-console
+     implementation group: 'net.mamoe', name: 'mirai-console', version: CONSOLE_VERSION
 
 }

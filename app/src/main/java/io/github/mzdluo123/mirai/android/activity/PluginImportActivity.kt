@@ -33,12 +33,12 @@ class PluginImportActivity : AppCompatActivity() {
         setContentView(R.layout.activity_plugin_import)
 //        uri = Uri.parse(intent.getStringExtra("uri"))
 
-        val errorHandel = CoroutineExceptionHandler { _, e ->
-            Toast.makeText(this, "无法打开这个文件，请检查这是不是一个合法的插件jar文件", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-            finish()
-
-        }
+//        val errorHandel = CoroutineExceptionHandler { _, e ->
+//            Toast.makeText(this, "无法打开这个文件，请检查这是不是一个合法的插件jar文件", Toast.LENGTH_SHORT).show()
+//            e.printStackTrace()
+//            finish()
+//
+//        }
         uri = intent.data ?: return
         pluginViewModel = ViewModelProvider(this).get(PluginViewModel::class.java)
         activityPluginImportBinding =

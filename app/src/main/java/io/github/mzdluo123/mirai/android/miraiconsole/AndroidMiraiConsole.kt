@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.*
@@ -26,7 +27,6 @@ import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginDataStorage
-import net.mamoe.mirai.console.internal.MiraiConsoleBuildConstants
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
 import net.mamoe.mirai.console.util.NamedSupervisorJob
@@ -39,14 +39,13 @@ import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
-import splitties.experimental.ExperimentalSplittiesApi
 import java.nio.file.Path
 
 class AndroidMiraiConsole(
     val context: Context,
     rootPath: Path,
 ) : MiraiConsoleImplementation,
-    CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { coroutineContext, throwable ->
+    CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { _, throwable ->
         Log.e("MiraiAndroid", "发生异常")
         throwable.printStackTrace()
 
@@ -199,7 +198,7 @@ object AndroidConsoleFrontEndDescImpl : MiraiConsoleFrontEndDescription {
 
     // net.mamoe.mirai.console.internal.MiraiConsoleBuildConstants.version
     // is console's version not frontend's version
-    override val version: SemVersion = SemVersion(MiraiConsoleBuildConstants.versionConst)
+    override val version: SemVersion = SemVersion(BuildConfig.VERSION_NAME)
 }
 
 @ConsoleFrontEndImplementation
