@@ -131,9 +131,21 @@ class PluginFragment : Fragment() {
 
 
 class PluginsAdapter() :
-    BaseQuickAdapter<File, BaseViewHolder>(R.layout.item_plugin) {
-    override fun convert(holder: BaseViewHolder, item: File) {
+    BaseQuickAdapter<MAPluginData, BaseViewHolder>(R.layout.item_plugin) {
+    override fun convert(holder: BaseViewHolder, item: MAPluginData) {
         holder.setText(R.id.pluginName_text, item.name)
-        holder.setText(R.id.pluginSize_text, "${item.length() / 1024}kb")
+        holder.setText(R.id.pluginSize_text, "${item.size}kb")
+        if (item.apkPackageName != null) {
+            holder.setVisible(R.id.text_apkFlag, true)
+        }
     }
+}
+
+data class MAPluginData(
+    val name: String,
+    val size: Long,
+    val file: File,
+    val apkPackageName: String? = null
+) {
+
 }
