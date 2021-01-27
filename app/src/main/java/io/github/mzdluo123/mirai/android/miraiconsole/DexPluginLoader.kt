@@ -87,7 +87,8 @@ class DexPluginLoader(val odexPath: String) :
             }
         }
 
-        val filePlugins = this.filterNot {
+
+        val filePlugins = (this + ApkPluginLoader.apkPluginFile()).filterNot {
             pluginFileToInstanceMap.containsKey(it)
         }.associateWith {
             // DexClassLoader(it.absolutePath,odexPath,it.path,MiraiConsole::class.java.classLoader )
