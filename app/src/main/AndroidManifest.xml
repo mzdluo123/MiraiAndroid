@@ -16,10 +16,12 @@
         android:icon="@mipmap/ic_new_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:debuggable="true"
         android:roundIcon="@mipmap/ic_new_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:ignore="HardcodedDebugMode">
         <activity
             android:name=".activity.CrashReportActivity"
             android:theme="@style/AppTheme"
