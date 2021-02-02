@@ -82,7 +82,7 @@ class ConsoleFragment : Fragment() {
             override fun newLog(log: String) {
                 lifecycleScope.launch(Dispatchers.Main) {
                     log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
-                    log_text.append("\n")
+                    log_text?.append("\n")
                     if (autoScroll) {
                         delay(20)
                         main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
@@ -136,7 +136,7 @@ class ConsoleFragment : Fragment() {
                 }, lifecycleScope
             )
             R.id.action_clean -> {
-                log_text.text = ""
+                log_text?.text = ""
                 conn.botService.clearLog()
             }
             /*
