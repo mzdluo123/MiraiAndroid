@@ -109,7 +109,7 @@ class PluginImportActivity : AppCompatActivity() {
                         copyToFileDir(
                             uri,
                             name,
-                            this@PluginImportActivity.getExternalFilesDir("files/plugins")!!.absolutePath
+                            this@PluginImportActivity.getExternalFilesDir("plugins")!!.absolutePath
                         )
                     }
                     dialog.dismiss()
