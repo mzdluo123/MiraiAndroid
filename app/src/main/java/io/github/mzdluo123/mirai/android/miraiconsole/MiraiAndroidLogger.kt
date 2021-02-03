@@ -32,17 +32,19 @@ object MiraiAndroidLogger :
                     "<br>"
                 ) ?: e
             }"
-        logStorage.add(colorLog)
-        for (i in 0 until BotService.consoleUi.beginBroadcast()) {
-            try {
-                BotService.consoleUi.getBroadcastItem(i).newLog(colorLog)
-            } catch (remoteE: Exception) {
-                Log.e("MA", remoteE.message ?: "发生错误")
-                remoteE.printStackTrace()
-            }
 
+        synchronized(this) {
+            logStorage.add(colorLog)
+            for (i in 0 until BotService.consoleUi.beginBroadcast()) {
+                try {
+                    BotService.consoleUi.getBroadcastItem(i).newLog(colorLog)
+                } catch (remoteE: Exception) {
+                    Log.e("MA", remoteE.message ?: "发生错误")
+                    remoteE.printStackTrace()
+                }	
+            }
+            BotService.consoleUi.finishBroadcast()
         }
-        BotService.consoleUi.finishBroadcast()
 
         if (BuildConfig.DEBUG || printToSysLog) {
             Log.i("MA", log)
