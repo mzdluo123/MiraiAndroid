@@ -4,6 +4,8 @@ MiraiAndroid提供了加载dex作为插件的功能，该功能最初的版本(d
 
 为解决此问题，我们开发了apk插件系统，类似于xposed模块
 
+你可以使用[项目模板](https://github.com/project-mirai/MAPluginTemplate)快速开始开发
+
 # 创建项目
 
 首先创建一个空项目
