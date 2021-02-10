@@ -178,7 +178,12 @@ class ConsoleFragment : Fragment() {
             if (!command.startsWith("/")) {
                 command = "/$command"
             }
-            conn.botService.runCmd(command)
+            try {
+                conn.botService.runCmd(command)
+            }
+            catch (e: DeadObjectException) {
+                //pass
+            }
         }
         command_input.text.clear()
     }
