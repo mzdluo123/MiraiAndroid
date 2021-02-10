@@ -52,8 +52,8 @@ class ConsoleFragment : Fragment() {
         return root
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         commandSend_btn.setOnClickListener {
             submitCmd()
@@ -78,11 +78,12 @@ class ConsoleFragment : Fragment() {
             }
             return@setOnEditorActionListener false
         }
+        // 将新的log显示到屏幕
         conn.registerConsole(object : IConsole.Stub() {
             override fun newLog(log: String) {
-                lifecycleScope.launch(Dispatchers.Main) {
-                    log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                     log_text.append("\n")
+                    log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
                     if (autoScroll) {
                         delay(20)
                         main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
@@ -90,8 +91,8 @@ class ConsoleFragment : Fragment() {
                 }
             }
         })
-
-        conn.connectStatus.observe(this, Observer {
+        // 首次启动加载缓存中的log
+        conn.connectStatus.observe(viewLifecycleOwner, Observer {
             Log.d(TAG, "service status $it")
             if (it) {
                 lifecycleScope.launch(Dispatchers.Default) {
@@ -180,12 +181,13 @@ class ConsoleFragment : Fragment() {
             }
             try {
                 conn.botService.runCmd(command)
+                command_input.text.clear()
             }
             catch (e: DeadObjectException) {
-                //pass
+                toast("服务状态异常，请在菜单内点击快速重启")
             }
         }
-        command_input.text.clear()
+
     }
 
     private fun setAutoLogin() {
