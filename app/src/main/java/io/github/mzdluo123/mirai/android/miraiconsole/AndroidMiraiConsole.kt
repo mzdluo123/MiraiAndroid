@@ -47,7 +47,7 @@ class AndroidMiraiConsole(
 ) : MiraiConsoleImplementation,
     CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { _, throwable ->
         Log.e("MiraiAndroid", "发生异常")
-        throwable.printStackTrace()
+        logException(throwable)
 
     }
     ) {
