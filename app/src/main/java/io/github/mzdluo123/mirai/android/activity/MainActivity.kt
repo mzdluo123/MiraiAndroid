@@ -16,11 +16,13 @@ import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.utils.RequestUtil
 import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
@@ -29,13 +31,17 @@ import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.message
 import splitties.alertdialog.appcompat.okButton
+import splitties.lifecycle.coroutines.coroutineScope
 import splitties.toast.toast
 import java.io.File
 import java.io.FileReader
 
 
-class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+class MainActivity : AppCompatActivity() {
     companion object {
+        const val CRASH_FILE_PREFIX = "crashdata"
+        const val CRASH_FILE_DIR = "crash"
+        const val UPDATE_URL = "https://api.github.com/repos/mzdluo123/MiraiAndroid/releases/latest"
         const val TAG = "MainActivity"
     }
 
@@ -62,91 +68,43 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
-
-        BotApplication.context.startBotService()
-        btn_exit.setOnClickListener {
-            BotApplication.context.stopBotService()
-            NotificationFactory.dismissAllNotification()
-            finish()
-        }
-        btn_reboot.setOnClickListener {
-            NotificationFactory.dismissAllNotification()
-            launch {
-                BotApplication.context.stopBotService()
-                delay(1000)
-                BotApplication.context.startBotService()
-                navController.popBackStack()
-                navController.navigate(R.id.nav_console)  // 重新启动console fragment，使其能够链接到服务
-                drawer_layout.closeDrawers()
-            }
-        }
-
-        checkCrash()
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            toast("检查更新失败")
-            throwable.printStackTrace()
-            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
-//            finish()
-//            BotApplication.context.stopBotService()
-        }
-
-        if (BuildConfig.DEBUG) {
-            toast("跳过更新检查")
-        } else {
-            lifecycleScope.launch(exceptionHandler) {
-                checkUpdate()
-            }
-        }
-            // throw Exception("测试异常")
+        (application as BotApplication).startBotService()
+        setupListeners()
+        crashCheck()
+        if (BuildConfig.DEBUG) toast("跳过更新检查")
+        else updateCheck()
     }
-
 
     override fun onSupportNavigateUp(): Boolean =
         navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
-
-    private suspend fun checkUpdate() {
-        val rep = withContext(Dispatchers.IO) {
-            val client = OkHttpClient.Builder().dns(SafeDns()).build()
-            val res = client.newCall(
-                Request.Builder()
-                    .url("https://api.github.com/repos/mzdluo123/MiraiAndroid/releases/latest")
-                    .build()
-            ).execute().body?.string()
-            client.dispatcher.executorService.shutdown();
-            client.connectionPool.evictAll();
-            client.cache?.close()
-            return@withContext res
-        }
-
-        val json =
-            BotApplication.json.value.parseToJsonElement(rep ?: throw IllegalStateException("返回为空"))
-        if (json.jsonObject.containsKey("url")) {
-            val body = json.jsonObject["body"]?.jsonPrimitive?.content ?: "暂无更新记录"
-            val htmlUrl = json.jsonObject["html_url"]!!.jsonPrimitive.content
-            val version = json.jsonObject["tag_name"]!!.jsonPrimitive.content
-            if (version == BuildConfig.VERSION_NAME) {
-                return
-            }
-            withContext(Dispatchers.Main) {
-                alertDialog(title = "发现新版本 $version", message = body) {
-                    setPositiveButton("立即更新") { _, _ ->
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl)))
-                    }
-                }.show()
-            }
-        } else {
-            throw IllegalStateException("检查更新失败")
+    private fun setupListeners(){
+        btn_exit.setOnClickListener { exit() }
+        btn_reboot.setOnClickListener {
+            lifecycleScope.launch { quickReboot() }
         }
     }
 
-    private fun checkCrash() {
-        val crashDataFile = File(getExternalFilesDir("crash"), "crashdata")
+    private fun exit(){
+        (application as BotApplication).stopBotService()
+        NotificationFactory.dismissAllNotification()
+        finish()
+    }
+
+    private suspend fun quickReboot(){
+        NotificationFactory.dismissAllNotification()
+        (application as BotApplication).stopBotService()
+        delay(1000)
+        (application as BotApplication).startBotService()
+        navController.popBackStack()
+        navController.navigate(R.id.nav_console)  // 重新启动console fragment，使其能够链接到服务
+        drawer_layout.closeDrawers()
+    }
+
+    private fun crashCheck() {
+        val crashDataFile = File(getExternalFilesDir(CRASH_FILE_DIR), CRASH_FILE_PREFIX)
         if (!crashDataFile.exists()) return
-        var crashData: String
-        FileReader(crashDataFile).also {
-            crashData = it.readText()
-        }.close()
+        val crashData = crashDataFile.readText()
         alertDialog {
             message = "检测到你上一次异常退出，是否上传崩溃日志？"
             okButton {
@@ -154,12 +112,30 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             }
             cancelButton { }
         }.show()
-        crashDataFile.renameTo(
-            File(
-                getExternalFilesDir("crash"),
-                "crashdata${System.currentTimeMillis()}"
-            )
-        )
+        crashDataFile.renameTo(File(getExternalFilesDir(CRASH_FILE_DIR), CRASH_FILE_PREFIX + System.currentTimeMillis()))
     }
 
+    private fun updateCheck(){
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            toast("检查更新失败")
+            throwable.printStackTrace()
+            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
+//            finish()
+//            BotApplication.context.stopBotService()
+        }
+        lifecycleScope.launch(exceptionHandler) {
+            val responseText = RequestUtil.get(UPDATE_URL){ dns(SafeDns()) }
+            val responseJsonObject = Json.parseToJsonElement(responseText).jsonObject
+            if (!responseJsonObject.containsKey("url")) throw IllegalStateException("检查更新失败")
+            val body = responseJsonObject["body"]?.jsonPrimitive?.content ?: "暂无更新记录"
+            val htmlUrl = responseJsonObject["html_url"]!!.jsonPrimitive.content
+            val version = responseJsonObject["tag_name"]!!.jsonPrimitive.content
+            if (version == BuildConfig.VERSION_NAME) return@launch
+            alertDialog(title = "发现新版本 $version", message = body) {
+                setPositiveButton("立即更新") { _, _ ->
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl)))
+                }
+            }.show()
+        }
+    }
 }
