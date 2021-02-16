@@ -28,7 +28,10 @@ import io.github.mzdluo123.mirai.android.miraiconsole.logException
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -188,13 +191,14 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
 //        if (wakeLock.isHeld) {
 //            wakeLock.release()
 //        }
+        launch {
+            ScriptManager.onDisable()
+            ConsoleCommandSender.executeCommand("stop")
+            stopForeground(true)
+            stopSelf()
+            exitProcess(0)
+        }
 
-        MiraiConsole.job.cancel()
-        ScriptManager.onDisable()
-        this.cancel()
-        stopForeground(true)
-        stopSelf()
-        exitProcess(0)
     }
 
     private fun registerReceiver() {
@@ -244,7 +248,7 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
-                runBlocking {
+                launch {
                     ConsoleCommandSender.executeCommand(cmd)
                 }
             }
