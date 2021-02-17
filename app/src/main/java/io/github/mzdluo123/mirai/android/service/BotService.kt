@@ -9,7 +9,6 @@
 package io.github.mzdluo123.mirai.android.service
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -17,6 +16,8 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.RemoteCallbackList
 import android.util.Log
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -41,8 +42,7 @@ import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.message.data.At
 import kotlin.system.exitProcess
 
-
-class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
+class BotService : LifecycleService() {
     @ConsoleFrontEndImplementation
     lateinit var consoleFrontEnd: AndroidMiraiConsole
         private set
@@ -54,7 +54,6 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
     private val allowPushMsg = AppSettings.allowPushMsg
-
 
 // 多进程调试辅助
 //  init {
@@ -72,12 +71,13 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
     }
 
     private fun createNotification() {
-        NotificationFactory.statusNotification().let {
-            startForeground(NOTIFICATION_ID, it) //设置为前台服务
-        }
+        startForeground(NOTIFICATION_ID, NotificationFactory.statusNotification())
     }
 
-    override fun onBind(intent: Intent): IBinder = binder
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
+        return binder
+    }
 
     @ConsoleFrontEndImplementation
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -114,18 +114,16 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         val qq = intent.getLongExtra("qq", 0)
         val pwd = intent.getStringExtra("pwd")
         if (qq == 0L) return
-
         //CommandManager.runCommand(ConsoleCommandSender, "login $qq $pwd")
         MiraiAndroidLogger.info("自动登录....")
         val handler = CoroutineExceptionHandler { _, throwable ->
             MiraiAndroidLogger.error("自动登录失败 $throwable")
         }
-
         // 新的自动登录
         //MiraiConsole.addBot().alsoLogin()
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
-        launch(handler) { bot.login() }
+        lifecycleScope.launch(handler) { bot.login() }
     }
 
     private fun registerDefaultCommand() {
@@ -175,23 +173,18 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
             consoleFrontEnd.afterBotLogin(bot)
             ScriptManager.onEnable(bot)
         }
-
     }
 
     private fun stopConsole() {
         if (!isStart) return
         Log.e(TAG, "停止服务")
-        if (allowPushMsg) {
-            unregisterReceiver(msgReceiver)
-        }
-
+        if (allowPushMsg) unregisterReceiver(msgReceiver)
 //        if (wakeLock.isHeld) {
 //            wakeLock.release()
 //        }
-
         MiraiConsole.job.cancel()
         ScriptManager.onDisable()
-        this.cancel()
+        lifecycleScope.cancel()
         stopForeground(true)
         stopSelf()
         exitProcess(0)
@@ -209,14 +202,12 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         }
     }
 
-
     internal fun sendFriendMsg(id: Long, msg: String?) {
         bot?.launch {
             MiraiAndroidLogger.info("[MA] 成功处理一个好友消息推送请求: $msg->$id")
             this@BotService.bot!!.getFriend(id)?.sendMessage(msg!!) ?: return@launch
         }
     }
-
 
     internal fun sendGroupMsg(id: Long, msg: String?) {
         bot?.launch {
@@ -233,14 +224,12 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         }
     }
 
-
     @ExperimentalUnsignedTypes
     private fun String.chunkedHexToBytes(): ByteArray =
         this.asSequence().chunked(2).map { (it[0].toString() + it[1]).toUByte(16).toByte() }
             .toList().toByteArray()
 
     inner class BotBinder : IbotAidlInterface.Stub() {
-
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
@@ -258,31 +247,27 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
             consoleUi.unregister(instance)
         }
 
-        override fun getLog(): MutableList<String>? {
-
+        override fun getLog(): MutableList<String> {
             return MiraiAndroidLogger.logs
         }
 
         @ConsoleFrontEndImplementation
         override fun submitVerificationResult(result: String?) {
             result?.let {
-
                 consoleFrontEnd.loginSolver.verificationResult.complete(it)
             }
         }
-
 
         override fun clearLog() {
             MiraiAndroidLogger.clearLog()
         }
 
-
         @ConsoleFrontEndImplementation
         override fun getUrl(): String = consoleFrontEnd.loginSolver.url
 
-
         @ConsoleFrontEndImplementation
         override fun getCaptcha(): ByteArray = consoleFrontEnd.loginSolver.captchaData
+
         override fun getLogonId(): Long {
             return try {
                 Bot.instances.first().id
@@ -291,7 +276,6 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
             }
         }
 
-
         override fun sendLog(log: String?) {
             MiraiAndroidLogger.info(log)
         }
@@ -299,5 +283,4 @@ class BotService : Service(), CoroutineScope by CoroutineScope(Job()) {
         override fun getBotInfo(): String = MiraiAndroidStatus.recentStatus().format()
 
     }
-
 }

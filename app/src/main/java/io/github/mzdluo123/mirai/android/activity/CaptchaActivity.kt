@@ -25,7 +25,7 @@ class CaptchaActivity : AppCompatActivity() {
 
         conn = ServiceConnector(this)
         lifecycle.addObserver(conn)
-        conn.connectStatus.observe(this, Observer {
+        conn.connectStatus.observe(this, {
             if (it) {
                 val data = conn.botService.captcha
                 lifecycleScope.launch(Dispatchers.Main) {

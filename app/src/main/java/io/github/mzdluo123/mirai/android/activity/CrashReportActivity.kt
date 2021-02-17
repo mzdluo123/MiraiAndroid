@@ -11,19 +11,15 @@ import org.acra.interaction.DialogInteraction
 import java.io.File
 
 class CrashReportActivity : BaseCrashReportDialog() {
-
     override fun onStart() {
         super.onStart()
         setContentView(R.layout.activity_crash)
-        val file = getIntent().getSerializableExtra(DialogInteraction.EXTRA_REPORT_FILE) as File
-        val persister = CrashReportPersister()
-        val data = persister.load(file)
+        val file = intent.getSerializableExtra(DialogInteraction.EXTRA_REPORT_FILE) as File
+        val data = CrashReportPersister().load(file)
         file.delete()
         crach_data_text.text = data["STACK_TRACE"].toString()
-
         crash_share.setOnClickListener {
             shareText(data.toJSON(), lifecycleScope)
         }
     }
-
 }

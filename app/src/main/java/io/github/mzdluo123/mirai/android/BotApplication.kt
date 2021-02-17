@@ -25,7 +25,6 @@ class BotApplication : Application() {
 
         val httpClient = lazy { OkHttpClient() }
         val json = lazy { Json.Default }
-
     }
 
 
