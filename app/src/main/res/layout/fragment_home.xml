@@ -43,6 +43,7 @@
 
     <ImageButton
         android:id="@+id/commandSend_btn"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:scaleType="fitCenter"
@@ -54,6 +55,7 @@
 
     <ImageButton
         android:id="@+id/shortcutBottom_btn"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_baseline_keyboard_arrow_up_24"
