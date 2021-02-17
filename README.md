@@ -25,7 +25,7 @@
 
 mirai-console的Android前端程序，可作为qq机器人使用，支持多种脚本接口，已适配MiraiConsole 2.0
 
-关于mirai项目以及mirai-console的一切请点击[这里](https://github.com/mamoe/mirai)
+如果你不知道什么是mirai或者是mirai-console，请到这里了解更多信息[mirai](https://github.com/mamoe/mirai)
 
 相比使用`Termux`或者是`Linux Deploy`等应用运行mirai的方案，该项目提供的方案具有更好的性能以及更少的资源占用，但可能存在兼容性问题
 
