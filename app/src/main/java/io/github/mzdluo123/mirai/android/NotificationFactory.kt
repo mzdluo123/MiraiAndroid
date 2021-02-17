@@ -3,7 +3,6 @@ package io.github.mzdluo123.mirai.android
 import android.app.*
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -25,8 +24,7 @@ object NotificationFactory {
     internal fun initNotification() {
         val notificationManager =
             context.getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // 只在8.0系统上注册通知通道，防止程序崩溃
+
             val statusChannel = NotificationChannel(
                 SERVICE_NOTIFICATION, "状态通知",
                 NotificationManager.IMPORTANCE_MIN
@@ -54,7 +52,7 @@ object NotificationFactory {
             notificationManager.createNotificationChannel(statusChannel)
             notificationManager.createNotificationChannel(captchaChannel)
             notificationManager.createNotificationChannel(offlineChannel)
-        }
+
     }
 
     internal fun dismissAllNotification() {
@@ -85,7 +83,8 @@ object NotificationFactory {
                 PendingIntent.getActivity(
                     context,
                     0,
-                    Intent(context, MainActivity::class.java), PendingIntent.FLAG_NO_CREATE
+                    Intent(context, MainActivity::class.java),
+                    0
                 )
             )
             .setContentTitle("MiraiAndroid") //创建通知
@@ -117,9 +116,7 @@ object NotificationFactory {
 
     internal fun captchaNotification(activity: Class<*>): Notification {
 
-        val notifyIntent = Intent(context, activity).apply {
-
-        }
+        val notifyIntent = Intent(context, activity)
 //        val notifyPendingIntent = PendingIntent.getActivity(
 //            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
 //        )
