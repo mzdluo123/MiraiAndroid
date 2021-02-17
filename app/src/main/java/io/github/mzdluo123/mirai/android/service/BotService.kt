@@ -25,10 +25,14 @@ import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
+import io.github.mzdluo123.mirai.android.miraiconsole.logException
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -93,8 +97,6 @@ class BotService : LifecycleService() {
             }
         } catch (e: Exception) {
             Log.e("onStartCommand", e.message ?: "null")
-            e.printStackTrace()
-            MiraiAndroidLogger.error("onStartCommand:发生错误")
             MiraiAndroidLogger.error(e)
         }
         return super.onStartCommand(intent, flags, startId)
@@ -118,6 +120,7 @@ class BotService : LifecycleService() {
         MiraiAndroidLogger.info("自动登录....")
         val handler = CoroutineExceptionHandler { _, throwable ->
             MiraiAndroidLogger.error("自动登录失败 $throwable")
+            logException(throwable)
         }
         // 新的自动登录
         //MiraiConsole.addBot().alsoLogin()
@@ -233,7 +236,7 @@ class BotService : LifecycleService() {
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
-                runBlocking {
+                launch {
                     ConsoleCommandSender.executeCommand(cmd)
                 }
             }

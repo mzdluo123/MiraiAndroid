@@ -1,9 +1,15 @@
 package io.github.mzdluo123.mirai.android.ui.console
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.DeadObjectException
+import android.os.PowerManager
+import android.provider.Settings
 import android.text.Html
 import android.util.Log
 import android.view.*
@@ -11,6 +17,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -114,10 +121,6 @@ class ConsoleFragment : Fragment() {
         startLoadAvatar()
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_console, menu)
     }
@@ -140,38 +143,34 @@ class ConsoleFragment : Fragment() {
                 log_text.text = ""
                 conn.botService.clearLog()
             }
-            /*
+
             R.id.action_battery -> {
                 ignoreBatteryOptimization(requireActivity())
             }
-
-            R.id.action_fast_restart -> {
-                NotificationFactory.dismissAllNotification()
-                restart()
-            }*/
+            /*
+                    R.id.action_fast_restart -> {
+                        NotificationFactory.dismissAllNotification()
+                        restart()
+                    }*/
         }
         return false
     }
 
-//    @SuppressLint("BatteryLife")
-//    private fun ignoreBatteryOptimization(activity: Activity) {
-//        val powerManager =
-//            getSystemService(requireContext(), PowerManager::class.java)
-//        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
-//            if (!hasIgnored) {
-//                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-//                intent.data = Uri.parse("package:" + activity.packageName)
-//                startActivity(intent)
-//            } else {
-//                Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
-//            }
-//        } else {
-//            Toast.makeText(requireContext(), "只有新版Android才需要这个操作哦", Toast.LENGTH_SHORT).show()
-//
-//        }
-//    }
+    @SuppressLint("BatteryLife")
+    private fun ignoreBatteryOptimization(activity: Activity) {
+        val powerManager =
+            getSystemService(requireContext(), PowerManager::class.java)
+        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+
+        val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+        if (!hasIgnored) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:" + activity.packageName)
+            startActivity(intent)
+        } else {
+            Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private fun submitCmd() {
         var command = command_input.text.toString()

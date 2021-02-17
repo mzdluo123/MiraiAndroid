@@ -6,7 +6,8 @@ import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
 import net.mamoe.mirai.utils.SimpleLogger
-import splitties.experimental.ExperimentalSplittiesApi
+import java.io.PrintWriter
+import java.io.StringWriter
 
 private const val LOGGER_IDENTITY = "MA"
 
@@ -20,6 +21,12 @@ private enum class LogColor(val color: String) {
     DEBUG(" #136E70"),
     WARNING("#FEAC48"),
     ERROR("#DD1C1A")
+}
+
+fun logException(err: Throwable) {
+    val stringWriter = StringWriter()
+    err.printStackTrace(PrintWriter(stringWriter))
+    MiraiAndroidLogger.error(stringWriter.toString())
 }
 
 object MiraiAndroidLogger :
@@ -41,21 +48,26 @@ object MiraiAndroidLogger :
                 } catch (remoteE: Exception) {
                     Log.e("MA", remoteE.message ?: "发生错误")
                     remoteE.printStackTrace()
-                }	
+                    logException(remoteE)
+                }
             }
             BotService.consoleUi.finishBroadcast()
         }
 
         if (BuildConfig.DEBUG || printToSysLog) {
             Log.i("MA", log)
-            e?.printStackTrace()
+            if (e != null) {
+                e.printStackTrace()
+                logException(e)
+            }
+
         }
     }) {
     val logs: MutableList<String>
         get() = logStorage.toMutableList()
 
+
     fun clearLog() {
         logStorage.clear()
-
     }
 }

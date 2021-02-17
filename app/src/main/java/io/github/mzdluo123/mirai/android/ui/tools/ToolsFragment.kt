@@ -1,6 +1,7 @@
 package io.github.mzdluo123.mirai.android.ui.tools
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -56,20 +57,18 @@ class ToolsFragment : Fragment() {
             getDeviceFile()?.delete() ?: return@setOnClickListener
             toast("成功")
         }
-//        btn_open_data_folder.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_GET_CONTENT)
-//            intent.addCategory(Intent.CATEGORY_OPENABLE)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//            intent.setDataAndType(
-//                FileProvider.getUriForFile(
-//                    requireContext(),
-//                    requireContext().getPackageName() + ".provider",
-//
-//                ), "file/*"
-//            )
-//            requireContext().startActivity(intent)
-//
-//        }
+        btn_open_data_folder.setOnClickListener {
+            val intent = Intent()
+
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+            intent.component = ComponentName(
+                "com.android.documentsui",
+                "com.android.documentsui.files.FilesActivity"
+            )
+
+            requireContext().startActivity(intent)
+
+        }
     }
 
     private fun getDeviceFile(): File? {

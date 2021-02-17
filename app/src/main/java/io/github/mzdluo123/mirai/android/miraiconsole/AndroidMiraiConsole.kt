@@ -47,7 +47,7 @@ class AndroidMiraiConsole(
 ) : MiraiConsoleImplementation,
     CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { _, throwable ->
         Log.e("MiraiAndroid", "发生异常")
-        throwable.printStackTrace()
+        logException(throwable)
 
     }
     ) {
@@ -166,6 +166,9 @@ class AndroidMiraiConsole(
                 }
                 msgSpeed -= msgSpeeds[refreshCurrentPos]
                 msgSpeeds[refreshCurrentPos] = 0
+                if (msgSpeed < 0) {
+                    msgSpeed = 0
+                }
                 NotificationManagerCompat.from(BotApplication.context).apply {
                     notify(
                         BotService.NOTIFICATION_ID,

@@ -100,6 +100,17 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/path_shared_file" />
         </provider>
+        <provider
+            android:name="io.github.mzdluo123.mirai.android.provider.FileProvider"
+            android:authorities="${applicationId}.documents"
+            android:grantUriPermissions="true"
+            android:exported="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+
     </application>
 
 </manifest>
