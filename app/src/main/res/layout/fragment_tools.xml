@@ -30,36 +30,38 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!--    <androidx.cardview.widget.CardView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="8dp"-->
-    <!--        android:layout_marginTop="8dp"-->
-    <!--        android:layout_marginEnd="8dp">-->
-    <!--        <LinearLayout-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:orientation="vertical">-->
-    <!--            <TextView-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:layout_margin="10dp"-->
-    <!--                android:text="数据工具"-->
-    <!--                android:textSize="18sp"-->
-    <!--                android:textStyle="bold" />-->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="数据工具"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
 
-    <!--            <Button-->
-    <!--                android:id="@+id/btn_open_data_folder"-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:layout_marginHorizontal="8dp"-->
-    <!--                android:text="打开数据目录" />-->
+            <Button
+                android:id="@+id/btn_open_data_folder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:text="打开系统文件管理器" />
 
 
-    <!--        </LinearLayout>-->
+        </LinearLayout>
 
-    <!--    </androidx.cardview.widget.CardView>-->
+    </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
