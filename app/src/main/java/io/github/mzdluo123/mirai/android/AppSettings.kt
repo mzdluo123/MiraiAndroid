@@ -1,6 +1,5 @@
 package io.github.mzdluo123.mirai.android
 
-import splitties.experimental.ExperimentalSplittiesApi
 import splitties.preferences.Preferences
 import kotlin.reflect.KProperty
 
@@ -22,4 +21,5 @@ object AppSettings : Preferences("setting") {
     var printToLogcat by BoolPref("print_to_logcat_preference", false)
     var refreshPerMinute by IntPrefSaveAsStr("status_refresh_count", 15)
     var startOnBoot by BoolPref("start_on_boot_preference", false)
+    var waitingDebugger by BoolPref("waiting_debugger_preference", false)
 }
