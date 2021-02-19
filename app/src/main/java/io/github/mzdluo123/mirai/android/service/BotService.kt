@@ -18,6 +18,7 @@ import android.os.RemoteCallbackList
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import com.ooooonly.luaMirai.miraiconsole.LuaMiraiPlugin
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -37,6 +38,8 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.command.executeCommand
+import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.enable
+import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.load
 import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotOnlineEvent
@@ -163,6 +166,10 @@ class BotService : LifecycleService() {
 //            consoleVersion = BuildConfig.COREVERSION,
 //            path = getExternalFilesDir(null).toString()
 //        )
+        
+        LuaMiraiPlugin.load()
+        LuaMiraiPlugin.enable()
+
         registerReceiver()
         isStart = true
         createNotification()

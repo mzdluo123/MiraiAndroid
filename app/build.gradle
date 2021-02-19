@@ -7,7 +7,7 @@ apply plugin: 'kotlinx-serialization'
 
 def CORE_VERSION = "2.4.0"
 def CONSOLE_VERSION = "2.4.0"
-def LUAMIRAI_VERSION = "0.5.0"
+def LUAMIRAI_VERSION = "2.0.5"
 
 android {
     compileSdkVersion 30
@@ -135,15 +135,10 @@ dependencies {
 //         // 修复Duplicate class
 //    }
 
-//    //mirai-lua
-//    implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
-    //noinspection DuplicatePlatformClasses
-    //implementation 'org.json:json:20160212'
-    //{
-        //exclude module: 'okio'
-        //exclude module: 'okhttp3'
-    //}
-    //implementation 'com.ooooonly:giteeman:0.1.1'
+    //mirai-lua
+    implementation "com.ooooonly:luaMirai:$LUAMIRAI_VERSION"
+    implementation 'org.json:json:20160212'
+    implementation 'com.ooooonly:giteeman:0.1.1'
 
     //splitties
     implementation("com.louiscad.splitties:splitties-fun-pack-android-base:3.0.0-alpha06")
