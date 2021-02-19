@@ -24,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
+import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.R
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
@@ -78,6 +79,9 @@ class ConsoleFragment : Fragment() {
                 }
 
             }
+        }
+        if (AppSettings.waitingDebugger && conn.connectStatus.value == false) {
+            log_text.text = "正在等待调试器链接,PID见日志....."
         }
         command_input.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -181,8 +185,7 @@ class ConsoleFragment : Fragment() {
             try {
                 conn.botService.runCmd(command)
                 command_input.text.clear()
-            }
-            catch (e: DeadObjectException) {
+            } catch (e: DeadObjectException) {
                 toast("服务状态异常，请在菜单内点击快速重启")
             }
         }

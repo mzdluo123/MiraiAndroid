@@ -9,11 +9,10 @@
 package io.github.mzdluo123.mirai.android.service
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Debug
 import android.os.IBinder
-import android.os.PowerManager
 import android.os.RemoteCallbackList
 import android.util.Log
 import androidx.lifecycle.LifecycleService
@@ -30,7 +29,9 @@ import io.github.mzdluo123.mirai.android.miraiconsole.logException
 import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -52,17 +53,25 @@ class BotService : LifecycleService() {
         private set
     private val binder = BotBinder()
     private var isStart = false
-    private lateinit var powerManager: PowerManager
+    // private lateinit var powerManager: PowerManager
 
     // private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
     private val allowPushMsg = AppSettings.allowPushMsg
 
-// 多进程调试辅助
+    // 多进程调试辅助
 //  init {
 //        Debug.waitForDebugger()
 //    }
+
+    init {
+        if (AppSettings.waitingDebugger) {
+            MiraiAndroidLogger.info("等待调试器链接..... PID:${android.os.Process.myPid()}")
+            Debug.waitForDebugger()
+        }
+
+    }
 
     companion object {
         const val START_SERVICE = 0
@@ -107,7 +116,7 @@ class BotService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
-        powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        //powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
 

@@ -30,11 +30,12 @@
             android:key="start_on_boot_preference"
             android:summary="请加入开机自启白名单以确保能够正常开机启动"
             android:title="开机启动" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:icon="@drawable/ic_battery_alert_24"
-            android:key="ignore_battery_optimization"
-            android:title="忽略电池优化" />
+        <!--        <SwitchPreference-->
+        <!--            android:defaultValue="false"-->
+        <!--            android:icon="@drawable/ic_battery_alert_24"-->
+        <!--            android:key="ignore_battery_optimization"-->
+        <!--            android:title="忽略电池优化" />-->
+
     </PreferenceCategory>
 
     <PreferenceCategory android:title="其他">
@@ -52,6 +53,13 @@
             android:key="allow_push_msg_preference"
             android:summary="使用方法请看项目GitHub"
             android:title="允许使用广播推送消息" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_baseline_bug_report_24"
+            android:key="waiting_debugger_preference"
+            android:summary="你可以使用USB调试机器人服务进程，请连接到BotProcess，PID见系统logcat"
+            android:title="等待调试器" />
     </PreferenceCategory>
     <EditTextPreference
         android:selectAllOnFocus="true"
