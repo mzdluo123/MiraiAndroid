@@ -63,7 +63,10 @@ android {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/ASL2.0'
         exclude("META-INF/*.kotlin_module")
-
+        exclude 'silk4j_libs/windows-shared-x64/*'
+        exclude 'silk4j_libs/windows-shared-x86/*'
+        exclude 'silk4j_libs/macos-x64/*'
+        exclude 'silk4j_libs/filelist.txt'
     }
 
     lintOptions {

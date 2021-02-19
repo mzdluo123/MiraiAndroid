@@ -113,7 +113,6 @@ class BotService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
-
         //powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }

@@ -6,7 +6,7 @@ import io.github.mzdluo123.mirai.android.BotApplication
 import java.io.File
 
 class ToolsFragmentViewModel : ViewModel() {
-    val botList: MutableLiveData<Array<File>> = MutableLiveData()
+    val botList: MutableLiveData<Array<File>?> = MutableLiveData()
 
     init {
 

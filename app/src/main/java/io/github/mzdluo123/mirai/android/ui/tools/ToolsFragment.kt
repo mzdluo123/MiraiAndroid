@@ -36,6 +36,9 @@ class ToolsFragment : Fragment() {
             ArrayAdapter(requireContext(), R.layout.item_list_menu, mutableListOf<String>())
         (menu.editText as AutoCompleteTextView).setAdapter(adapter)
         viewModel.botList.observe(viewLifecycleOwner, { arrayOfFiles ->
+            if (arrayOfFiles == null) {
+                return@observe
+            }
             adapter.clear()
             adapter.addAll(arrayOfFiles.map { it.name })
             adapter.notifyDataSetChanged()
