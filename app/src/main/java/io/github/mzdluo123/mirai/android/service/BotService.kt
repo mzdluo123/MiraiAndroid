@@ -65,13 +65,6 @@ class BotService : LifecycleService() {
 //        Debug.waitForDebugger()
 //    }
 
-    init {
-        if (AppSettings.waitingDebugger) {
-            MiraiAndroidLogger.info("等待调试器链接..... PID:${android.os.Process.myPid()}")
-            Debug.waitForDebugger()
-        }
-
-    }
 
     companion object {
         const val START_SERVICE = 0
@@ -116,6 +109,12 @@ class BotService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
+
+        if (AppSettings.waitingDebugger) {
+            MiraiAndroidLogger.info("等待调试器链接..... PID:${android.os.Process.myPid()}")
+            Debug.waitForDebugger()
+        }
+
         //powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
@@ -175,7 +174,7 @@ class BotService : LifecycleService() {
 //            consoleVersion = BuildConfig.COREVERSION,
 //            path = getExternalFilesDir(null).toString()
 //        )
-        
+
         LuaMiraiPlugin.load()
         LuaMiraiPlugin.enable()
 
