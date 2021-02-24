@@ -23,7 +23,10 @@ private enum class LogColor(val color: String) {
     ERROR("#DD1C1A")
 }
 
-fun logException(err: Throwable) {
+fun logException(err: Throwable?) {
+    if (err == null) {
+        return
+    }
     val stringWriter = StringWriter()
     err.printStackTrace(PrintWriter(stringWriter))
     MiraiAndroidLogger.error(stringWriter.toString())
@@ -37,11 +40,12 @@ object MiraiAndroidLogger :
                 message?.replace(
                     "\n",
                     "<br>"
-                ) ?: e
+                ) ?: "发生错误"
             }"
 
         synchronized(this) {
             logStorage.add(colorLog)
+            logException(e)
             for (i in 0 until BotService.consoleUi.beginBroadcast()) {
                 try {
                     BotService.consoleUi.getBroadcastItem(i).newLog(colorLog)
@@ -56,10 +60,7 @@ object MiraiAndroidLogger :
 
         if (BuildConfig.DEBUG || printToSysLog) {
             Log.i("MA", log)
-            if (e != null) {
-                e.printStackTrace()
-                logException(e)
-            }
+            e?.printStackTrace()
 
         }
     }) {
