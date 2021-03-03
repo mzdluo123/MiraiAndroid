@@ -33,6 +33,8 @@ mirai-console的Android前端程序，可作为qq机器人使用，支持多种�
 
 MiraiAndroid交流群：`1131127734`但是请注意，如果您违反了群内相关规定或是有其他不当行为你可能会被无理由移出本群
 
+MiraiForum：mirai官方论坛 https://mirai.mamoe.net
+
 图标以及形象由画师<a href = "https://github.com/DazeCake">DazeCake</a>绘制
 
 ## 声明
