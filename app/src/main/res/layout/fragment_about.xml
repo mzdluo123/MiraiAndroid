@@ -193,10 +193,20 @@
                 android:id="@+id/btn_join_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="64dp"
                 android:layout_marginTop="8dp"
                 android:text="加入交流群"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/version_text" />
+
+            <Button
+                android:id="@+id/btn_visit_forum"
+                android:layout_width="93dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="64dp"
+                android:text="访问论坛"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/version_text" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

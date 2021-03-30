@@ -45,6 +45,9 @@ class AboutFragment : Fragment() {
         github2_bth.setOnClickListener {
             openUrl("https://github.com/mzdluo123/MiraiAndroid")
         }
+        btn_visit_forum.setOnClickListener {
+            openUrl("https://mirai.mamoe.net/")
+        }
         imageView2.setOnClickListener {
             if (click < 4) {
                 click++
@@ -67,13 +70,13 @@ class AboutFragment : Fragment() {
 
     /****************
      *
-     * 发起添加群流程。群号：MiraiAndroid(1131127734) 的 key 为： df6wSbKtDBo3cMJ9ULtYAZeln5ZZuA9d
-     * 调用 joinQQGroup(df6wSbKtDBo3cMJ9ULtYAZeln5ZZuA9d) 即可发起手Q客户端申请加群 MiraiAndroid(1131127734)
+     * 发起添加群流程。群号：MiraiAndroid(206073050) 的 key 为： 2aqIV-MkAOvx53dwUl-VVUYZqn8UrFAJ
+     * 调用 joinQQGroup(2aqIV-MkAOvx53dwUl-VVUYZqn8UrFAJ) 即可发起手Q客户端申请加群 MiraiAndroid(206073050)
      *
      * @param key 由官网生成的key
      * @return 返回true表示呼起手Q成功，返回false表示呼起失败
      */
-    private fun joinQQGroup(key: String): Boolean {
+    fun joinQQGroup(key: String): Boolean {
         val intent = Intent()
         intent.data =
             Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26jump_from%3Dwebapi%26k%3D$key")
@@ -86,5 +89,6 @@ class AboutFragment : Fragment() {
             false
         }
     }
+
 
 }

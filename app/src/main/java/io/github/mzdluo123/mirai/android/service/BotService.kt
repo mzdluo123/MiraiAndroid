@@ -30,6 +30,7 @@ import io.github.mzdluo123.mirai.android.receiver.PushMsgReceiver
 import io.github.mzdluo123.mirai.android.script.ScriptManager
 import io.github.mzdluo123.mirai.android.utils.MiraiAndroidStatus
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
@@ -134,7 +135,7 @@ class BotService : LifecycleService() {
         //MiraiConsole.addBot().alsoLogin()
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
-        lifecycleScope.launch(handler) { bot.login() }
+        lifecycleScope.launch(Dispatchers.Default + handler) { bot.login() }
     }
 
     private fun registerDefaultCommand() {
@@ -248,7 +249,7 @@ class BotService : LifecycleService() {
         override fun runCmd(cmd: String?) {
             cmd?.let {
                 //CommandManager.runCommand(ConsoleCommandSender, it)
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.Default) {
                     ConsoleCommandSender.executeCommand(cmd)
                 }
             }

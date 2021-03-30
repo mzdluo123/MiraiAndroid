@@ -21,20 +21,18 @@ import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import splitties.alertdialog.appcompat.alertDialog
 import splitties.alertdialog.appcompat.cancelButton
 import splitties.alertdialog.appcompat.message
 import splitties.alertdialog.appcompat.okButton
-import splitties.lifecycle.coroutines.coroutineScope
 import splitties.toast.toast
 import java.io.File
-import java.io.FileReader
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,8 +69,9 @@ class MainActivity : AppCompatActivity() {
         (application as BotApplication).startBotService()
         setupListeners()
         crashCheck()
-        if (BuildConfig.DEBUG) toast("跳过更新检查")
-        else updateCheck()
+//        if (BuildConfig.DEBUG) toast("跳过更新检查")
+//        else updateCheck()
+        updateCheck()
     }
 
     override fun onSupportNavigateUp(): Boolean =
@@ -124,8 +123,8 @@ class MainActivity : AppCompatActivity() {
 //            BotApplication.context.stopBotService()
         }
         lifecycleScope.launch(exceptionHandler) {
-            val responseText = RequestUtil.get(UPDATE_URL){ dns(SafeDns()) }
-            val responseJsonObject = Json.parseToJsonElement(responseText).jsonObject
+            val responseText = RequestUtil.get(UPDATE_URL) { dns(SafeDns()) }
+            val responseJsonObject = Json.parseToJsonElement(responseText ?: "").jsonObject
             if (!responseJsonObject.containsKey("url")) throw IllegalStateException("检查更新失败")
             val body = responseJsonObject["body"]?.jsonPrimitive?.content ?: "暂无更新记录"
             val htmlUrl = responseJsonObject["html_url"]!!.jsonPrimitive.content

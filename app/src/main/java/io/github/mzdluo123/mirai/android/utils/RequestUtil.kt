@@ -7,7 +7,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 object RequestUtil {
-    suspend fun get(url: String,clientBuilder:OkHttpClient.Builder.()->Unit = {}):String {
+    suspend fun get(url: String, clientBuilder: OkHttpClient.Builder.() -> Unit = {}): String? {
         val client = OkHttpClient.Builder().apply(clientBuilder).build()
         val request: Request = Request.Builder()
             .url(url)
@@ -19,8 +19,9 @@ object RequestUtil {
                 override fun onFailure(call: Call, e: IOException) {
                     continuation.resumeWithException(e)
                 }
+
                 override fun onResponse(call: Call, response: Response) {
-                    continuation.resume(response.body.toString())
+                    continuation.resume(response.body?.string())
                 }
             })
         }
