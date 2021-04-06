@@ -22,4 +22,6 @@ object AppSettings : Preferences("setting") {
     var refreshPerMinute by IntPrefSaveAsStr("status_refresh_count", 15)
     var startOnBoot by BoolPref("start_on_boot_preference", false)
     var waitingDebugger by BoolPref("waiting_debugger_preference", false)
+
+    var keepLive by BoolPref("keeplive_preference", false)
 }

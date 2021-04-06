@@ -30,6 +30,13 @@
             android:key="start_on_boot_preference"
             android:summary="请加入开机自启白名单以确保能够正常开机启动"
             android:title="开机启动" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_baseline_new_releases_24"
+            android:key="keeplive_preference"
+            android:summary="降低MiraiAndroid被系统杀死的可能性，不保证效果"
+            android:title="启用保活服务" />
         <!--        <SwitchPreference-->
         <!--            android:defaultValue="false"-->
         <!--            android:icon="@drawable/ic_battery_alert_24"-->

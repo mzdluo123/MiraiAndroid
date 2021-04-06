@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Process
+import com.fanjun.keeplive.KeepLive
+import com.fanjun.keeplive.config.ForegroundNotification
+import com.fanjun.keeplive.config.KeepLiveService
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.activity.CrashReportActivity
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
@@ -73,7 +76,22 @@ class BotApplication : Application() {
         return null
     }
 
+    internal fun keepLive() {
+        val notification = ForegroundNotification("MiraiAndroid", "保活服务已启动", R.mipmap.ic_launcher)
+        KeepLive.startWork(this, KeepLive.RunMode.ROGUE, notification, object : KeepLiveService {
+            override fun onWorking() {
+                startBotService()
+            }
+
+            override fun onStop() {
+                stopBotService()
+            }
+
+        })
+    }
+
     internal fun startBotService() {
+
         val account = getSharedPreferences("account", Context.MODE_PRIVATE)
         this.startService(Intent(this, BotService::class.java).apply {
             putExtra("action", BotService.START_SERVICE)

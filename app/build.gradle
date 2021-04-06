@@ -5,8 +5,8 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 
 
-def CORE_VERSION = "2.5.1"
-def CONSOLE_VERSION = "2.5.1"
+def CORE_VERSION = "2.6-M2"
+def CONSOLE_VERSION = "2.6-M2"
 def LUAMIRAI_VERSION = "2.0.8"
 
 android {
@@ -17,8 +17,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 44
-        versionName "3.1.1"
+        versionCode 45
+        versionName "3.1.2-dev"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "CONSOLEVERSION", "\"$CONSOLE_VERSION\"")
@@ -164,6 +164,8 @@ dependencies {
 
     //test
     implementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
+
+    implementation 'com.fanjun:keeplive:1.1.22'
 
     // fuck!! 他不能在Android平台工作
     //    implementation  'org.codehaus.groovy:groovy:2.4.6:grooid'

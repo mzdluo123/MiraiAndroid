@@ -32,15 +32,19 @@ fun logException(err: Throwable?) {
     MiraiAndroidLogger.error(stringWriter.toString())
 }
 
+internal fun processHTMLLog(log: String): String =
+    log.replace("\n", "<br>")
+        .replace("<", "&lt;")
+        .replace(">", "&gt")
+        .replace("&", "&amp;")
+        .replace("\"", "&quot")
+
 object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
         val log = "[${priority.name}] ${message ?: e}"
         val colorLog =
             "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font> ${
-                message?.replace(
-                    "\n",
-                    "<br>"
-                ) ?: "发生错误"
+                processHTMLLog(message ?: "")
             }"
 
         synchronized(this) {

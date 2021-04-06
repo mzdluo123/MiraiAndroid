@@ -12,10 +12,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import io.github.mzdluo123.mirai.android.BotApplication
-import io.github.mzdluo123.mirai.android.BuildConfig
-import io.github.mzdluo123.mirai.android.NotificationFactory
-import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.*
 import io.github.mzdluo123.mirai.android.utils.RequestUtil
 import io.github.mzdluo123.mirai.android.utils.SafeDns
 import io.github.mzdluo123.mirai.android.utils.shareText
@@ -69,6 +66,9 @@ class MainActivity : AppCompatActivity() {
         (application as BotApplication).startBotService()
         setupListeners()
         crashCheck()
+        if (AppSettings.keepLive) {
+            BotApplication.context.keepLive()
+        }
 //        if (BuildConfig.DEBUG) toast("跳过更新检查")
 //        else updateCheck()
         updateCheck()
