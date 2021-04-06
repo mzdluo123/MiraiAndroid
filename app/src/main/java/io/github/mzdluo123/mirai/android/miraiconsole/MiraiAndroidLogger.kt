@@ -32,42 +32,51 @@ fun logException(err: Throwable?) {
     MiraiAndroidLogger.error(stringWriter.toString())
 }
 
-internal fun processHTMLLog(log: String): String =
-    log.replace("\n", "<br>")
-        .replace("<", "&lt;")
-        .replace(">", "&gt")
-        .replace("&", "&amp;")
-        .replace("\"", "&quot")
+private val lock = Object()
+
+internal fun pushLog(log: String) {
+    synchronized(lock) {
+        logStorage.add(log)
+        for (i in 0 until BotService.consoleUi.beginBroadcast()) {
+            try {
+                BotService.consoleUi.getBroadcastItem(i).newLog(log)
+            } catch (remoteE: Exception) {
+                Log.e("MA", remoteE.message ?: "发生错误")
+                remoteE.printStackTrace()
+                logException(remoteE)
+            }
+        }
+        BotService.consoleUi.finishBroadcast()
+
+    }
+}
+
 
 object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
-        val log = "[${priority.name}] ${message ?: e}"
-        val colorLog =
-            "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font> ${
-                processHTMLLog(message ?: "")
-            }"
-
+        e?.printStackTrace()
+        logException(e)
         synchronized(this) {
-            logStorage.add(colorLog)
-            logException(e)
-            for (i in 0 until BotService.consoleUi.beginBroadcast()) {
-                try {
-                    BotService.consoleUi.getBroadcastItem(i).newLog(colorLog)
-                } catch (remoteE: Exception) {
-                    Log.e("MA", remoteE.message ?: "发生错误")
-                    remoteE.printStackTrace()
-                    logException(remoteE)
+            message?.split("\n")?.forEach {
+                val log = "[${priority.name}] ${it}"
+                val colorLog =
+                    "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font><![CDATA[${
+                        it.replace(
+                            "\n",
+                            "\r"
+                        )
+                    }]]>"
+                pushLog(colorLog)
+
+
+                if (BuildConfig.DEBUG || printToSysLog) {
+                    Log.i("MA", log)
                 }
             }
-            BotService.consoleUi.finishBroadcast()
         }
+    }
 
-        if (BuildConfig.DEBUG || printToSysLog) {
-            Log.i("MA", log)
-            e?.printStackTrace()
-
-        }
-    }) {
+    ) {
     val logs: MutableList<String>
         get() = logStorage.toMutableList()
 
