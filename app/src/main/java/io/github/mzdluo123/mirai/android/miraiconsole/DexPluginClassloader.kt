@@ -1,6 +1,6 @@
 package io.github.mzdluo123.mirai.android.miraiconsole
 
-
+import android.os.Build
 import dalvik.system.DexClassLoader
 import net.mamoe.mirai.console.plugin.jvm.ExportManager
 import java.io.File
@@ -35,7 +35,9 @@ internal class DexPluginClassLoader(
         val loadingLock = ConcurrentHashMap<String, Any>()
 
         init {
-            ClassLoader.registerAsParallelCapable()
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                ClassLoader.registerAsParallelCapable()
+            }
         }
     }
 

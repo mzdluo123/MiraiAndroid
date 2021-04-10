@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.TaskStackBuilder
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
@@ -22,36 +23,31 @@ object NotificationFactory {
 
 
     internal fun initNotification() {
-        val notificationManager =
-            context.getSystemService(Application.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = NotificationManagerCompat.from(context)
 
-            val statusChannel = NotificationChannel(
-                SERVICE_NOTIFICATION, "状态通知",
-                NotificationManager.IMPORTANCE_MIN
-            )
+        val statusChannel =
+            NotificationChannelCompat.Builder(SERVICE_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_MIN)
+                .setName("状态通知")
+                .setDescription("Mirai正在运行的通知")
 
-            statusChannel.description = "Mirai正在运行的通知"
+        val captchaChannel =
+            NotificationChannelCompat.Builder(CAPTCHA_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_HIGH)
+                .setName("验证码通知")
+                .setDescription("登录需要输入验证码时的通知")
 
-            val captchaChannel = NotificationChannel(
-                CAPTCHA_NOTIFICATION, "验证码通知",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            captchaChannel.description = "登录需要输入验证码时的通知"
+        val offlineChannel =
+            NotificationChannelCompat.Builder(OFFLINE_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_HIGH)
+                .setName("离线通知")
+                .setDescription("Mirai因各种原因离线的通知")
 
-            val offlineChannel = NotificationChannel(
-                OFFLINE_NOTIFICATION, "离线通知",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            offlineChannel.description = "Mirai因各种原因离线的通知"
+        if (BuildConfig.DEBUG) {
+            offlineChannel.setImportance(NotificationManagerCompat.IMPORTANCE_MIN)
+            captchaChannel.setImportance(NotificationManagerCompat.IMPORTANCE_MIN)
+        }
 
-            if (BuildConfig.DEBUG) {
-                offlineChannel.importance = NotificationManager.IMPORTANCE_MIN
-                captchaChannel.importance = NotificationManager.IMPORTANCE_MIN
-            }
-
-            notificationManager.createNotificationChannel(statusChannel)
-            notificationManager.createNotificationChannel(captchaChannel)
-            notificationManager.createNotificationChannel(offlineChannel)
+        notificationManager.createNotificationChannel(statusChannel.build())
+        notificationManager.createNotificationChannel(captchaChannel.build())
+        notificationManager.createNotificationChannel(offlineChannel.build())
 
     }
 
