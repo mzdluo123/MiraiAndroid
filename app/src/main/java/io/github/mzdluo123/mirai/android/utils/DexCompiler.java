@@ -6,11 +6,15 @@ import com.android.tools.r8.D8Command;
 import com.android.tools.r8.OutputMode;
 
 import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.exception.ZipException;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.nio.file.Paths;
 
 
 public class DexCompiler {
@@ -32,8 +36,8 @@ public class DexCompiler {
 //            outFile.createNewFile();
 //        }
         D8Command.Builder command = D8Command.builder()
-                .addProgramFiles(jarFile.getAbsoluteFile().toPath())
-                .setOutput(outFile.toPath(), OutputMode.DexIndexed)
+                .addProgramFiles(Paths.get(jarFile.getAbsolutePath()))
+                .setOutput(Paths.get(outFile.getAbsolutePath()), OutputMode.DexIndexed)
                 .setMinApiLevel(26);
 
         if (!desugaring) {
@@ -53,13 +57,15 @@ public class DexCompiler {
         ZipFile originZip = new ZipFile(origin);
         ZipFile newZip = new ZipFile(newFile);
         ArrayList<File> resources = new ArrayList<>();
-        originZip.getFileHeaders().forEach(i -> {
+        List<FileHeader> fileHeaders = originZip.getFileHeaders();
+        for(FileHeader i : fileHeaders)
+        {
             try {
                 originZip.extractFile(i, tempDir.getAbsolutePath());
             } catch (ZipException e) {
                 e.printStackTrace();
             }
-        });
+        }
 
         for (File file : tempDir.listFiles()) {
             if (file.isFile() && !file.getName().equals(newFile.getName())) {

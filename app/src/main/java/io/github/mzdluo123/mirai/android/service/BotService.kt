@@ -46,6 +46,7 @@ import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.message.data.At
+import java.nio.file.Paths
 import kotlin.system.exitProcess
 
 class BotService : LifecycleService() {
@@ -109,7 +110,7 @@ class BotService : LifecycleService() {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
-        consoleFrontEnd = AndroidMiraiConsole(baseContext, getExternalFilesDir("")!!.toPath())
+        consoleFrontEnd = AndroidMiraiConsole(baseContext, Paths.get(getExternalFilesDir("")!!.absolutePath))
 
         if (AppSettings.waitingDebugger) {
             MiraiAndroidLogger.info("等待调试器链接..... PID:${android.os.Process.myPid()}")

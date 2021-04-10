@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.DeadObjectException
 import android.os.PowerManager
@@ -94,7 +95,11 @@ class ConsoleFragment : Fragment() {
             override fun newLog(log: String) {
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                     log_text.append("\n")
-                    log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        log_text?.append(Html.fromHtml(log, Html.FROM_HTML_MODE_COMPACT))
+                    } else {
+                        log_text?.append(Html.fromHtml(log))
+                    }
                     if (autoScroll) {
                         delay(20)
                         main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
@@ -109,7 +114,11 @@ class ConsoleFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.Default) {
                     val text = conn.botService.log.joinToString(separator = "<br>")
                     withContext(Dispatchers.Main) {
-                        log_text?.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            log_text?.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+                        } else {
+                            log_text?.text = Html.fromHtml(text)
+                        }
                         if (autoScroll) {
                             delay(20)
                             main_scroll.fullScroll(ScrollView.FOCUS_DOWN)
@@ -162,17 +171,19 @@ class ConsoleFragment : Fragment() {
 
     @SuppressLint("BatteryLife")
     private fun ignoreBatteryOptimization(activity: Activity) {
-        val powerManager =
-            getSystemService(requireContext(), PowerManager::class.java)
-        //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager =
+                getSystemService(requireContext(), PowerManager::class.java)
+            //  判断当前APP是否有加入电池优化的白名单，如果没有，弹出加入电池优化的白名单的设置对话框。
 
-        val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
-        if (!hasIgnored) {
-            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-            intent.data = Uri.parse("package:" + activity.packageName)
-            startActivity(intent)
-        } else {
-            Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+            val hasIgnored = powerManager!!.isIgnoringBatteryOptimizations(activity.packageName)
+            if (!hasIgnored) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:" + activity.packageName)
+                startActivity(intent)
+            } else {
+                Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -184,7 +195,9 @@ class ConsoleFragment : Fragment() {
             }
             try {
                 conn.botService.runCmd(command)
-                command_input.text.clear()
+                requireActivity().runOnUiThread {
+                    command_input.text.clear()
+                }
             } catch (e: DeadObjectException) {
                 toast("服务状态异常，请在菜单内点击快速重启")
             }

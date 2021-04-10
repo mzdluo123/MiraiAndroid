@@ -40,6 +40,7 @@ import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
 import java.nio.file.Path
+import java.nio.file.Paths
 
 class AndroidMiraiConsole(
     val context: Context,
@@ -65,7 +66,7 @@ class AndroidMiraiConsole(
 
 
     @ConsoleFrontEndImplementation
-    override val rootPath: Path = context.getExternalFilesDir("")!!.toPath()
+    override val rootPath: Path = Paths.get(context.getExternalFilesDir("")!!.absolutePath)
 
     @ConsoleFrontEndImplementation
     override fun createLogger(identity: String?): MiraiLogger = MiraiAndroidLogger
