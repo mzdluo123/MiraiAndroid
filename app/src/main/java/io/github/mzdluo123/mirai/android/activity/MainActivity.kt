@@ -2,6 +2,7 @@ package io.github.mzdluo123.mirai.android.activity
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -72,6 +73,12 @@ class MainActivity : AppCompatActivity() {
 //        if (BuildConfig.DEBUG) toast("跳过更新检查")
 //        else updateCheck()
         updateCheck()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            alertDialog {
+                this.setTitle("特别提醒")
+                message = "MiraiAndroid不对低于Android8.0的设备提供支持，但是你仍然可以在低于8.0的设备上运行；适配代码由溯洄提供，请勿反馈问题"
+            }.show()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean =
