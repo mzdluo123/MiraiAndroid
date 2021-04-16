@@ -81,7 +81,7 @@ MiraiForum：mirai官方论坛 https://mirai.mamoe.net
 
 # 安装插件
 
-对于apk(Android软件包)格式的插件，请直接安装到系统内即可，关于这类插件的开发说明请看[这里](doc/develop.md)
+对于apk(Android软件包)格式的插件，请直接安装到系统内即可，关于这类插件的开发说明请看[这里](docs/develop.md)
 
 对于jar格式的插件，你有两个办法安装插件
 
