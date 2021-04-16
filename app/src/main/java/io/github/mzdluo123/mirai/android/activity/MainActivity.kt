@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         const val CRASH_FILE_PREFIX = "crashdata"
         const val CRASH_FILE_DIR = "crash"
         const val UPDATE_URL = "https://api.github.com/repos/mzdluo123/MiraiAndroid/releases/latest"
+
+        //  const val UPDATE_URL_V2 = "https://api.github.com/repos/mzdluo123/MiraiAndroid/releases/latest"
         const val TAG = "MainActivity"
     }
 
@@ -144,4 +146,17 @@ class MainActivity : AppCompatActivity() {
             }.show()
         }
     }
+//    private fun updateCheckV2():{
+//        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+//            toast("检查更新失败")
+//            throwable.printStackTrace()
+//            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
+////            finish()
+////            BotApplication.context.stopBotService()
+//        }
+//
+//        lifecycleScope.launch(exceptionHandler+Dispatchers.IO) {
+//            RequestUtil.get(get)
+//        }
+//    }
 }
