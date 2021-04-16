@@ -43,6 +43,7 @@ class BotApplication : Application() {
         if (processName?.isEmpty() == false && processName == packageName) {
             initNotification()
         }
+
     }
 
 
@@ -91,7 +92,6 @@ class BotApplication : Application() {
     }
 
     internal fun startBotService() {
-
         val account = getSharedPreferences("account", Context.MODE_PRIVATE)
         this.startService(Intent(this, BotService::class.java).apply {
             putExtra("action", BotService.START_SERVICE)

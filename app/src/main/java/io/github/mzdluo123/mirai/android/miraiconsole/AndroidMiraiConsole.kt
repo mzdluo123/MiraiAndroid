@@ -120,26 +120,10 @@ class AndroidMiraiConsole(
                 }
                 return@subscribeAlways
             }
-            if (this is BotOfflineEvent.Dropped) {
-                sendOfflineMsgJob = GlobalScope.launch {
-                    delay(2000)
-                    if (!isActive) {
-                        return@launch
-                    }
-                    NotificationManagerCompat.from(BotApplication.context).apply {
-                        notify(
-                            BotService.OFFLINE_NOTIFICATION_ID,
-                            NotificationFactory.offlineNotification("请检查网络设置")
-                        )
-                    }
-                }
-            }
-
-            bot.logger.info("发送离线通知....")
         }
         bot.eventChannel.subscribeAlways<BotReloginEvent>() {
-            bot.logger.info("发送上线通知....")
-            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
+
+        if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
                 sendOfflineMsgJob!!.cancel()
             }
             NotificationManagerCompat.from(BotApplication.context)
