@@ -1,6 +1,5 @@
 3.1.4
 https://pl.mirai.mamoe.net/app-release.apk
-更新mirai版本到2.6.0正式版
-删除了一些无用的日志
-提高了检查更新的速度
+又有新更新了。。。。。
+更新mirai版本到2.6.1
 
