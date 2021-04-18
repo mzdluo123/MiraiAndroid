@@ -184,6 +184,8 @@ class ConsoleFragment : Fragment() {
             } else {
                 Toast.makeText(context, "您已授权忽略电池优化", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            Toast.makeText(context, "你的设备无需执行此操作", Toast.LENGTH_SHORT).show()
         }
     }
 
