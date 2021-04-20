@@ -1,5 +1,4 @@
-3.1.5
+3.1.6
 https://pl.mirai.mamoe.net/app-release.apk
-又有新更新了。。。。。
-更新mirai版本到2.6.1
+提升了兼容性
 
