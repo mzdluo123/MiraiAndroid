@@ -1,3 +1,5 @@
-3.1.8
-https://maupdate.rainchan.win/app-release.apk
-更新mirai依赖版本至2.6.4
+3.2.0
+https://maupdate.rainchan.win/app-normal-release.apk
+修复了无法通过设备锁验证的问题
+从此版本开始，MA将会每次发布两个不同的版本，普通版版只能在Android8.0及以上系统使用，兼容版版增加了一些兼容性措施使得它能在8.0以下系统使用。
+更新默认为普通版，兼容版下载请到GitHub了解更多信息

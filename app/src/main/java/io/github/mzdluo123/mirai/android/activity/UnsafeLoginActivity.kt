@@ -21,6 +21,11 @@ class UnsafeLoginActivity : AppCompatActivity() {
 
     private lateinit var conn: ServiceConnector
     val gson = JsonParser()
+
+    companion object {
+        const val TAG = "UnsafeLogin"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         conn = ServiceConnector(this)
@@ -82,7 +87,8 @@ class UnsafeLoginActivity : AppCompatActivity() {
 
         conn.connectStatus.observe(this, Observer {
             if (it) {
-                unsafe_login_web.loadUrl(conn.botService.url)
+
+                unsafe_login_web.loadUrl(conn.botService.url.replace("verify", "qrcode"))
             }
         })
     }
