@@ -9,8 +9,8 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: "com.github.johnrengelman.shadow"
 
 
-def CORE_VERSION = "2.6.4"
-def CONSOLE_VERSION = "2.6.4"
+def CORE_VERSION = "2.7-M1"
+def CONSOLE_VERSION = "2.7-M1"
 def LUAMIRAI_VERSION = "2.0.8"
 
 android {
@@ -56,7 +56,6 @@ android {
         normal{
             dimension "api"
             minSdkVersion 26
-
         }
     }
 
