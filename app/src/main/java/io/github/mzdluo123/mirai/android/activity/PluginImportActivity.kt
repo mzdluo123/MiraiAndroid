@@ -68,6 +68,7 @@ class PluginImportActivity : AppCompatActivity() {
                     "无法编译插件 \n${throwable}",
                     Toast.LENGTH_LONG
                 ).show()
+                throwable.printStackTrace()
             }
         }
 
@@ -80,6 +81,7 @@ class PluginImportActivity : AppCompatActivity() {
                     val name = withContext(Dispatchers.Main) {
                         askFileName()
                     } ?: return@launch
+                    // 从contentprovider 读取插件数据到缓存
                     withContext(Dispatchers.IO) {
                         copyToFileDir(
                             uri,
@@ -87,10 +89,12 @@ class PluginImportActivity : AppCompatActivity() {
                             this@PluginImportActivity.getExternalFilesDir(null)!!.absolutePath
                         )
                     }
+                    // 编译插件
                     pluginViewModel.compilePlugin(
                         File(baseContext.getExternalFilesDir(null), name),
                         desugaring_checkBox.isChecked
                     )
+                    // 删除缓存
                     withContext(Dispatchers.IO) {
                         File(this@PluginImportActivity.getExternalFilesDir(null), name).delete()
                     }

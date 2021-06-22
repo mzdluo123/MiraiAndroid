@@ -46,6 +46,7 @@ import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotOnlineEvent
 import net.mamoe.mirai.message.data.At
+import net.mamoe.mirai.utils.MiraiLogger
 import java.nio.file.Paths
 import kotlin.system.exitProcess
 
@@ -135,7 +136,12 @@ class BotService : LifecycleService() {
         // 新的自动登录
         //MiraiConsole.addBot().alsoLogin()
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
-        val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes())
+        val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes(),){
+            if (AppSettings.printToLogcat){
+                this.networkLoggerSupplier =  {MiraiLogger.create("NetLog")}
+            }
+        }
+
         lifecycleScope.launch(Dispatchers.Default + handler) { bot.login() }
     }
 

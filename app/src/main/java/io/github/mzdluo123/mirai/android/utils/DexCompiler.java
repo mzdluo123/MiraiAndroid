@@ -10,6 +10,8 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.exception.ZipException;
 
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,6 +78,8 @@ public class DexCompiler {
             newZip.addFiles(resources);
         }
         newZip.addFolder(new File(tempDir, "META-INF"));
-        newFile.renameTo(new File(pluginDir, newFile.getName()));
+        // 自带的moveto在遇到不同文件系统的时候会失败
+        FileUtils.moveFile(newFile,new File(pluginDir, newFile.getName()));
+
     }
 }

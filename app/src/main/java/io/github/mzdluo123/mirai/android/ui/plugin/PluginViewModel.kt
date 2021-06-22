@@ -73,6 +73,7 @@ class PluginViewModel : ViewModel() {
             val out = compiler.compile(file, desugaring)
             compiler.copyResourcesAndMove(file, out)
         }
+
     }
 
     private fun deleteDir(path: File) {
