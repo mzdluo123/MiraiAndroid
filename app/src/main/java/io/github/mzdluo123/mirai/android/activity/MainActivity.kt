@@ -21,6 +21,7 @@ import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.coroutines.*
+import org.apache.commons.io.FileUtils
 import splitties.alertdialog.appcompat.*
 import splitties.toast.toast
 import java.io.File
@@ -59,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(navController, appBarConfiguration)
         nav_view.setupWithNavController(navController)
+
         lifecycleScope.launch(Dispatchers.IO) {
             Glide.get(applicationContext).clearDiskCache()
         }
@@ -118,12 +120,12 @@ class MainActivity : AppCompatActivity() {
             }
             cancelButton { }
         }.show()
-        crashDataFile.renameTo(
-            File(
-                getExternalFilesDir(CRASH_FILE_DIR),
-                CRASH_FILE_PREFIX + System.currentTimeMillis()
-            )
-        )
+
+      lifecycleScope.launch (Dispatchers.IO){
+          FileUtils.moveFile(crashDataFile,File(
+              getExternalFilesDir(CRASH_FILE_DIR),
+              CRASH_FILE_PREFIX + System.currentTimeMillis()))
+      }
     }
 
 //    private fun updateCheck() {
@@ -155,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateCheckV2() {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            toast("检查更新失败")
+            runOnUiThread {  toast("检查更新失败") }
             throwable.printStackTrace()
             Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
         }

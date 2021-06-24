@@ -21,8 +21,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 51
-        versionName "3.2.0"
+        versionCode 52
+        versionName "3.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "CONSOLEVERSION", "\"$CONSOLE_VERSION\"")
