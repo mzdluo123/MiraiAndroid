@@ -19,7 +19,7 @@ class AndroidLoginSolver(private val context: Context) : LoginSolver() {
         const val CAPTCHA_NOTIFICATION_ID = 2
     }
 
-    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
+    override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String {
         MiraiAndroidLogger.info("本次登录需要输入验证码，请在通知栏点击通知来输入")
         verificationResult = CompletableDeferred()
         captchaData = data

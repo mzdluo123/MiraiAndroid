@@ -11,7 +11,7 @@ object AppSettings : Preferences("setting") {
         }
 
         operator fun setValue(thisRef: Preferences, prop: KProperty<*>, value: Int) {
-            editor.putString(key, value.toString()).commit()
+            prefs.edit().putString(key, value.toString()).apply()
         }
 
     }

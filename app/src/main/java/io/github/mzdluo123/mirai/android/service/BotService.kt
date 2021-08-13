@@ -17,7 +17,6 @@ import android.os.RemoteCallbackList
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.ooooonly.luaMirai.miraiconsole.LuaMiraiPlugin
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.IConsole
 import io.github.mzdluo123.mirai.android.IbotAidlInterface
@@ -40,8 +39,6 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation.Companion.start
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.ConsoleCommandSender
 import net.mamoe.mirai.console.command.executeCommand
-import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.enable
-import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.load
 import net.mamoe.mirai.console.rootDir
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotOnlineEvent
@@ -61,7 +58,7 @@ class BotService : LifecycleService() {
     // private lateinit var wakeLock: PowerManager.WakeLock
     private var bot: Bot? = null
     private val msgReceiver = PushMsgReceiver(this)
-    private val allowPushMsg = AppSettings.allowPushMsg
+    private var allowPushMsg: Boolean = false
 
     // 多进程调试辅助
 //  init {
@@ -111,7 +108,9 @@ class BotService : LifecycleService() {
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate() {
         super.onCreate()
-        consoleFrontEnd = AndroidMiraiConsole(baseContext, Paths.get(getExternalFilesDir("")!!.absolutePath))
+        allowPushMsg = AppSettings.allowPushMsg
+        consoleFrontEnd =
+            AndroidMiraiConsole(baseContext, Paths.get(getExternalFilesDir("")!!.absolutePath))
 
         if (AppSettings.waitingDebugger) {
             MiraiAndroidLogger.info("等待调试器链接..... PID:${android.os.Process.myPid()}")
@@ -182,9 +181,9 @@ class BotService : LifecycleService() {
 //            consoleVersion = BuildConfig.COREVERSION,
 //            path = getExternalFilesDir(null).toString()
 //        )
-
-        LuaMiraiPlugin.load()
-        LuaMiraiPlugin.enable()
+//
+//        LuaMiraiPlugin.load()
+//        LuaMiraiPlugin.enable()
 
         registerReceiver()
         isStart = true

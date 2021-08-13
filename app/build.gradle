@@ -9,8 +9,8 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: "com.github.johnrengelman.shadow"
 
 
-def CORE_VERSION = "2.7-M1"
-def CONSOLE_VERSION = "2.7-M1"
+def CORE_VERSION = "2.7-RC"
+def CONSOLE_VERSION = "2.7-RC"
 def LUAMIRAI_VERSION = "2.0.8"
 
 android {
@@ -53,7 +53,7 @@ android {
             versionNameSuffix "-Api21"
             applicationIdSuffix ".Api21"
         }
-        normal{
+        normal {
             dimension "api"
             minSdkVersion 26
         }
@@ -128,18 +128,22 @@ task nnioJar(type: ShadowJar) {
 dependencies {
     implementation(fileTree(dir: 'libs', include: ['*.jar']))
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
 
-    implementation 'androidx.core:core-ktx:1.6.0-rc01'
+    implementation 'androidx.core:core-ktx:1.7.0-alpha01'
 
     //androidx-appcompat
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
 
     //androidx-legacy
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //androidx-constraintlayout
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
+
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.69'
+
 
     //androidx-navigation
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
@@ -156,10 +160,10 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
 
     //kotlinx-coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt'
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
 
 
     //zip
@@ -169,20 +173,28 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
 
     //mirai-core
-    implementation("net.mamoe:mirai-core:$CORE_VERSION")
+//    implementation("net.mamoe:mirai-core-android:$CORE_VERSION")
+    implementation("net.mamoe:mirai-core-android:$CORE_VERSION") {
+        exclude module: "net.mamoe:mirai-core-api"
+        exclude module: "net.mamoe:mirai-core-utils"
+    }
+    implementation("net.mamoe:mirai-core-api-android:$CORE_VERSION") {
+        exclude module: "net.mamoe:mirai-core-utils"
+    }
+    implementation("net.mamoe:mirai-core-utils-android:$CORE_VERSION")
 //    implementation("net.mamoe:mirai-core:$CORE_VERSION"){
 //        exclude  module: "mirai-core-utils"
 //         // 修复Duplicate class
 //    }
 
     //mirai-lua
-    implementation "com.ooooonly:luaMirai:${LUAMIRAI_VERSION}"
+    // implementation "com.ooooonly:luaMirai:${LUAMIRAI_VERSION}"
     // implementation 'org.json:json:20160212'
     implementation 'com.ooooonly:giteeman:0.1.1'
 
     //splitties
-    implementation("com.louiscad.splitties:splitties-fun-pack-android-base:3.0.0-alpha06")
-    implementation("com.louiscad.splitties:splitties-fun-pack-android-appcompat:3.0.0-alpha06")
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-base:3.0.0-rc02")
+    implementation("com.louiscad.splitties:splitties-fun-pack-android-appcompat:3.0.0-rc02")
 
     //acra
     implementation "ch.acra:acra-core:5.1.3"
@@ -193,14 +205,14 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //yaml
-    implementation 'net.mamoe.yamlkt:yamlkt:0.9.0'
+    implementation 'net.mamoe.yamlkt:yamlkt:0.10.0'
     implementation group: 'com.moandjiezana.toml', name: 'toml4j', version: '0.7.2'
 
     //okhttp3
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
 
     //test
-    implementation 'androidx.test.espresso:espresso-idling-resource:3.3.0'
+    implementation 'androidx.test.espresso:espresso-idling-resource:3.4.0'
 
     implementation 'com.fanjun:keeplive:1.1.22'
 
@@ -213,14 +225,14 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
 
-    debugImplementation 'androidx.fragment:fragment-testing:1.2.4'
+    debugImplementation 'androidx.fragment:fragment-testing:1.3.6'
 
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 
     //  https://mvnrepository.com/artifact/net.mamoe/mirai-console

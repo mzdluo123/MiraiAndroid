@@ -1,3 +1,2 @@
 rootProject.name='MiraiAndroid'
 include ':app'
-

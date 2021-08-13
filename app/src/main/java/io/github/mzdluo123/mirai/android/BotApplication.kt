@@ -19,6 +19,9 @@ import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.data.StringFormat
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import splitties.init.injectAsAppCtx
+import java.security.Security
 
 class BotApplication : Application() {
     companion object {
@@ -33,6 +36,7 @@ class BotApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        injectAsAppCtx()
         context = this
         val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
@@ -43,7 +47,10 @@ class BotApplication : Application() {
         if (processName?.isEmpty() == false && processName == packageName) {
             initNotification()
         }
-
+        if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) != null) {
+            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
+        }
+        Security.addProvider(BouncyCastleProvider())
     }
 
 

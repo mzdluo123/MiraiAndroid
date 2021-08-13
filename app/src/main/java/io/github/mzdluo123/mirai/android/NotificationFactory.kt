@@ -1,12 +1,12 @@
 package io.github.mzdluo123.mirai.android
 
-import android.app.*
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
+import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.NotificationChannelCompat
-import androidx.core.app.TaskStackBuilder
 import io.github.mzdluo123.mirai.android.activity.MainActivity
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.BotService
@@ -26,17 +26,26 @@ object NotificationFactory {
         val notificationManager = NotificationManagerCompat.from(context)
 
         val statusChannel =
-            NotificationChannelCompat.Builder(SERVICE_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_MIN)
+            NotificationChannelCompat.Builder(
+                SERVICE_NOTIFICATION,
+                NotificationManagerCompat.IMPORTANCE_MIN
+            )
                 .setName("状态通知")
                 .setDescription("Mirai正在运行的通知")
 
         val captchaChannel =
-            NotificationChannelCompat.Builder(CAPTCHA_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_HIGH)
+            NotificationChannelCompat.Builder(
+                CAPTCHA_NOTIFICATION,
+                NotificationManagerCompat.IMPORTANCE_HIGH
+            )
                 .setName("验证码通知")
                 .setDescription("登录需要输入验证码时的通知")
 
         val offlineChannel =
-            NotificationChannelCompat.Builder(OFFLINE_NOTIFICATION, NotificationManagerCompat.IMPORTANCE_HIGH)
+            NotificationChannelCompat.Builder(
+                OFFLINE_NOTIFICATION,
+                NotificationManagerCompat.IMPORTANCE_HIGH
+            )
                 .setName("离线通知")
                 .setDescription("Mirai因各种原因离线的通知")
 
@@ -113,14 +122,21 @@ object NotificationFactory {
     internal fun captchaNotification(activity: Class<*>): Notification {
 
         val notifyIntent = Intent(context, activity)
+        val mainIntent = Intent(context, MainActivity::class.java)
+
 //        val notifyPendingIntent = PendingIntent.getActivity(
 //            context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
 //        )
-        val notifyPendingIntent = TaskStackBuilder.create(BotApplication.context)
-            .addParentStack(MainActivity::class.java)
-            .addNextIntent(notifyIntent)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-
+//        val notifyPendingIntent = TaskStackBuilder.create(BotApplication.context)
+//            .addParentStack(MainActivity::class.java)
+//            .addNextIntent(notifyIntent)
+//            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        val notifyPendingIntent = PendingIntent.getActivities(
+            BotApplication.context,
+            0,
+            arrayOf(mainIntent, notifyIntent),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         return NotificationCompat.Builder(
             context,
