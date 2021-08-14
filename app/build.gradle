@@ -141,9 +141,9 @@ dependencies {
     //androidx-constraintlayout
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
-    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.69'
-
+//    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+//    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.69'
+//
 
     //androidx-navigation
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
