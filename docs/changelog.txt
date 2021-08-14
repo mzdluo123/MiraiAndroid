@@ -1,5 +1,3 @@
-3.2.2
+3.2.3
 https://maupdate.rainchan.win/app-normal-release.apk
-更新mirai-core到2.7-RC
-修复了部分情况下无法登录的问题
-修复了部分情况下控制台指令无回显的问题
+紧急修复在某些设备上启动白屏的问题
