@@ -54,7 +54,7 @@ class PluginViewModel : ViewModel() {
     }
 
     fun refreshPluginList() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             pluginList.postValue(loadPluginList())
         }
     }
