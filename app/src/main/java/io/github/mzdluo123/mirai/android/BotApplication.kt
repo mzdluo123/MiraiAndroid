@@ -52,10 +52,13 @@ class BotApplication : Application() {
      * 在新版系统上无法使用ECDH算法，使用下面的代码绕过
      * */
     private fun byPassECDHCHeck() {
-        val cls = Class.forName("sun.security.jca.Providers")
-        val field = cls.getDeclaredField("maximumAllowableApiLevelForBcDeprecation")
-        field.isAccessible = true
-        field.setInt(null, 999)
+        try {
+            val cls = Class.forName("sun.security.jca.Providers")
+            val field = cls.getDeclaredField("maximumAllowableApiLevelForBcDeprecation")
+            field.isAccessible = true
+            field.setInt(null, 999)
+        }
+        catch(e : Exception) {}
     }
 
 
