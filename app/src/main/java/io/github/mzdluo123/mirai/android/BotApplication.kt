@@ -19,9 +19,7 @@ import org.acra.ACRA
 import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.data.StringFormat
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import splitties.init.injectAsAppCtx
-import java.security.Security
 
 class BotApplication : Application() {
     companion object {
@@ -38,6 +36,7 @@ class BotApplication : Application() {
         super.onCreate()
         injectAsAppCtx()
         context = this
+        byPassECDHCHeck()
         val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
         else
@@ -47,10 +46,16 @@ class BotApplication : Application() {
         if (processName?.isEmpty() == false && processName == packageName) {
             initNotification()
         }
-        if (Security.getProperty(BouncyCastleProvider.PROVIDER_NAME) != null) {
-            Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME)
-        }
-        Security.addProvider(BouncyCastleProvider())
+    }
+
+    /**
+     * 在新版系统上无法使用ECDH算法，使用下面的代码绕过
+     * */
+    private fun byPassECDHCHeck() {
+        val cls = Class.forName("sun.security.jca.Providers")
+        val field = cls.getDeclaredField("maximumAllowableApiLevelForBcDeprecation")
+        field.isAccessible = true
+        field.setInt(null, 999)
     }
 
 

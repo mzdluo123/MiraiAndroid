@@ -1,5 +1,5 @@
-3.2.1
+3.2.2
 https://maupdate.rainchan.win/app-normal-release.apk
-修复了部分系统无法编译插件的问题
-修复了网络异常导致的启动崩溃问题
-更新mirai-core到2.7-M1
+更新mirai-core到2.7-RC
+修复了部分情况下无法登录的问题
+修复了部分情况下控制台指令无回显的问题

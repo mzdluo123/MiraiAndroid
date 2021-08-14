@@ -1,5 +1,6 @@
 package io.github.mzdluo123.mirai.android.miraiconsole
 
+import android.text.TextUtils
 import android.util.Log
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BuildConfig
@@ -32,6 +33,7 @@ fun logException(err: Throwable?) {
     MiraiAndroidLogger.error(stringWriter.toString())
 }
 
+
 private val lock = Object()
 
 internal fun pushLog(log: String) {
@@ -47,7 +49,6 @@ internal fun pushLog(log: String) {
             }
         }
         BotService.consoleUi.finishBroadcast()
-
     }
 }
 
@@ -58,17 +59,12 @@ object MiraiAndroidLogger :
         logException(e)
         synchronized(this) {
             message?.split("\n")?.forEach {
-                val log = "[${priority.name}] ${it}"
+                val log = "[${priority.name}] $it"
                 val colorLog =
-                    "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font><![CDATA[${
-                        it.replace(
-                            "\n",
-                            "\r"
-                        )
-                    }]]>"
+                    "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font>${
+                        TextUtils.htmlEncode(it)
+                    }"
                 pushLog(colorLog)
-
-
                 if (BuildConfig.DEBUG || printToSysLog) {
                     Log.i("MA", log)
                 }

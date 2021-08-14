@@ -21,8 +21,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 52
-        versionName "3.2.1"
+        versionCode 53
+        versionName "3.2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "CONSOLEVERSION", "\"$CONSOLE_VERSION\"")
@@ -188,8 +188,8 @@ dependencies {
 //    }
 
     //mirai-lua
-    // implementation "com.ooooonly:luaMirai:${LUAMIRAI_VERSION}"
-    // implementation 'org.json:json:20160212'
+     implementation "com.ooooonly:luaMirai:${LUAMIRAI_VERSION}"
+     implementation 'org.json:json:20160212'
     implementation 'com.ooooonly:giteeman:0.1.1'
 
     //splitties

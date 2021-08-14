@@ -50,7 +50,8 @@
             android:name=".activity.UnsafeLoginActivity"
             android:excludeFromRecents="true"
             android:label="请完成登录验证"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:parentActivityName=".activity.MainActivity" />
         <activity android:name=".activity.PluginImportActivity">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
