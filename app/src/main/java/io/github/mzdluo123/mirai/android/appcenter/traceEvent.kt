@@ -12,8 +12,8 @@ internal fun traceCritical(event: String) {
     Analytics.trackEvent(event, mapOf(), Flags.CRITICAL)
 }
 
-internal fun trace(event: String, vararg prop: Pair<String, String>) {
-    val map = hashMapOf<String, String>()
+internal fun trace(event: String, vararg prop: Pair<String, String?>) {
+    val map = hashMapOf<String, String?>()
     prop.forEach { map[it.first] = it.second }
     Analytics.trackEvent(event, map)
 }

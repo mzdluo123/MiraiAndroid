@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.appcenter.trace
 import io.github.mzdluo123.mirai.android.databinding.ActivityPluginImportBinding
 import io.github.mzdluo123.mirai.android.ui.plugin.PluginViewModel
 import io.github.mzdluo123.mirai.android.utils.askFileName
@@ -69,6 +70,11 @@ class PluginImportActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 throwable.printStackTrace()
+                trace(
+                    "install plugin error",
+                    "type" to throwable.javaClass.name,
+                    "msg" to throwable.message
+                )
             }
         }
 
@@ -102,6 +108,7 @@ class PluginImportActivity : AppCompatActivity() {
                     Toast.makeText(this@PluginImportActivity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT)
                         .show()
                     finish()
+                    trace("install plugin success", "name" to name)
                 }
             }
             R.id.copy_radioButton -> {
@@ -120,6 +127,7 @@ class PluginImportActivity : AppCompatActivity() {
                     Toast.makeText(this@PluginImportActivity, "安装成功,重启后即可加载", Toast.LENGTH_SHORT)
                         .show()
                     finish()
+                    trace("install plugin success", "name" to name)
                 }
             }
         }

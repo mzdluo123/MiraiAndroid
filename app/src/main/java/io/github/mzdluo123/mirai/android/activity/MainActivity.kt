@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 message = "MiraiAndroid不对低于Android8.0的设备提供支持，但是你仍然可以在低于8.0的设备上运行；适配代码由溯洄提供，请勿反馈问题"
             }.show()
         }
-
+        trace("launch app")
     }
 
     override fun onSupportNavigateUp(): Boolean =
