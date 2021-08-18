@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.JsonParser
 import io.github.mzdluo123.mirai.android.R
+import io.github.mzdluo123.mirai.android.appcenter.trace
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidLoginSolver
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import kotlinx.android.synthetic.main.activity_unsafe_login.*
@@ -99,6 +100,7 @@ class UnsafeLoginActivity : AppCompatActivity() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(AndroidLoginSolver.CAPTCHA_NOTIFICATION_ID)
         finish()
+        trace("finish UnsafeLogin")
     }
 
 

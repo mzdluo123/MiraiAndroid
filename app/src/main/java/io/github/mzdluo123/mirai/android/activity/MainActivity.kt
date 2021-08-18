@@ -1,10 +1,7 @@
 package io.github.mzdluo123.mirai.android.activity
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -14,16 +11,22 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
-import io.github.mzdluo123.mirai.android.*
+import io.github.mzdluo123.mirai.android.AppSettings
+import io.github.mzdluo123.mirai.android.BotApplication
+import io.github.mzdluo123.mirai.android.NotificationFactory
 import io.github.mzdluo123.mirai.android.R
-import io.github.mzdluo123.mirai.android.utils.RequestUtil
+import io.github.mzdluo123.mirai.android.appcenter.trace
 import io.github.mzdluo123.mirai.android.utils.shareText
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.apache.commons.io.FileUtils
-import splitties.alertdialog.appcompat.*
-import splitties.toast.toast
+import splitties.alertdialog.appcompat.alertDialog
+import splitties.alertdialog.appcompat.cancelButton
+import splitties.alertdialog.appcompat.message
+import splitties.alertdialog.appcompat.okButton
 import java.io.File
 
 
@@ -71,8 +74,8 @@ class MainActivity : AppCompatActivity() {
             BotApplication.context.keepLive()
         }
         //updateCheckV2()
-        if (BuildConfig.DEBUG) toast("跳过更新检查")
-        else updateCheckV2()
+//        if (BuildConfig.DEBUG) toast("跳过更新检查")
+//        else updateCheckV2()
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             alertDialog {
@@ -107,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         navController.popBackStack()
         navController.navigate(R.id.nav_console)  // 重新启动console fragment，使其能够链接到服务
         drawer_layout.closeDrawers()
+        trace("quick reboot")
     }
 
     private fun crashCheck() {
@@ -155,36 +159,36 @@ class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    private fun updateCheckV2() {
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            runOnUiThread {  toast("检查更新失败") }
-            throwable.printStackTrace()
-            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
-        }
-
-        lifecycleScope.launch(exceptionHandler + Dispatchers.IO) {
-            val rsp = RequestUtil.get(UPDATE_URL_V2)
-            if (rsp == null) {
-                toast("检查更新失败，请手动到Github或论坛检查是否有新版本")
-                return@launch
-            }
-            val lines = rsp.split("\n")
-            val version = lines[0]
-            val url = lines[1]
-            val updateMsg = lines.subList(2, lines.size - 1).joinToString(separator = "\n") { it }
-            if (version == BuildConfig.VERSION_NAME) {
-                return@launch
-            }
-            withContext(Dispatchers.Main) {
-                alertDialog {
-                    title = "发现新版本$version"
-                    message = updateMsg
-                    setPositiveButton("立即更新") { _, _ ->
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                    }
-                }.show()
-            }
-
-        }
-    }
+//    private fun updateCheckV2() {
+//        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+//            runOnUiThread {  toast("检查更新失败") }
+//            throwable.printStackTrace()
+//            Log.e(TAG, throwable.message ?: return@CoroutineExceptionHandler)
+//        }
+//
+//        lifecycleScope.launch(exceptionHandler + Dispatchers.IO) {
+//            val rsp = RequestUtil.get(UPDATE_URL_V2)
+//            if (rsp == null) {
+//                toast("检查更新失败，请手动到Github或论坛检查是否有新版本")
+//                return@launch
+//            }
+//            val lines = rsp.split("\n")
+//            val version = lines[0]
+//            val url = lines[1]
+//            val updateMsg = lines.subList(2, lines.size - 1).joinToString(separator = "\n") { it }
+//            if (version == BuildConfig.VERSION_NAME) {
+//                return@launch
+//            }
+//            withContext(Dispatchers.Main) {
+//                alertDialog {
+//                    title = "发现新版本$version"
+//                    message = updateMsg
+//                    setPositiveButton("立即更新") { _, _ ->
+//                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+//                    }
+//                }.show()
+//            }
+//
+//        }
+//    }
 }

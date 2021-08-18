@@ -17,6 +17,7 @@ import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.NotificationFactory
+import io.github.mzdluo123.mirai.android.appcenter.trace
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -151,7 +152,7 @@ class AndroidMiraiConsole(
             NotificationManagerCompat.from(BotApplication.context)
                 .cancel(BotService.OFFLINE_NOTIFICATION_ID)
         }
-
+        trace("login success")
     }
 
 

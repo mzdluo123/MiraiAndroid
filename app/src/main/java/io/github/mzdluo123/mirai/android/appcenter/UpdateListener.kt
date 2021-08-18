@@ -11,13 +11,21 @@ import splitties.alertdialog.appcompat.title
 class UpdateListener : DistributeListener {
     override fun onReleaseAvailable(activity: Activity, releaseDetails: ReleaseDetails): Boolean {
         val dialog = activity.alertDialog {
-            title = "发现新版本${releaseDetails.version}"
+            title = "发现新版本 ${releaseDetails.version}"
             message = releaseDetails.releaseNotes
             setPositiveButton("立即更新") { _, _ ->
                 activity.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
                         releaseDetails.downloadUrl
+                    )
+                )
+            }
+            setNeutralButton("查看详细信息") { _, _ ->
+                activity.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        releaseDetails.releaseNotesUrl
                     )
                 )
             }

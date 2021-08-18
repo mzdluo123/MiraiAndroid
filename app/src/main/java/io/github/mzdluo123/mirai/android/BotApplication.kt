@@ -16,6 +16,7 @@ import com.microsoft.appcenter.distribute.Distribute
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.activity.CrashReportActivity
 import io.github.mzdluo123.mirai.android.appcenter.UpdateListener
+import io.github.mzdluo123.mirai.android.appcenter.trace
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import io.github.mzdluo123.mirai.android.service.BotService
 import kotlinx.serialization.json.Json
@@ -55,12 +56,13 @@ class BotApplication : Application() {
     }
 
     private fun initAppCenter() {
-
+        Distribute.setEnabledForDebuggableBuild(false)
+        Distribute.setListener(UpdateListener())
         AppCenter.start(
             this, "70a7bed9-65ce-4526-a448-0be273dbb652",
             Analytics::class.java, Crashes::class.java, Distribute::class.java
         )
-        Distribute.setListener(UpdateListener())
+
     }
 
 
@@ -96,6 +98,7 @@ class BotApplication : Application() {
 
     internal fun keepLive() {
         val notification = ForegroundNotification("MiraiAndroid", "保活服务已启动", R.mipmap.ic_launcher)
+        trace("start keepLive")
         KeepLive.startWork(this, KeepLive.RunMode.ROGUE, notification, object : KeepLiveService {
             override fun onWorking() {
                 startBotService()
