@@ -36,7 +36,6 @@ class BotApplication : Application() {
         super.onCreate()
         injectAsAppCtx()
         context = this
-        byPassECDHCHeck()
         val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
         else
@@ -46,19 +45,6 @@ class BotApplication : Application() {
         if (processName?.isEmpty() == false && processName == packageName) {
             initNotification()
         }
-    }
-
-    /**
-     * 在新版系统上无法使用ECDH算法，使用下面的代码绕过
-     * */
-    private fun byPassECDHCHeck() {
-        try {
-            val cls = Class.forName("sun.security.jca.Providers")
-            val field = cls.getDeclaredField("maximumAllowableApiLevelForBcDeprecation")
-            field.isAccessible = true
-            field.setInt(null, 999)
-        }
-        catch(e : Exception) {}
     }
 
 

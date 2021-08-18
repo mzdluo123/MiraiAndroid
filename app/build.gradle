@@ -21,8 +21,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 54
-        versionName "3.2.3"
+        versionCode 55
+        versionName "3.2.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "CONSOLEVERSION", "\"$CONSOLE_VERSION\"")
@@ -141,9 +141,13 @@ dependencies {
     //androidx-constraintlayout
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
-//    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
-//    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.69'
-//
+    // 下一个mirai版本可以移除
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.69'
+
+    implementation("io.netty:netty-all:4.1.63.Final")
+
+
 
     //androidx-navigation
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
@@ -174,10 +178,10 @@ dependencies {
 
     //mirai-core
 //    implementation("net.mamoe:mirai-core-android:$CORE_VERSION")
-    implementation("net.mamoe:mirai-core-android:$CORE_VERSION") {
-        exclude module: "net.mamoe:mirai-core-api"
-        exclude module: "net.mamoe:mirai-core-utils"
-    }
+//    implementation("net.mamoe:mirai-core-android:$CORE_VERSION") {
+//        exclude module: "net.mamoe:mirai-core-api"
+//        exclude module: "net.mamoe:mirai-core-utils"
+//    }
     implementation("net.mamoe:mirai-core-api-android:$CORE_VERSION") {
         exclude module: "net.mamoe:mirai-core-utils"
     }

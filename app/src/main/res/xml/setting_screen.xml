@@ -17,8 +17,8 @@
             android:defaultValue="false"
             android:icon="@drawable/ic_local_printshop_24"
             android:key="print_to_logcat_preference"
-            android:summary="你可以使用 TAG: MA 级别:INFO 来看到log"
-            android:title="打印日志到logcat" />
+            android:summary="该选项会覆盖配置文件，同时会打印日志到logcat。你可以使用 TAG: MA 级别:INFO 来看到log"
+            android:title="显示调试日志" />
 
 
     </PreferenceCategory>

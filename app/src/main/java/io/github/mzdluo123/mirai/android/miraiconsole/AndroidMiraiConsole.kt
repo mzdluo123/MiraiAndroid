@@ -27,8 +27,11 @@ import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginDataStorage
+import net.mamoe.mirai.console.internal.logging.LoggerControllerImpl
+import net.mamoe.mirai.console.logging.LoggerController
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleInput
+import net.mamoe.mirai.console.util.ConsoleInternalApi
 import net.mamoe.mirai.console.util.NamedSupervisorJob
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.event.events.BotOfflineEvent
@@ -39,6 +42,7 @@ import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.SimpleLogger
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -88,6 +92,8 @@ class AndroidMiraiConsole(
     @ConsoleFrontEndImplementation
     override val consoleCommandSender: MiraiConsoleImplementation.ConsoleCommandSenderImpl =
         AndroidConsoleCommandSenderImpl
+
+    @ConsoleFrontEndImplementation
     override val consoleInput: ConsoleInput
         get() = AndroidConsoleInput
 
@@ -107,6 +113,22 @@ class AndroidMiraiConsole(
     @ConsoleFrontEndImplementation
     override val configStorageForBuiltIns: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("config"))
+
+    @ConsoleInternalApi
+    @ConsoleFrontEndImplementation
+    override val loggerController: LoggerController
+        get() = if (AppSettings.printToLogcat) { // 显示所有级别的日志
+            object : LoggerController {
+                override fun shouldLog(
+                    identity: String?,
+                    priority: SimpleLogger.LogPriority
+                ): Boolean {
+                    return true
+                }
+            }
+        } else {
+            LoggerControllerImpl
+        }
 
     fun afterBotLogin(bot: Bot) {
         startRefreshNotificationJob(bot)
@@ -188,6 +210,7 @@ object AndroidConsoleFrontEndDescImpl : MiraiConsoleFrontEndDescription {
     // is console's version not frontend's version
     override val version: SemVersion = SemVersion(BuildConfig.VERSION_NAME)
 }
+
 
 @ConsoleFrontEndImplementation
 object AndroidConsoleCommandSenderImpl : MiraiConsoleImplementation.ConsoleCommandSenderImpl {

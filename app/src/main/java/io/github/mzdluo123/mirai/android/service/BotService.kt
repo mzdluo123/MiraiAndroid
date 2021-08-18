@@ -120,6 +120,9 @@ class BotService : LifecycleService() {
             Debug.waitForDebugger()
         }
 
+        if (AppSettings.printToLogcat) {
+
+        }
         //powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
