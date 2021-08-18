@@ -31,7 +31,7 @@ MiraiAndroid 是 基于 [Mirai](https://github.com/mamoe/mirai) 的 QQ 机器人
 
 相比使用 `Termux` 或者是 `Linux Deploy` 等部署并运行 [Mirai](https://github.com/mamoe/mirai) 的方案， MiraiAndroid 提供了更好的性能、更少的资源占用，以及更方便的操作界面。
 
-最新的构建版本你可以到 [releases](https://github.com/mzdluo123/MiraiAndroid/releases) 或 上方交流群 内找到。其中请注意，如果您违反了交流群内相关规定或是有其他不当行为你可能会被无理由移出交流群。
+最新的构建版本你可以到 [appcenter](https://install.appcenter.ms/users/mzdluo123/apps/miraiandroid/distribution_groups/release) 内找到。其中请注意，如果您违反了交流群内相关规定或是有其他不当行为你可能会被无理由移出交流群。
 
 ## 声明
 
