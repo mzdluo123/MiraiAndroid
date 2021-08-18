@@ -13,6 +13,9 @@ def CORE_VERSION = "2.7-RC"
 def CONSOLE_VERSION = "2.7-RC"
 def LUAMIRAI_VERSION = "2.0.8"
 
+
+def appCenterSdkVersion = '4.1.0'
+
 android {
     compileSdkVersion 30
     buildToolsVersion "29.0.2"
@@ -21,8 +24,8 @@ android {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
         targetSdkVersion 30
-        versionCode 55
-        versionName "3.2.4"
+        versionCode 56
+        versionName "3.2.4-center"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "COREVERSION", "\"$CORE_VERSION\"")
         buildConfigField("String", "CONSOLEVERSION", "\"$CONSOLE_VERSION\"")
@@ -193,7 +196,6 @@ dependencies {
 
     //mirai-lua
      implementation "com.ooooonly:luaMirai:${LUAMIRAI_VERSION}"
-     implementation 'org.json:json:20160212'
     implementation 'com.ooooonly:giteeman:0.1.1'
 
     //splitties
@@ -222,6 +224,9 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.10.0'
 
+    implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
+    implementation "com.microsoft.appcenter:appcenter-distribute:${appCenterSdkVersion}"
 
     // fuck!! 他不能在Android平台工作
     //    implementation  'org.codehaus.groovy:groovy:2.4.6:grooid'

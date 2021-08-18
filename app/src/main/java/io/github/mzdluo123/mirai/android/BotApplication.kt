@@ -9,8 +9,13 @@ import android.os.Process
 import com.fanjun.keeplive.KeepLive
 import com.fanjun.keeplive.config.ForegroundNotification
 import com.fanjun.keeplive.config.KeepLiveService
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
+import com.microsoft.appcenter.distribute.Distribute
 import io.github.mzdluo123.mirai.android.NotificationFactory.initNotification
 import io.github.mzdluo123.mirai.android.activity.CrashReportActivity
+import io.github.mzdluo123.mirai.android.appcenter.UpdateListener
 import io.github.mzdluo123.mirai.android.crash.MiraiAndroidReportSenderFactory
 import io.github.mzdluo123.mirai.android.service.BotService
 import kotlinx.serialization.json.Json
@@ -20,6 +25,7 @@ import org.acra.config.CoreConfigurationBuilder
 import org.acra.config.DialogConfigurationBuilder
 import org.acra.data.StringFormat
 import splitties.init.injectAsAppCtx
+
 
 class BotApplication : Application() {
     companion object {
@@ -36,6 +42,7 @@ class BotApplication : Application() {
         super.onCreate()
         injectAsAppCtx()
         context = this
+        initAppCenter()
         val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
         else
@@ -45,6 +52,15 @@ class BotApplication : Application() {
         if (processName?.isEmpty() == false && processName == packageName) {
             initNotification()
         }
+    }
+
+    private fun initAppCenter() {
+
+        AppCenter.start(
+            this, "70a7bed9-65ce-4526-a448-0be273dbb652",
+            Analytics::class.java, Crashes::class.java, Distribute::class.java
+        )
+        Distribute.setListener(UpdateListener())
     }
 
 
