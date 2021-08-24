@@ -1,3 +1,4 @@
-3.2.4
-https://maupdate.rainchan.win/app-normal-release.apk
-修复了在大部分设备上无法正常登录的问题
+3.2.5
+https://install.appcenter.ms/users/mzdluo123/apps/miraiandroid/distribution_groups/release
+全新的更新服务
+自动错误报告
