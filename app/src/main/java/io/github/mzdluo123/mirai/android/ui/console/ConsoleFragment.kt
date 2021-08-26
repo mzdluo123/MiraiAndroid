@@ -191,18 +191,17 @@ class ConsoleFragment : Fragment() {
 
     private fun submitCmd() {
         var command = command_input.text.toString()
-        lifecycleScope.launch(Dispatchers.Default) {
+
             if (!command.startsWith("/")) {
                 command = "/$command"
             }
             try {
-                conn.botService.runCmd(command)
-                requireActivity().runOnUiThread {
-                    command_input.text.clear()
+                lifecycleScope.launch(Dispatchers.Default) {
+                    conn.botService.runCmd(command)
                 }
+                command_input.text.clear()
             } catch (e: DeadObjectException) {
                 toast("服务状态异常，请在菜单内点击快速重启")
-            }
         }
 
     }
