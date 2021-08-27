@@ -30,7 +30,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
-        tools:ignore="HardcodedDebugMode">
+        android:hasFragileUserData="true"
+        tools:ignore="HardcodedDebugMode"
+        tools:targetApi="q">
         <activity
             android:name=".activity.CrashReportActivity"
             android:theme="@style/AppTheme"
