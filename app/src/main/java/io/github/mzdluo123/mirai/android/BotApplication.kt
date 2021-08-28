@@ -43,7 +43,9 @@ class BotApplication : Application() {
         super.onCreate()
         injectAsAppCtx()
         context = this
-        initAppCenter()
+        if (!BuildConfig.DEBUG) {
+            initAppCenter()
+        }
         val processName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
             getProcessName()
         else

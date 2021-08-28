@@ -34,10 +34,8 @@ fun logException(err: Throwable?) {
 }
 
 
-private val lock = Object()
-
+@Synchronized
 internal fun pushLog(log: String) {
-    synchronized(lock) {
         logStorage.add(log)
         for (i in 0 until BotService.consoleUi.beginBroadcast()) {
             try {
@@ -49,7 +47,6 @@ internal fun pushLog(log: String) {
             }
         }
         BotService.consoleUi.finishBroadcast()
-    }
 }
 
 

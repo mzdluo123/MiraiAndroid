@@ -17,6 +17,7 @@ import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import kotlinx.android.synthetic.main.activity_unsafe_login.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import splitties.toast.toast
 
 class UnsafeLoginActivity : AppCompatActivity() {
 
@@ -88,7 +89,12 @@ class UnsafeLoginActivity : AppCompatActivity() {
 
         conn.connectStatus.observe(this, Observer {
             if (it) {
+                if (conn.botService.url == null) {
+                    toast("获取URL失败，请重试")
+                    finish()
+                    return@Observer
 
+                }
                 unsafe_login_web.loadUrl(conn.botService.url.replace("verify", "qrcode"))
             }
         })
