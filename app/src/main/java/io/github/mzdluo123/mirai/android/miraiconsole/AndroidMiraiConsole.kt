@@ -118,7 +118,7 @@ class AndroidMiraiConsole(
     @ConsoleInternalApi
     @ConsoleFrontEndImplementation
     override val loggerController: LoggerController
-        get() = if (AppSettings.printToLogcat) { // 显示所有级别的日志
+        get() = if (AppSettings.printToLogcat || BuildConfig.DEBUG) { // 显示所有级别的日志
             object : LoggerController {
                 override fun shouldLog(
                     identity: String?,
