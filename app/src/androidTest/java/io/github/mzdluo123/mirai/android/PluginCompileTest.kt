@@ -51,13 +51,13 @@ class PluginCompileTest {
             }
             conn.registerConsole(console)
             launch {
-                repeat(10) {
+                repeat(60) {
                     conn.botService.runCmd("/help")
                     delay(100)
                 }
             }
             File(BotApplication.context.filesDir, "/plugins/test-android.jar").deleteOnExit()
-            withTimeout(5000) {
+            withTimeout(6000) {
                 Assert.assertTrue(feature.await())
             }
         }

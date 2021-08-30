@@ -20,7 +20,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.hamcrest.Description
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.TypeSafeMatcher
 import org.junit.Assert
@@ -102,13 +101,6 @@ class SavePwdTest {
         val materialButton = onView(
             allOf(
                 withId(android.R.id.button1), withText("设置自动登录"),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.ScrollView")),
-                        0
-                    ),
-                    3
-                )
             )
         )
         materialButton.perform(scrollTo(), click())
