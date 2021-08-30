@@ -137,4 +137,41 @@ class BotServiceTest {
 
         }
     }
+//
+//    @Test
+//    fun broadcastReceiverTest() {
+//        runBlocking {
+//            AppSettings.allowPushMsg = true
+//            BotApplication.context.startBotService()
+//            val feature = CompletableDeferred<Boolean>()
+//            val conn = ServiceConnector(BotApplication.context)
+//            val console = object : IConsole.Stub() {
+//                override fun newLog(log: String?) {
+//                    if (log != null && "成功处理一个群消息推送请求" in log) {
+//                        feature.complete(true)
+//                    }
+//                }
+//            }
+//            conn.registerConsole(console)
+//            rule.bindService(
+//                Intent(BotApplication.context, BotService::class.java),
+//                conn,
+//                Context.BIND_AUTO_CREATE
+//            )
+//
+//            launch {
+//                repeat(30) {
+//                    LocalBroadcastManager.getInstance(BotApplication.context)
+//                        .sendBroadcast(Intent("io.github.mzdluo123.mirai.android.PushMsg").apply {
+//                            data =
+//                                Uri.parse("ma://sendGroupMsg?msg=HelloWorld&id=4234234&at=43434343")
+//                        })
+//                    delay(300)
+//                }
+//            }
+//            withTimeout(6000) {
+//                Assert.assertTrue(feature.await())
+//            }
+//        }
+//    }
 }

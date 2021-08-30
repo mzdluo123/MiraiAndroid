@@ -13,7 +13,9 @@ class PushMsgReceiver(private val botService: BotService) : BroadcastReceiver() 
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
+            Log.d(TAG, "收到广播")
             val data = intent.data ?: return
+
             if (data.scheme != "ma") {
                 return
             }
