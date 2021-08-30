@@ -45,7 +45,7 @@ class ConsoleFragment : Fragment() {
     }
 
 
-    private lateinit var conn: ServiceConnector
+    lateinit var conn: ServiceConnector
 
     private var autoScroll = true
 
