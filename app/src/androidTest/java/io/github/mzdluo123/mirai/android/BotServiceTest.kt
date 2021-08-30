@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
 class BotServiceTest {
@@ -91,6 +92,49 @@ class BotServiceTest {
             withTimeout(5000) {
                 Assert.assertTrue(feature.await())
             }
+        }
+    }
+
+    @Test
+    fun fastRestartTest() {
+        runBlocking {
+            BotApplication.context.startBotService()
+            val feature = CompletableDeferred<Boolean>()
+            val conn = ServiceConnector(BotApplication.context)
+            val console = object : IConsole.Stub() {
+                var count = 0
+                override fun newLog(log: String?) {
+                    if (log != null && "mirai-console started successfully." in log) {
+                        count++
+                        if (count == 1) {
+                            thread {
+                                BotApplication.context.stopBotService()
+                                Thread.sleep(1000)
+                                BotApplication.context.startBotService()
+                                rule.bindService(
+                                    Intent(BotApplication.context, BotService::class.java),
+                                    conn,
+                                    Context.BIND_AUTO_CREATE
+                                )
+                            }.start()
+                        }
+                        if (count == 2) {
+                            feature.complete(true)
+
+                        }
+                    }
+                }
+            }
+            conn.registerConsole(console)
+            rule.bindService(
+                Intent(BotApplication.context, BotService::class.java),
+                conn,
+                Context.BIND_AUTO_CREATE
+            )
+            withTimeout(8000) {
+                Assert.assertTrue(feature.await())
+            }
+
         }
     }
 }

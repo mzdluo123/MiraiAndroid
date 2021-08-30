@@ -51,7 +51,6 @@ class PageLoadTest {
     @Test
     fun toolsTest() {
         with(launchFragmentInContainer<ToolsFragment>(themeResId = R.style.AppTheme)) {
-
             onView(withId(R.id.btn_export_device)).check(ViewAssertions.matches(isDisplayed()))
         }
     }
