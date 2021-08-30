@@ -7,9 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.service.ServiceConnector
 import io.github.mzdluo123.mirai.android.ui.plugin.PluginViewModel
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,12 +44,18 @@ class PluginCompileTest {
             )
             val console = object : IConsole.Stub() {
                 override fun newLog(log: String?) {
-                    if (log != null && "SimpleGroupAuth已启动" in log) {
+                    if (log != null && "/ga-switch" in log) {
                         feature.complete(true)
                     }
                 }
             }
             conn.registerConsole(console)
+            launch {
+                repeat(10) {
+                    conn.botService.runCmd("/help")
+                    delay(100)
+                }
+            }
             File(BotApplication.context.filesDir, "/plugins/test-android.jar").deleteOnExit()
             withTimeout(5000) {
                 Assert.assertTrue(feature.await())
