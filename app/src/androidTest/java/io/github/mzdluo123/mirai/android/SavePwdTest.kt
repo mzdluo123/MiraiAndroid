@@ -37,7 +37,7 @@ class SavePwdTest {
     var mActivityTestRule = ActivityTestRule(MainActivity::class.java)
 
     @Test
-    fun mainActivityTest() {
+    fun savePwdTest() {
 
         val overflowMenuButton = onView(
             allOf(

@@ -11,7 +11,6 @@ import kotlinx.atomicfu.locks.withLock
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.PrintWriter
 import java.io.StringWriter
-import kotlin.concurrent.thread
 
 private const val LOGGER_IDENTITY = "MA"
 
@@ -47,7 +46,7 @@ internal fun pushLog(log: String) {
             } catch (remoteE: Exception) {
                 Log.e("MA", remoteE.message ?: "发生错误")
                 remoteE.printStackTrace()
-                thread { logException(remoteE) }.start() // 防止死锁
+               // thread { logException(remoteE) }.start() // 防止死锁
             }
         }
         BotService.consoleUi.finishBroadcast()

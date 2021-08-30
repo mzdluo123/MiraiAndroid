@@ -62,6 +62,7 @@ android {
         }
     }
 
+
 // To inline the bytecode built with JVM target 1.8 into
 // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
     compileOptions {
@@ -96,9 +97,15 @@ android {
         abortOnError false
     }
 
-
+    sourceSets {
+        androidTest {
+            assets.srcDirs = ['src/main/assets', 'src/androidTest/assets/', 'src/debug/assets/']
+            java.srcDirs = ['src/main/java', 'src/androidTest/java', 'src/debug/java']
+        }
+    }
     testOptions {
         animationsDisabled = true
+
     }
 
     configurations {
@@ -111,6 +118,7 @@ android {
         }
     }
 }
+
 
 kotlin.sourceSets.all {
     languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")

@@ -38,33 +38,6 @@ class BotServiceTest {
     }
 
     @Test
-    fun liveLogTest() {
-        runBlocking {
-            BotApplication.context.startBotService()
-            val feature = CompletableDeferred<Boolean>()
-            val conn = ServiceConnector(BotApplication.context)
-            rule.bindService(
-                Intent(BotApplication.context, BotService::class.java),
-                conn,
-                Context.BIND_AUTO_CREATE
-            )
-            val console = object : IConsole.Stub() {
-                override fun newLog(log: String?) {
-                    if (log != null) {
-                        feature.complete(true)
-                    }
-                }
-            }
-            conn.botService.registerConsole(console)
-
-            withTimeout(5000) {
-                Assert.assertTrue(feature.await())
-
-            }
-        }
-    }
-
-    @Test
     fun helpTest() {
         runBlocking {
             BotApplication.context.startBotService()
