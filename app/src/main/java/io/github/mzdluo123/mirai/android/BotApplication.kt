@@ -43,6 +43,7 @@ class BotApplication : Application() {
         super.onCreate()
         injectAsAppCtx()
         context = this
+        enableDebugNetLog()
         if (!BuildConfig.DEBUG) {
             initAppCenter()
         }
@@ -86,6 +87,14 @@ class BotApplication : Application() {
 //                .setEnabled(true)
             //不知道为什么开启的时候总是显示这个，先暂时禁用
         })
+    }
+
+    private fun enableDebugNetLog(){
+        if (AppSettings.printToLogcat || BuildConfig.DEBUG){
+            System.setProperty("mirai.network.handle.selector.logging","true")
+      //      System.setProperty("mirai.network.packet.logger","true")
+
+        }
     }
 
     private fun myGetProcessName(): String? {
