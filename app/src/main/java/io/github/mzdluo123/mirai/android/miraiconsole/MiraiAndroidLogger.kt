@@ -6,6 +6,8 @@ import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
+import kotlinx.atomicfu.locks.ReentrantLock
+import kotlinx.atomicfu.locks.withLock
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -33,23 +35,23 @@ fun logException(err: Throwable?) {
     MiraiAndroidLogger.error(stringWriter.toString())
 }
 
-
-private val lock = Object()
-
+private val lock = ReentrantLock()
 internal fun pushLog(log: String) {
-    synchronized(lock) {
+    lock.withLock {
         logStorage.add(log)
+
         for (i in 0 until BotService.consoleUi.beginBroadcast()) {
             try {
                 BotService.consoleUi.getBroadcastItem(i).newLog(log)
             } catch (remoteE: Exception) {
                 Log.e("MA", remoteE.message ?: "发生错误")
                 remoteE.printStackTrace()
-                logException(remoteE)
+               // thread { logException(remoteE) }.start() // 防止死锁
             }
         }
         BotService.consoleUi.finishBroadcast()
     }
+
 }
 
 
@@ -57,17 +59,15 @@ object MiraiAndroidLogger :
     SimpleLogger(LOGGER_IDENTITY, { priority: LogPriority, message: String?, e: Throwable? ->
         e?.printStackTrace()
         logException(e)
-        synchronized(this) {
-            message?.split("\n")?.forEach {
-                val log = "[${priority.name}] $it"
-                val colorLog =
-                    "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font>${
-                        TextUtils.htmlEncode(it)
-                    }"
-                pushLog(colorLog)
-                if (BuildConfig.DEBUG || printToSysLog) {
-                    Log.i("MA", log)
-                }
+        message?.split("\n")?.forEach {
+            val log = "[${priority.name}] $it"
+            val colorLog =
+                "<font color=\"${LogColor.valueOf(priority.name).color}\">[${priority.name}]</font>${
+                    TextUtils.htmlEncode(it)
+                }"
+            pushLog(colorLog)
+            if (BuildConfig.DEBUG || printToSysLog) {
+                Log.i("MA", log)
             }
         }
     }

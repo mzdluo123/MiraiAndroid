@@ -6,25 +6,25 @@ import com.android.tools.r8.D8Command;
 import com.android.tools.r8.OutputMode;
 
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.exception.ZipException;
-
+import net.lingala.zip4j.model.FileHeader;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.nio.file.Paths;
 
 
 public class DexCompiler {
-    private File tempDir, pluginDir;
+    private final File tempDir;
+    private final File pluginDir;
 
     public DexCompiler(File fileDir, File cache) {
         tempDir = cache;
-        if (!tempDir.exists()){
+        if (!tempDir.exists()) {
             tempDir.mkdir();
         }
         pluginDir = new File(fileDir.getAbsolutePath(), "plugins");
@@ -79,7 +79,11 @@ public class DexCompiler {
         }
         newZip.addFolder(new File(tempDir, "META-INF"));
         // 自带的moveto在遇到不同文件系统的时候会失败
-        FileUtils.moveFile(newFile,new File(pluginDir, newFile.getName()));
+        File dest = new File(pluginDir, newFile.getName());
+        if (dest.exists()) {
+            dest.delete();
+        }
+        FileUtils.moveFile(newFile, dest);
 
     }
 }

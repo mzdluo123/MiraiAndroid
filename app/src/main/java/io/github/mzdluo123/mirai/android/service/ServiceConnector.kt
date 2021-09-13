@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.DeadObjectException
 import android.os.IBinder
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -67,7 +68,12 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     fun onStop() {
         if (connectStatus.value!!) {
             if (callback != null) {
-                botService.unregisterConsole(callback)
+                try {
+                    botService.unregisterConsole(callback)
+                } catch (ignore: DeadObjectException) {
+
+                }
+
                 callback = null
             }
         }
@@ -77,7 +83,12 @@ class ServiceConnector(var context: Context) : ServiceConnection, LifecycleObser
     fun disconnect() {
         if (connectStatus.value!!) {
             if (callback != null) {
-                botService.unregisterConsole(callback)
+                try {
+                    botService.unregisterConsole(callback)
+                } catch (ignore: DeadObjectException) {
+
+                }
+
             }
             context.unbindService(this)
             connectStatus.value = false

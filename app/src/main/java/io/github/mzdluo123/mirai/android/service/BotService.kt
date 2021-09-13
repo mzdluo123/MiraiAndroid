@@ -17,11 +17,9 @@ import android.os.RemoteCallbackList
 import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.ooooonly.luaMirai.miraiconsole.LuaMiraiPlugin
-import io.github.mzdluo123.mirai.android.AppSettings
-import io.github.mzdluo123.mirai.android.IConsole
-import io.github.mzdluo123.mirai.android.IbotAidlInterface
-import io.github.mzdluo123.mirai.android.NotificationFactory
+import io.github.mzdluo123.mirai.android.*
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
 import io.github.mzdluo123.mirai.android.miraiconsole.MiraiAndroidLogger
@@ -120,9 +118,6 @@ class BotService : LifecycleService() {
             Debug.waitForDebugger()
         }
 
-        if (AppSettings.printToLogcat) {
-
-        }
         //powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
 //        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BotWakeLock")
     }
@@ -220,33 +215,32 @@ class BotService : LifecycleService() {
 
     private fun registerReceiver() {
         if (allowPushMsg) {
-            MiraiAndroidLogger.info("[MA] 正在启动消息推送广播监听器")
-            val filter = IntentFilter().apply {
-                addAction("io.github.mzdluo123.mirai.android.PushMsg")
-                priority = 999
-                addDataScheme("ma")
-            }
+
+            val filter = IntentFilter("io.github.mzdluo123.mirai.android.PushMsg")
             registerReceiver(msgReceiver, filter)
+            LocalBroadcastManager.getInstance(BotApplication.context)
+                .registerReceiver(msgReceiver, filter)
+            MiraiAndroidLogger.info("[MA] 正在启动消息推送广播监听器")
         }
     }
 
     internal fun sendFriendMsg(id: Long, msg: String?) {
+        MiraiAndroidLogger.info("[MA] 成功处理一个好友消息推送请求: $msg->$id")
         bot?.launch {
-            MiraiAndroidLogger.info("[MA] 成功处理一个好友消息推送请求: $msg->$id")
             this@BotService.bot!!.getFriend(id)?.sendMessage(msg!!) ?: return@launch
         }
     }
 
     internal fun sendGroupMsg(id: Long, msg: String?) {
+        MiraiAndroidLogger.info("[MA] 成功处理一个群消息推送请求: $msg->$id")
         bot?.launch {
-            MiraiAndroidLogger.info("[MA] 成功处理一个群消息推送请求: $msg->$id")
             this@BotService.bot!!.getGroup(id)?.sendMessage(msg!!) ?: return@launch
         }
     }
 
     internal fun sendGroupMsgWithAT(id: Long, msg: String?, user: Long) {
+        MiraiAndroidLogger.info("[MA] 成功处理一个群消息推送请求: $msg->$id")
         bot?.launch {
-            MiraiAndroidLogger.info("[MA] 成功处理一个群消息推送请求: $msg->$id")
             val group = this@BotService.bot!!.getGroup(id) ?: return@launch
             group.sendMessage(At(group[user]?.id ?: return@launch) + msg!!)
         }
