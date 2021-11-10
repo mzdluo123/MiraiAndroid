@@ -6,11 +6,11 @@ import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BuildConfig
 import io.github.mzdluo123.mirai.android.service.BotService
 import io.github.mzdluo123.mirai.android.utils.LoopQueue
-import kotlinx.atomicfu.locks.ReentrantLock
-import kotlinx.atomicfu.locks.withLock
 import net.mamoe.mirai.utils.SimpleLogger
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 private const val LOGGER_IDENTITY = "MA"
 
