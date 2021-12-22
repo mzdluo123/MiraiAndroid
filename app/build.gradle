@@ -17,13 +17,13 @@ def LUAMIRAI_VERSION = "2.0.8"
 def appCenterSdkVersion = '4.1.0'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
     buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "io.github.mzdluo123.mirai.android"
         minSdkVersion 26
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode 62
         versionName "3.3.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
