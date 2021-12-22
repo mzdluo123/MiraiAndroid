@@ -11,6 +11,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import dalvik.system.DexFile
 import io.github.mzdluo123.mirai.android.AppSettings
 import io.github.mzdluo123.mirai.android.BotApplication
 import io.github.mzdluo123.mirai.android.NotificationFactory
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_tools
             ), drawer_layout
         )
+
     }
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
