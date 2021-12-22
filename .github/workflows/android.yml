@@ -20,7 +20,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Unit tests
-        run: bash ./gradlew build --scan
+        run: bash ./gradlew build --scan --stacktrace 
 
 #jobs:
 #  test:
