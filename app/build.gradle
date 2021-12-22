@@ -185,7 +185,7 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.5.2'
 
     //BaseRecyclerViewAdapterHelper
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
 
     //mirai-core
     //implementation("net.mamoe:mirai-core-android:$CORE_VERSION")
