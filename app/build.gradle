@@ -16,7 +16,7 @@ def LUAMIRAI_VERSION = "2.0.8"
 
 def appCenterSdkVersion = '4.1.0'
 
-android { 
+android {
     compileSdkVersion 30
     buildToolsVersion "29.0.2"
 
