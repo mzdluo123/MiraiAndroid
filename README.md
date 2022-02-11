@@ -24,15 +24,13 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mzdluo123/MiraiAndroid/Android%20Build?style=flat-square&logo=github)](https://github.com/mzdluo123/MiraiAndroid/actions)
 [![Release](https://img.shields.io/github/v/release/mzdluo123/MiraiAndroid?style=flat-square&color=orange&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRFOqTdPpDDDjdWAAAA01db/wAAAAR0Uk5T////AEAqqfQAAAGRSURBVHja7NrRTsMwEETRO+v//2cKQtDSNNm1PSuE8Ht0FOcpM8NoOPwpJM6P5g/yI/gRsCNgR8COgB0BOwJ2BOwI2BGwI2BHwI6AHQE7AnYE7AjYEbAjYEfAjoAdATsCdgTsCNgRsCNgR8COgB2BdiTkRxQlZQq5GbdnzMi7McKLfBhjyIkoPv805UMU8fU/a0O+jfRnKSN3RvrCqojiIQCQA1HEj5jBgPw0cp+lhjwZuQsrIQdGSqkgiuP0ZyeiOEZiJ/LCSFxYHnlpXF9YFpHiLJTb9CZnxlAHcqGkkasUcwdynZV2IFpHErHvciKRC5c7kLGGJHPyWEHSabzmkUrmP4vUmoUORHNIsSSZCjrrVUwHMurIRKtUDp+nuivVkNmGrILM93AdiPLIQqWY7k/WissOZOSQxQ421WktN726Rnb0yR3IuEK2VOM6RzYV8Ke17L6avwMZr5GNi4WXVfnWXYSOkd3riw4kjpDtQxI9I4a5ytPawzOKeURc05t7xLXvkTq2RC3I+Ed+KfImwADzdEfKPNJbbAAAAABJRU5ErkJggg==&logoWidth=12)](https://github.com/mzdluo123/MiraiAndroid/releases)
-![QQ Group](https://img.shields.io/badge/交流群-206073050-informational?style=flat-square&logo=tencent-qq)
 [![MiraiForum](https://img.shields.io/badge/官方论坛-mirai--forum-blueviolet?style=flat-square&logo=appveyor)](https://mirai.mamoe.net)
 
 MiraiAndroid 是 基于 [Mirai](https://github.com/mamoe/mirai) 的 QQ 机器人 Android 前端程序，支持多种脚本接口，具有 轻量、简洁、易用、高效 的特点，依赖于 [mirai-console](https://github.com/mamoe/mirai-console) 。
 
 相比使用 `Termux` 或者是 `Linux Deploy` 等部署并运行 [Mirai](https://github.com/mamoe/mirai) 的方案， MiraiAndroid 提供了更好的性能、更少的资源占用，以及更方便的操作界面。
 
-最新的构建版本你可以到 [appcenter](https://install.appcenter.ms/users/mzdluo123/apps/miraiandroid/distribution_groups/release) 内找到。其中请注意，如果您违反了交流群内相关规定或是有其他不当行为你可能会被无理由移出交流群。
-
+最新的构建版本你可以到 [appcenter](https://install.appcenter.ms/users/mzdluo123/apps/miraiandroid/distribution_groups/release) 内找到。
 ## 声明
 
 ### 一切开发旨在学习，请勿用于非法用途
@@ -96,7 +94,6 @@ MiraiAndroid 是 基于 [Mirai](https://github.com/mamoe/mirai) 的 QQ 机器人
 
 d8工具已在新版 `Android sdk` 中自带，它就在 `build-tools` 中对应版本的文件夹下。在Windows平台他是一个bat文件
 
-如果没有可到上面的交流群内下载
 
 * 编译
 
