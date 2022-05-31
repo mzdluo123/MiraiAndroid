@@ -1,7 +1,6 @@
 ---
 name: Bug report
 about: 报告一个bug
-title: "[BUG]"
 labels: bug
 assignees: ''
 
