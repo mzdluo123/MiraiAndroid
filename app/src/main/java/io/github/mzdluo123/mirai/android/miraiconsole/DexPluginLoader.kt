@@ -24,14 +24,17 @@ import net.mamoe.mirai.console.plugin.loader.AbstractFilePluginLoader
 import net.mamoe.mirai.console.plugin.loader.PluginLoadException
 import net.mamoe.mirai.console.plugin.name
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
+import net.mamoe.mirai.utils.MiraiInternalApi
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
+import net.mamoe.mirai.console.internal.data.MultiFilePluginDataStorageImpl
+import java.nio.file.Path
 
 /**
  * copy from net.mamoe.mirai.console.internal.plugin.BuiltInJvmPluginLoaderImpl
  * */
 
-class DexPluginLoader(val odexPath: String) :
+class DexPluginLoader(val odexPath: String,private val workingDir:Path) :
     AbstractFilePluginLoader<JvmPlugin, JvmPluginDescription>(".jar"),
     CoroutineScope by MiraiConsole.childScope(
         "DexPluginLoader",
@@ -44,19 +47,21 @@ class DexPluginLoader(val odexPath: String) :
     JvmPluginLoader {
 
     override val configStorage: PluginDataStorage
-        get() = MiraiConsoleImplementationBridge.configStorageForJvmPluginLoader
+        get() =MultiFilePluginDataStorageImpl(workingDir.resolve("config"))
 
 
     override val dataStorage: PluginDataStorage
-        get() = MiraiConsoleImplementationBridge.dataStorageForJvmPluginLoader
+        get() =MultiFilePluginDataStorageImpl(workingDir.resolve("data"))
 
-    internal val classLoaders: MutableList<DexPluginClassLoader> = mutableListOf()
+    @MiraiInternalApi
+    override val classLoaders: MutableList<DexPluginClassLoader> = mutableListOf()
 
     @Suppress("EXTENSION_SHADOWED_BY_MEMBER") // doesn't matter
     override fun getPluginDescription(plugin: JvmPlugin): JvmPluginDescription = plugin.description
 
     private val pluginFileToInstanceMap: MutableMap<File, JvmPlugin> = ConcurrentHashMap()
 
+    @MiraiInternalApi
     override fun Sequence<File>.extractPlugins(): List<JvmPlugin> {
         ensureActive()
 
@@ -131,6 +136,11 @@ class DexPluginLoader(val odexPath: String) :
         }.getOrElse {
             throw PluginLoadException("Exception while loading ${plugin.description.name}", it)
         }
+    }
+
+    @MiraiInternalApi
+    override fun findLoadedClass(name: String): Class<*>? {
+        TODO("Not yet implemented")
     }
 
     override fun disable(plugin: JvmPlugin) {

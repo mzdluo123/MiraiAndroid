@@ -18,7 +18,6 @@ import android.util.Log
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.ooooonly.luaMirai.miraiconsole.LuaMiraiPlugin
 import io.github.mzdluo123.mirai.android.*
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidMiraiConsole
 import io.github.mzdluo123.mirai.android.miraiconsole.AndroidStatusCommand
@@ -138,7 +137,7 @@ class BotService : LifecycleService() {
 //        GlobalScope.launch(handler) { sendMessage("$qq login successes") }
         val bot = MiraiConsole.addBot(qq, pwd!!.chunkedHexToBytes(),){
             if (AppSettings.printToLogcat){
-                this.networkLoggerSupplier =  {MiraiLogger.create("NetLog")}
+                this.networkLoggerSupplier =  {MiraiAndroidLogger}
             }
         }
 
@@ -183,13 +182,13 @@ class BotService : LifecycleService() {
 //            path = getExternalFilesDir(null).toString()
 //        )
 //
-        LuaMiraiPlugin.load()
-        LuaMiraiPlugin.enable()
+//        LuaMiraiPlugin.load()
+//        LuaMiraiPlugin.enable()
 
         registerReceiver()
         isStart = true
         createNotification()
-        registerDefaultCommand()
+        //registerDefaultCommand()
         intent?.let { autoLogin(it) }
         ScriptManager.onLoad()
         GlobalEventChannel.subscribeAlways<BotOnlineEvent> {

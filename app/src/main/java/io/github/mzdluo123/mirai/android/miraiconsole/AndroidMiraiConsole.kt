@@ -26,15 +26,14 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsoleFrontEndDescription
 import net.mamoe.mirai.console.MiraiConsoleImplementation
+import net.mamoe.mirai.console.command.CommandManager
 import net.mamoe.mirai.console.data.MultiFilePluginDataStorage
 import net.mamoe.mirai.console.data.PluginDataStorage
 import net.mamoe.mirai.console.internal.logging.LoggerControllerImpl
 import net.mamoe.mirai.console.logging.LoggerController
+import net.mamoe.mirai.console.plugin.jvm.JvmPluginLoader
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
-import net.mamoe.mirai.console.util.ConsoleInput
-import net.mamoe.mirai.console.util.ConsoleInternalApi
-import net.mamoe.mirai.console.util.NamedSupervisorJob
-import net.mamoe.mirai.console.util.SemVersion
+import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.event.events.BotOfflineEvent
 import net.mamoe.mirai.event.events.BotReloginEvent
 import net.mamoe.mirai.event.globalEventChannel
@@ -44,17 +43,18 @@ import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.SimpleLogger
+import net.mamoe.mirai.console.internal.command.CommandManagerImpl
+import net.mamoe.mirai.console.logging.AbstractLoggerController
 import java.nio.file.Path
 import java.nio.file.Paths
 
 class AndroidMiraiConsole(
     val context: Context,
-    rootPath: Path,
+    rootPath: Path
 ) : MiraiConsoleImplementation,
     CoroutineScope by CoroutineScope(NamedSupervisorJob("MiraiAndroid") + CoroutineExceptionHandler { _, throwable ->
         Log.e("MiraiAndroid", "发生异常")
         logException(throwable)
-
     }
     ) {
 
@@ -70,66 +70,86 @@ class AndroidMiraiConsole(
     private var sendOfflineMsgJob: Job? = null
 
 
-    @ConsoleFrontEndImplementation
+    override val commandManager: CommandManager
+        get() = CommandManagerImpl(coroutineContext)
+
     override val rootPath: Path = Paths.get(context.getExternalFilesDir("")!!.absolutePath)
 
-    @ConsoleFrontEndImplementation
+
     override fun createLogger(identity: String?): MiraiLogger = MiraiAndroidLogger
 
-    @ConsoleFrontEndImplementation
+
     override fun createLoginSolver(
         requesterBot: Long,
         configuration: BotConfiguration
     ): LoginSolver = loginSolver
 
-    @ConsoleFrontEndImplementation
-    override val builtInPluginLoaders: List<Lazy<PluginLoader<*, *>>> =
-        listOf(lazy { DexPluginLoader(context.getExternalFilesDir("odex")!!.path) })
 
-    @ConsoleFrontEndImplementation
+    override val builtInPluginLoaders: List<Lazy<PluginLoader<*, *>>> =
+        listOf(lazy { DexPluginLoader(context.getExternalFilesDir("odex")!!.path,rootPath) })
+
     override val frontEndDescription: MiraiConsoleFrontEndDescription =
         AndroidConsoleFrontEndDescImpl
 
-    @ConsoleFrontEndImplementation
+    override val jvmPluginLoader: JvmPluginLoader
+        get() = this.builtInPluginLoaders[0].value as JvmPluginLoader
+
+
     override val consoleCommandSender: MiraiConsoleImplementation.ConsoleCommandSenderImpl =
         AndroidConsoleCommandSenderImpl
+    override val consoleDataScope: MiraiConsoleImplementation.ConsoleDataScope
+        get() = MiraiConsoleImplementation.ConsoleDataScope.createDefault(
+            coroutineContext,
+            this.dataStorageForJvmPluginLoader,
+            this.configStorageForBuiltIns
+        )
 
-    @ConsoleFrontEndImplementation
+
     override val consoleInput: ConsoleInput
         get() = AndroidConsoleInput
 
 
-    @ConsoleFrontEndImplementation
+    @OptIn(ConsoleExperimentalApi::class)
     override val dataStorageForJvmPluginLoader: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("data"))
 
-    @ConsoleFrontEndImplementation
+
+    @OptIn(ConsoleExperimentalApi::class)
     override val dataStorageForBuiltIns: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("data"))
 
-    @ConsoleFrontEndImplementation
+
+    @OptIn(ConsoleExperimentalApi::class)
     override val configStorageForJvmPluginLoader: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("config"))
 
-    @ConsoleFrontEndImplementation
+
+    @OptIn(ConsoleExperimentalApi::class)
     override val configStorageForBuiltIns: PluginDataStorage =
         MultiFilePluginDataStorage(rootPath.resolve("config"))
 
-    @ConsoleInternalApi
-    @ConsoleFrontEndImplementation
-    override val loggerController: LoggerController
-        get() = if (AppSettings.printToLogcat || BuildConfig.DEBUG) { // 显示所有级别的日志
-            object : LoggerController {
-                override fun shouldLog(
-                    identity: String?,
-                    priority: SimpleLogger.LogPriority
-                ): Boolean {
-                    return true
-                }
-            }
-        } else {
-            LoggerControllerImpl
+    @OptIn(ConsoleExperimentalApi::class, ConsoleInternalApi::class)
+    override val loggerController: LoggerController =  object : LoggerController {
+        override fun shouldLog(
+            identity: String?,
+            priority: SimpleLogger.LogPriority
+        ): Boolean {
+            return true
         }
+    }
+//        get() = if (AppSettings.printToLogcat || BuildConfig.DEBUG) { // 显示所有级别的日志
+//            object : LoggerController {
+//                override fun shouldLog(
+//                    identity: String?,
+//                    priority: SimpleLogger.LogPriority
+//                ): Boolean {
+//                    return true
+//                }
+//            }
+//        } else {
+//            AbstractLoggerController
+//        }
+
 
     fun afterBotLogin(bot: Bot) {
         startRefreshNotificationJob(bot)
@@ -146,7 +166,7 @@ class AndroidMiraiConsole(
         }
         bot.eventChannel.subscribeAlways<BotReloginEvent>() {
 
-        if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
+            if (sendOfflineMsgJob != null && sendOfflineMsgJob!!.isActive) {
                 sendOfflineMsgJob!!.cancel()
             }
             NotificationManagerCompat.from(BotApplication.context)

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
  * copy from net.mamoe.mirai.console.internal.plugin.JvmPluginClassLoader
  * */
 
-internal class DexPluginClassLoader(
+class DexPluginClassLoader(
     val file: File,
     odexPath: String,
     parent: ClassLoader?,

@@ -85,14 +85,14 @@ class ScriptFragment : Fragment() {
             )
         )
         script_recycler.layoutManager = LinearLayoutManager(activity)
-        scriptViewModel.scriptList.observe(viewLifecycleOwner, {
+        scriptViewModel.scriptList.observe(viewLifecycleOwner) {
             if (it != null) {
                 adapter.data = it.toMutableList()
                 adapter.notifyDataSetChanged()
             }
 
 
-        })
+        }
     }
 
     override fun onResume() {

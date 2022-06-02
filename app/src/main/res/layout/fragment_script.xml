@@ -10,7 +10,7 @@
         android:id="@+id/script_embed_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MiraiAndroid已内置lua插件，请在控制台内操作"
+        android:text="敬请期待"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
